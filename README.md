@@ -36,7 +36,7 @@ apps/manu      manu.meneghel.me
 packages/ui    design tokens and base stylesheet, shared by all three
 infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
-tools          one-off asset pipelines (EAGLE board -> JSON)
+tools          one-off asset pipelines (EAGLE board and IDF model -> JSON)
 docs           what is still needed from Maykon
 ```
 
@@ -75,7 +75,16 @@ TypeScript modules, tested separately from the DOM:
   segments and 1321 mm of copper, and that the two nets the chapter narrates
   (`+5V` crossing layers seven times, `IN` never crossing) still behave that way.
 
-Node 24 strips types natively, so all five run with plain `node` — no runner,
+- `games/board3d.ts` is a small 3D renderer written for one shape: a flat board
+  with parts on both faces. `board3d.test.ts` pins the parts that are easy to
+  get backwards and impossible to eyeball — that the camera's up and view
+  vectors stay orthogonal at every elevation, that a part mounted underneath is
+  mirrored the way it is in reality, that back faces are culled by comparing
+  world normals rather than screen winding, and that the lamp riding with the
+  camera keeps the underside readable without washing out faces turned away.
+  Three of those assertions were written after the bug they describe.
+
+Node 24 strips types natively, so all six run with plain `node` — no runner,
 no build step, no dev dependency.
 
 ## The timeline

@@ -1,6 +1,7 @@
 ---
 import type { Content } from '../../content';
 import board from '../../data/agrom-board.json';
+import model3d from '../../data/agrom-board3d.json';
 
 interface Props { copper: Content['copper'] }
 const { copper } = Astro.props;
@@ -8,29 +9,40 @@ const { copper } = Astro.props;
 const { outline, holes, nets, parts, texts } = board;
 const pad = 3;
 const size = 2 * (outline.r + pad);
-// EAGLE's Y axis points up and SVG's points down, so the whole board is drawn
-// inside a flipped group rather than negating every coordinate.
+// EAGLE's Y axis points up and SVG's points down, so everything is drawn inside
+// a flipped group rather than negating every coordinate at extraction time.
 const viewBox = `${outline.cx - outline.r - pad} ${-(outline.cy + outline.r + pad)} ${size} ${size}`;
 
 const totalMm = nets.reduce((sum, n) => sum + n.mm, 0);
+const totalSegments = nets.reduce((s, n) => s + n.top.length + n.bot.length, 0);
 const totalVias = nets.reduce((sum, n) => sum + n.vias.length, 0);
 
 /** The nets worth offering as chips: the ones with enough copper to follow. */
 const featured = [...nets].sort((a, b) => b.mm - a.mm).slice(0, 8);
+const allVias = nets.flatMap((n) => n.vias.map(([x, y, d]) => ({ x, y, d, net: n.name })));
 
 const stats = Object.fromEntries(nets.map((n) => [n.name, {
   segments: n.top.length + n.bot.length,
   vias: n.vias.length,
   mm: n.mm,
 }]));
+
+/** Position of a via as a percentage of the plane, for the 3D posts. */
+const pctOf = (x: number, y: number) => ({
+  left: ((x - (outline.cx - outline.r - pad)) / size) * 100,
+  top: ((-y - (-(outline.cy + outline.r + pad))) / size) * 100,
+});
 ---
 <div class="cu" data-cu
   data-stats={JSON.stringify(stats)}
-  data-total={JSON.stringify({ segments: nets.reduce((s, n) => s + n.top.length + n.bot.length, 0), vias: totalVias, mm: Math.round(totalMm) })}
+  data-total={JSON.stringify({ segments: totalSegments, vias: totalVias, mm: Math.round(totalMm) })}
   data-hint-idle={copper.hintIdle}
   data-hint-crossings={copper.hintCrossings}
   data-hint-flat={copper.hintFlat}
   data-hint-onelayer={copper.hintOneLayer}
+  data-hint-stack={copper.hintStack}
+  data-hint-solid={copper.hintSolid}
+  data-model={JSON.stringify(model3d)}
 >
   <p class="cu__lede">{copper.lede}</p>
 
@@ -40,6 +52,10 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
       <button type="button" class="btn cu__chip" data-layer="both" aria-pressed="true">{copper.both}</button>
       <button type="button" class="btn cu__chip" data-layer="top" aria-pressed="false">{copper.topOnly}</button>
       <button type="button" class="btn cu__chip" data-layer="bot" aria-pressed="false">{copper.bottomOnly}</button>
+      <span class="cu__spacer"></span>
+      <button type="button" class="btn cu__chip" data-view="flat" aria-pressed="true">{copper.view2d}</button>
+      <button type="button" class="btn cu__chip" data-view="stack" aria-pressed="false">{copper.view3d}</button>
+      <button type="button" class="btn cu__chip" data-view="solid" aria-pressed="false">{copper.viewSolid}</button>
     </div>
     <div class="cu__group">
       <span class="cu__grouplabel mono">{copper.netsLabel}</span>
@@ -50,51 +66,80 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
     </div>
   </div>
 
-  <div class="cu__boardwrap">
-    <svg class="cu__board" viewBox={viewBox} data-svg
-      role="img" aria-label="The AGROM.IO soil probe board, two copper layers">
-      <g transform="scale(1,-1)">
-        <circle class="cu__substrate" cx={outline.cx} cy={outline.cy} r={outline.r} />
+  <div class="cu__scene" data-scene>
+    <canvas class="cu__canvas" data-canvas width="1100" height="780" hidden
+      role="img" aria-label="The assembled board in three dimensions"></canvas>
+    <div class="cu__stack" data-stack>
+      <div class="cu__plane cu__plane--bot">
+        <svg viewBox={viewBox} role="img" aria-label="Bottom copper layer">
+          <g transform="scale(1,-1)">
+            {nets.map((n) => n.bot.length > 0 && (
+              <g class="cu__net cu__net--bot" data-net={n.name}>
+                {n.bot.map(([x1, y1, x2, y2, w]) => (
+                  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-width={w} />
+                ))}
+              </g>
+            ))}
+            {allVias.map((v) => (
+              <circle class="cu__via" data-net={v.net} cx={v.x} cy={v.y} r={v.d / 2 + 0.28} />
+            ))}
+          </g>
+        </svg>
+      </div>
 
-        <g class="cu__layer" data-side="bot">
-          {nets.map((n) => n.bot.length > 0 && (
-            <g class="cu__net" data-net={n.name}>
-              {n.bot.map(([x1, y1, x2, y2, w]) => (
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-width={w} />
-              ))}
-            </g>
-          ))}
-        </g>
+      <div class="cu__plane cu__plane--core">
+        <svg viewBox={viewBox} role="img" aria-label="Board substrate and components">
+          <g transform="scale(1,-1)">
+            <circle class="cu__substrate" cx={outline.cx} cy={outline.cy} r={outline.r} />
+            <g class="cu__holes">{holes.map((h) => <circle cx={h.x} cy={h.y} r={h.d / 2} />)}</g>
+            <g class="cu__parts">{parts.map((p) => <circle cx={p.x} cy={p.y} r="0.55" />)}</g>
+            {texts.map((t) => (
+              <text class="cu__silk" x={t.x} y={-t.y} font-size={t.size} transform="scale(1,-1)">{t.t}</text>
+            ))}
+          </g>
+        </svg>
+      </div>
 
-        <g class="cu__layer" data-side="top">
-          {nets.map((n) => n.top.length > 0 && (
-            <g class="cu__net" data-net={n.name}>
-              {n.top.map(([x1, y1, x2, y2, w]) => (
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-width={w} />
-              ))}
-            </g>
-          ))}
-        </g>
+      <div class="cu__plane cu__plane--top">
+        <svg viewBox={viewBox} role="img" aria-label="Top copper layer">
+          <g transform="scale(1,-1)">
+            {nets.map((n) => n.top.length > 0 && (
+              <g class="cu__net cu__net--top" data-net={n.name}>
+                {n.top.map(([x1, y1, x2, y2, w]) => (
+                  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-width={w} />
+                ))}
+              </g>
+            ))}
+            {allVias.map((v) => (
+              <circle class="cu__via" data-net={v.net} cx={v.x} cy={v.y} r={v.d / 2 + 0.28} />
+            ))}
+          </g>
+        </svg>
+      </div>
 
-        <g class="cu__vias">
-          {nets.map((n) => n.vias.map(([x, y, d]) => (
-            <circle class="cu__via" data-net={n.name} cx={x} cy={y} r={d / 2 + 0.28} />
-          )))}
-        </g>
+      {/* The posts only mean anything once the stack is opened, so they live
+          outside the planes: each stands perpendicular to the board. */}
+      <div class="cu__posts" aria-hidden="true">
+        {allVias.map((v) => {
+          const { left, top } = pctOf(v.x, v.y);
+          return <i class="cu__post" data-net={v.net} style={`left:${left.toFixed(2)}%; top:${top.toFixed(2)}%`}></i>;
+        })}
+      </div>
+    </div>
+  </div>
 
-        <g class="cu__holes">
-          {holes.map((h) => <circle cx={h.x} cy={h.y} r={h.d / 2} />)}
-        </g>
+  <div class="cu__solidbar" data-solidbar hidden>
+    <button type="button" class="btn" data-flip>⤺ {copper.flip}</button>
+    <span class="cu__spin mono">↔ {copper.spin}</span>
+    <span class="cu__solidnote mono">{model3d.parts.length} {copper.componentsWord} · {model3d.parts.filter((p) => p.side === 'bot').length} {copper.underneathWord} · {model3d.thickness} mm</span>
+  </div>
 
-        <g class="cu__parts">
-          {parts.map((p) => <circle cx={p.x} cy={p.y} r="0.55" />)}
-        </g>
-
-        {texts.map((t) => (
-          <text class="cu__silk" x={t.x} y={-t.y} font-size={t.size} transform="scale(1,-1)">{t.t}</text>
-        ))}
-      </g>
-    </svg>
+  <div class="cu__stackbar" data-stackbar hidden>
+    <label class="control">
+      <span class="control__label">{copper.explode} <b data-out="gap">40</b></span>
+      <input type="range" min="0" max="100" value="40" step="1" data-explode />
+    </label>
+    <span class="cu__spin mono">↔ {copper.spin}</span>
   </div>
 
   <p class="cu__legend mono">
@@ -107,7 +152,7 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
   <div class="readout">
     <div class="readout__cell">
       <span class="readout__k">{copper.segments}</span>
-      <span class="readout__v" data-out="segments">{nets.reduce((s, n) => s + n.top.length + n.bot.length, 0)}</span>
+      <span class="readout__v" data-out="segments">{totalSegments}</span>
     </div>
     <div class="readout__cell">
       <span class="readout__k">{copper.crossings}</span>
@@ -132,33 +177,88 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
     color: var(--fg-700); min-width: 5.5rem;
   }
   .cu__chip { font-size: 11px; padding: .3rem .6rem; }
+  .cu__spacer { flex: 1 1 1rem; }
 
-  .cu__boardwrap { display: grid; place-items: center; }
-  .cu__board {
-    width: min(100%, 560px); height: auto;
+  /* ---- the stage ---- */
+  .cu__scene {
+    perspective: 1400px;
+    display: grid; place-items: center;
+    padding: 1rem 0;
     background: #06070a; border: 1px solid var(--line); border-radius: 8px;
   }
+  .cu__stack {
+    position: relative;
+    width: min(100%, 520px); aspect-ratio: 1;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.22,.61,.36,1);
+    --gap: 0px;
+  }
+  .cu.is-stack .cu__stack { margin-block: -14%; }
+  .cu.is-stack .cu__scene { cursor: grab; touch-action: pan-y; }
+  .cu.is-stack .cu__scene:active { cursor: grabbing; }
+  /* While dragging, following the pointer must be instant, not eased. */
+  .cu.is-dragging .cu__stack { transition: none; }
+
+  .cu__plane {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.22,.61,.36,1);
+  }
+  .cu__plane svg { width: 100%; height: 100%; display: block; }
+  .cu__plane--top  { transform: translateZ(var(--gap)); }
+  .cu__plane--core { transform: translateZ(0); }
+  .cu__plane--bot  { transform: translateZ(calc(var(--gap) * -1)); }
+
   .cu__substrate { fill: #0c1c14; stroke: #2f6b4f; stroke-width: .5; }
+  /* Opaque while flat so it hides the bottom layer; translucent once opened. */
+  .cu.is-stack .cu__substrate { fill: rgba(12,28,20,.72); }
 
   .cu__net line { fill: none; stroke-linecap: round; transition: opacity .18s; }
-  .cu__layer[data-side="top"] .cu__net line { stroke: #ff2d55; }
-  .cu__layer[data-side="bot"] .cu__net line { stroke: #38bdf8; }
+  .cu__net--top line { stroke: #ff2d55; }
+  .cu__net--bot line { stroke: #38bdf8; }
 
-  /* Hiding a layer is the whole demonstration, so it has to be total. */
-  .cu.is-top .cu__layer[data-side="bot"],
-  .cu.is-bot .cu__layer[data-side="top"] { display: none; }
+  .cu.is-top .cu__plane--bot,
+  .cu.is-bot .cu__plane--top { display: none; }
+  .cu.is-top .cu__posts, .cu.is-bot .cu__posts { display: none; }
 
   .cu.has-selection .cu__net line { opacity: .07; }
   .cu.has-selection .cu__net.is-on line { opacity: 1; }
 
   .cu__via { fill: #06070a; stroke: #d9a441; stroke-width: .18; transition: opacity .18s; }
   .cu.has-selection .cu__via { opacity: .12; }
-  .cu.has-selection .cu__via.is-on {
-    opacity: 1; stroke: #fbbf24; stroke-width: .38;
-  }
+  .cu.has-selection .cu__via.is-on { opacity: 1; stroke: #fbbf24; stroke-width: .38; }
+
   .cu__holes circle { fill: #06070a; stroke: #6b7280; stroke-width: .3; }
   .cu__parts circle { fill: #e5e7eb; opacity: .35; }
   .cu__silk { fill: #cfd6e4; opacity: .5; font-family: var(--font-mono); }
+
+  /* ---- vias as posts between the two faces ---- */
+  .cu__posts { position: absolute; inset: 0; transform-style: preserve-3d; opacity: 0; transition: opacity .35s; }
+  .cu.is-stack .cu__posts { opacity: 1; }
+  .cu__post {
+    position: absolute;
+    width: 2px;
+    height: calc(var(--gap) * 2);
+    margin-left: -1px;
+    background: linear-gradient(#fbbf24, #b45309);
+    /* Stand the strip up perpendicular to the board, centred on the core. */
+    transform: translateY(calc(var(--gap) * -1)) rotateX(90deg);
+    transform-origin: 50% 50%;
+    transition: opacity .18s;
+  }
+  .cu.has-selection .cu__post { opacity: .1; }
+  .cu.has-selection .cu__post.is-on { opacity: 1; box-shadow: 0 0 6px #fbbf24; }
+
+  .cu__canvas { width: min(100%, 640px); height: auto; display: block; }
+  .cu.is-solid .cu__stack { display: none; }
+  .cu.is-solid .cu__scene { cursor: grab; touch-action: pan-y; }
+  .cu.is-solid .cu__scene:active { cursor: grabbing; }
+  .cu__solidbar { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; margin-top: 1rem; }
+  .cu__solidnote { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-700); margin-left: auto; }
+
+  .cu__stackbar { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; margin-top: 1rem; }
+  .cu__stackbar .control { max-width: 320px; }
+  .cu__spin { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
 
   .cu__legend {
     display: flex; flex-wrap: wrap; gap: .5rem 1.3rem; margin: .8rem 0 0;
@@ -172,6 +272,10 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
   .cu__src { margin-left: auto; }
 
   .cu__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--fg-300); max-width: 74ch; min-height: 3.2em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cu__stack, .cu__plane, .cu__posts { transition: none; }
+  }
 </style>
 
 <script>
@@ -180,6 +284,10 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
     type Stat = { segments: number; vias: number; mm: number };
     const stats: Record<string, Stat> = JSON.parse(root.dataset.stats!);
     const total: Stat = JSON.parse(root.dataset.total!);
+    const stack = root.querySelector<HTMLElement>('[data-stack]')!;
+    const scene = root.querySelector<HTMLElement>('[data-scene]')!;
+    const stackbar = root.querySelector<HTMLElement>('[data-stackbar]')!;
+    const explode = root.querySelector<HTMLInputElement>('[data-explode]')!;
     const hintOut = root.querySelector<HTMLElement>('[data-hint]')!;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
 
@@ -188,18 +296,37 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
       crossings: root.dataset.hintCrossings!,
       flat: root.dataset.hintFlat!,
       oneLayer: root.dataset.hintOnelayer!,
+      stack: root.dataset.hintStack!,
+      solid: root.dataset.hintSolid!,
     };
+    const canvasEl = root.querySelector<HTMLElement>('[data-canvas]')!;
+    const solidbar = root.querySelector<HTMLElement>('[data-solidbar]')!;
 
     let net = '';
     let layer: 'both' | 'top' | 'bot' = 'both';
+    let mode: 'flat' | 'stack' | 'solid' = 'flat';
+    let tiltX = 0;
+    let spinZ = 0;
+
+    /** Fraction of the board's own width used as the layer gap. */
+    const GAP_MAX = 0.16;
+
+    function transform() {
+      const px = stack.clientWidth || 480;
+      const gap = mode === 'stack' ? (Number(explode.value) / 100) * GAP_MAX * px : 0;
+      stack.style.setProperty('--gap', `${gap.toFixed(1)}px`);
+      stack.style.transform = `rotateX(${tiltX}deg) rotateZ(${spinZ}deg)`;
+    }
 
     function apply() {
       root!.classList.toggle('is-top', layer === 'top');
       root!.classList.toggle('is-bot', layer === 'bot');
+      root!.classList.toggle('is-stack', mode === 'stack');
+      root!.classList.toggle('is-solid', mode === 'solid');
       root!.classList.toggle('has-selection', net !== '');
 
-      for (const g of root!.querySelectorAll<SVGElement>('.cu__net, .cu__via')) {
-        g.classList.toggle('is-on', net !== '' && g.getAttribute('data-net') === net);
+      for (const el of root!.querySelectorAll<Element>('.cu__net, .cu__via, .cu__post')) {
+        el.classList.toggle('is-on', net !== '' && el.getAttribute('data-net') === net);
       }
 
       const s = net ? stats[net] : total;
@@ -208,12 +335,28 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
       out('vias').dataset.state = net && s.vias > 0 ? 'warn' : '';
       out('mm').textContent = `${Math.round(s.mm)} mm`;
 
-      if (!net) {
-        hintOut.textContent = layer === 'both' ? L.idle : L.oneLayer;
-      } else if (stats[net].vias > 0) {
+      if (mode === 'solid') hintOut.textContent = L.solid;
+      else if (mode === 'stack' && !net) hintOut.textContent = L.stack;
+      else if (!net) hintOut.textContent = layer === 'both' ? L.idle : L.oneLayer;
+      else if (stats[net].vias > 0) {
         hintOut.textContent = L.crossings.replace('{net}', net).replace('{n}', String(stats[net].vias));
-      } else {
-        hintOut.textContent = L.flat.replace('{net}', net);
+      } else hintOut.textContent = L.flat.replace('{net}', net);
+
+      transform();
+    }
+
+    function setMode(next: 'flat' | 'stack' | 'solid') {
+      mode = next;
+      stackbar.hidden = next !== 'stack';
+      solidbar.hidden = next !== 'solid';
+      canvasEl.hidden = next !== 'solid';
+      // Opening the stack tilts it to an angle where the gap is legible.
+      tiltX = next === 'stack' ? 62 : 0;
+      spinZ = next === 'stack' ? -22 : 0;
+      apply();
+      // The canvas has no size while hidden, so it must be drawn after showing.
+      if (next === 'solid') {
+        (window as unknown as { __drawBoard3D?: () => void }).__drawBoard3D?.();
       }
     }
 
@@ -225,8 +368,14 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
       });
     });
 
-    root.querySelectorAll<HTMLButtonElement>('[data-net]').forEach((btn) => {
-      if (!btn.matches('button')) return;
+    root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        root.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        setMode(btn.dataset.view as 'flat' | 'stack' | 'solid');
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('button[data-net]').forEach((btn) => {
       btn.addEventListener('click', () => {
         net = btn.dataset.net!;
         root.querySelectorAll('button[data-net]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
@@ -234,6 +383,213 @@ const stats = Object.fromEntries(nets.map((n) => [n.name, {
       });
     });
 
+    explode.addEventListener('input', () => {
+      out('gap').textContent = explode.value;
+      transform();
+    });
+
+    // Drag to turn the board, but only once there is a stack to turn.
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    scene.addEventListener('pointerdown', (e) => {
+      if (mode !== 'stack') return;
+      dragging = true;
+      lastX = e.clientX; lastY = e.clientY;
+      root.classList.add('is-dragging');
+      scene.setPointerCapture(e.pointerId);
+    });
+    scene.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      spinZ -= (e.clientX - lastX) * 0.4;
+      tiltX = Math.min(89, Math.max(8, tiltX + (e.clientY - lastY) * 0.3));
+      lastX = e.clientX; lastY = e.clientY;
+      transform();
+    });
+    const endDrag = () => { dragging = false; root.classList.remove('is-dragging'); };
+    scene.addEventListener('pointerup', endDrag);
+    scene.addEventListener('pointercancel', endDrag);
+
+    addEventListener('resize', transform);
     apply();
+  }
+</script>
+
+<script>
+  import {
+    project, placeShape, partZ, shade, mix, partColour, ensureCCW,
+    facesCamera, edgeNormal, headlight,
+    type Board3D, type Camera, type Part, type Poly, type Vec3,
+  } from './board3d';
+
+  const root = document.querySelector<HTMLElement>('[data-cu]');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-canvas]');
+  if (root && canvas) {
+    const ctx = canvas.getContext('2d')!;
+    const model: Board3D = JSON.parse(root.dataset.model!);
+    const flat = JSON.parse(root.dataset.stats!) as unknown; // presence check only
+    void flat;
+
+    /** Copper polylines to lay on each face, taken from the 2D board data. */
+    const traces: { top: number[][]; bot: number[][] } = { top: [], bot: [] };
+    for (const g of root.querySelectorAll<SVGGElement>('.cu__net--top')) {
+      for (const l of g.querySelectorAll('line')) {
+        traces.top.push([+l.getAttribute('x1')!, +l.getAttribute('y1')!, +l.getAttribute('x2')!, +l.getAttribute('y2')!, +l.getAttribute('stroke-width')!]);
+      }
+    }
+    for (const g of root.querySelectorAll<SVGGElement>('.cu__net--bot')) {
+      for (const l of g.querySelectorAll('line')) {
+        traces.bot.push([+l.getAttribute('x1')!, +l.getAttribute('y1')!, +l.getAttribute('x2')!, +l.getAttribute('y2')!, +l.getAttribute('stroke-width')!]);
+      }
+    }
+
+    const half = model.thickness / 2;
+    const outline = ensureCCW(model.outline as Poly);
+    const placed = model.parts.map((p) => ({
+      part: p as Part,
+      poly: ensureCCW(placeShape(p as Part)),
+      z: partZ(p as Part, model.thickness),
+      colour: partColour(p.geom),
+    }));
+
+    const cam: Camera = { azimuth: -18, elevation: 58, scale: 8, cx: 0, cy: 0 };
+
+    const fillPoly = (pts: { sx: number; sy: number }[], colour: string) => {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].sx, pts[0].sy);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].sx, pts[i].sy);
+      ctx.closePath();
+      ctx.fillStyle = colour;
+      ctx.fill();
+    };
+
+    function draw() {
+      const w = canvas.width, h = canvas.height;
+      cam.cx = w / 2;
+      cam.cy = h / 2;
+      // Fit the board, leaving room for the tallest parts to stand up.
+      const radius = Math.max(...outline.map(([x, y]) => Math.hypot(x, y)));
+      cam.scale = Math.min(w, h) / (radius * 2.5);
+      ctx.clearRect(0, 0, w, h);
+      const lamp = headlight(cam);
+
+      type Item = { depth: number; paint: () => void };
+      const items: Item[] = [];
+
+      const faceAt = (z: number) => outline.map(([x, y]) => project({ x, y, z }, cam));
+
+      // --- the two faces of the laminate, each with its copper ---
+      for (const side of ['bot', 'top'] as const) {
+        const z = side === 'top' ? half : -half;
+        const pts = faceAt(z);
+        const normal: Vec3 = { x: 0, y: 0, z: side === 'top' ? 1 : -1 };
+        const front = facesCamera(normal, cam);
+        const lit = shade(normal, 0.34, lamp);
+        const base = side === 'top' ? '#0d2a1b' : '#0a2116';
+
+        items.push({
+          depth: z * Math.sin((cam.elevation * Math.PI) / 180),
+          paint: () => {
+            if (!front) return;
+            fillPoly(pts, mix(base, lit));
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = side === 'top' ? mix('#ff2d55', lit) : mix('#38bdf8', lit);
+            for (const [x1, y1, x2, y2, tw] of traces[side]) {
+              const a = project({ x: x1, y: y1, z }, cam);
+              const b = project({ x: x2, y: y2, z }, cam);
+              ctx.lineWidth = Math.max(0.6, tw * cam.scale);
+              ctx.beginPath();
+              ctx.moveTo(a.sx, a.sy);
+              ctx.lineTo(b.sx, b.sy);
+              ctx.stroke();
+            }
+          },
+        });
+      }
+
+      // --- the edge of the laminate ---
+      for (let i = 0; i < outline.length; i++) {
+        const [x1, y1] = outline[i];
+        const [x2, y2] = outline[(i + 1) % outline.length];
+        const quad = [
+          project({ x: x1, y: y1, z: -half }, cam),
+          project({ x: x2, y: y2, z: -half }, cam),
+          project({ x: x2, y: y2, z: half }, cam),
+          project({ x: x1, y: y1, z: half }, cam),
+        ];
+        const normal = edgeNormal(x1, y1, x2, y2);
+        if (!facesCamera(normal, cam)) continue;
+        const lit = shade(normal, 0.34, lamp);
+        const depth = quad.reduce((s, p) => s + p.depth, 0) / 4;
+        items.push({ depth, paint: () => fillPoly(quad, mix('#c2a56b', lit)) });
+      }
+
+      // --- the components ---
+      for (const { part, poly, z, colour } of placed) {
+        const [z0, z1] = z;
+        const capZ = part.side === 'top' ? z1 : z0;
+        const cap = poly.map(([x, y]) => project({ x, y, z: capZ }, cam));
+        const capNormal: Vec3 = { x: 0, y: 0, z: part.side === 'top' ? 1 : -1 };
+        const capLit = shade(capNormal, 0.34, lamp);
+        const centre = project({ x: part.x, y: part.y, z: (z0 + z1) / 2 }, cam);
+
+        items.push({
+          depth: centre.depth,
+          paint: () => {
+            for (let i = 0; i < poly.length; i++) {
+              const [x1, y1] = poly[i];
+              const [x2, y2] = poly[(i + 1) % poly.length];
+              const quad = [
+                project({ x: x1, y: y1, z: z0 }, cam),
+                project({ x: x2, y: y2, z: z0 }, cam),
+                project({ x: x2, y: y2, z: z1 }, cam),
+                project({ x: x1, y: y1, z: z1 }, cam),
+              ];
+              const normal = edgeNormal(x1, y1, x2, y2);
+              if (!facesCamera(normal, cam)) continue;
+              fillPoly(quad, mix(colour, shade(normal, 0.34, lamp)));
+            }
+            if (facesCamera(capNormal, cam)) fillPoly(cap, mix(colour, capLit));
+          },
+        });
+      }
+
+      items.sort((a, b) => a.depth - b.depth);
+      for (const item of items) item.paint();
+    }
+
+    // --- orbit ---
+    const scene = root.querySelector<HTMLElement>('[data-scene]')!;
+    let dragging = false;
+    let lastX = 0, lastY = 0;
+    scene.addEventListener('pointerdown', (e) => {
+      if (!root.classList.contains('is-solid')) return;
+      dragging = true;
+      lastX = e.clientX; lastY = e.clientY;
+      try { scene.setPointerCapture(e.pointerId); } catch { /* not ours to capture */ }
+    });
+    scene.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      cam.azimuth -= (e.clientX - lastX) * 0.45;
+      // Past 90 the camera goes under the board, which is how you find the
+      // nineteen parts mounted on the other side.
+      cam.elevation = Math.max(-89, Math.min(89, cam.elevation - (e.clientY - lastY) * 0.35));
+      lastX = e.clientX; lastY = e.clientY;
+      draw();
+    });
+    const end = () => { dragging = false; };
+    scene.addEventListener('pointerup', end);
+    scene.addEventListener('pointercancel', end);
+
+    // Turning the board over is the point of the view, and nobody discovers it
+    // by dragging 130 pixels upward. Give it a button.
+    root.querySelector<HTMLButtonElement>('[data-flip]')?.addEventListener('click', () => {
+      cam.elevation = -cam.elevation;
+      draw();
+    });
+
+    addEventListener('resize', draw);
+    (window as unknown as { __drawBoard3D?: () => void }).__drawBoard3D = draw;
+    draw();
   }
 </script>

@@ -133,6 +133,16 @@ export interface ServiceGame {
 export interface CopperGame {
   lede: string;
   layersLabel: string;
+  view2d: string;
+  view3d: string;
+  viewSolid: string;
+  flip: string;
+  componentsWord: string;
+  underneathWord: string;
+  hintSolid: string;
+  explode: string;
+  spin: string;
+  hintStack: string;
   both: string;
   topOnly: string;
   bottomOnly: string;
