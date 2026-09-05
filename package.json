@@ -2,12 +2,16 @@
   "name": "meneghel-me",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w @meneghel/maykon",
     "dev:root": "npm run dev -w @meneghel/root",
     "dev:manu": "npm run dev -w @meneghel/manu",
     "build": "npm run build --workspaces --if-present",
-    "check": "npm run check --workspaces --if-present"
+    "check": "npm run check --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   }
 }

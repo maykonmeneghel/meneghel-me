@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapter 01 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -22,6 +22,7 @@ npm install
 npm run dev        # maykon.meneghel.me on :4322
 npm run dev:root   # meneghel.me on :4321
 npm run build      # builds all three
+npm test           # topic-filter suite, no test runner needed
 ```
 
 Node 24 (see `.nvmrc`).
@@ -37,6 +38,14 @@ infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
 docs           what is still needed from Maykon
 ```
+
+## Testing
+
+`apps/maykon/src/components/games/mqtt.ts` implements MQTT topic-filter matching
+from the OASIS spec, and `mqtt.test.ts` next to it asserts the spec's own worked
+examples — including that `sport/tennis/player1/#` matches the parent topic
+`sport/tennis/player1`, which is the rule everyone gets wrong. Node 24 strips
+types natively, so the suite runs with plain `node`, no runner and no build step.
 
 ## The timeline
 

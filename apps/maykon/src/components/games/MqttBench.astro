@@ -1,0 +1,302 @@
+---
+import type { Content } from '../../content';
+import { TOPICS } from './mqtt';
+
+interface Props { signal: Content['signal'] }
+const { signal } = Astro.props;
+---
+<div class="mq" data-mq
+  data-err-hash={signal.invalidHash}
+  data-err-plus={signal.invalidPlus}
+  data-err-empty={signal.invalidEmpty}
+  data-all-solved={signal.allSolved}
+>
+  <div class="mq__sub">
+    <label class="mq__sub-label mono" for="mq-filter">{signal.subLabel}</label>
+    <div class="mq__field">
+      <span class="mq__prompt mono">SUB</span>
+      <input
+        id="mq-filter" class="mq__input mono" type="text" spellcheck="false"
+        autocomplete="off" autocapitalize="off"
+        placeholder={signal.placeholder} value="farm/greenhouse/#" data-filter
+      />
+    </div>
+    <p class="mq__error mono" data-error role="status"></p>
+    <div class="mq__chips">
+      {['#', 'farm/#', 'farm/+/+/temp', 'farm/greenhouse/#', '+/+/+/moisture'].map((c) => (
+        <button type="button" class="btn mq__chip" data-chip={c}>{c}</button>
+      ))}
+    </div>
+  </div>
+
+  <div class="mq__panes">
+    <div class="mq__pane">
+      <p class="mq__pane-title mono">{signal.broker}</p>
+      <ul class="mq__stream" data-stream aria-live="off"></ul>
+    </div>
+    <div class="mq__pane">
+      <p class="mq__pane-title mono">{signal.inbox}</p>
+      <ul class="mq__stream mq__stream--inbox" data-inbox>
+        <li class="mq__empty mono" data-empty>{signal.emptyInbox}</li>
+      </ul>
+    </div>
+  </div>
+
+  <template data-row-tpl>
+    <li class="mq__msg">
+      <span class="mq__topic"></span>
+      <span class="mq__value"></span>
+    </li>
+  </template>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{signal.delivered}</span>
+      <span class="readout__v" data-out="hit" data-state="ok">0</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{signal.dropped}</span>
+      <span class="readout__v" data-out="miss">0</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">topics</span>
+      <span class="readout__v" data-out="scope">0 / {TOPICS.length}</span>
+    </div>
+  </div>
+
+  <div class="mq__missions">
+    <p class="mq__missions-title">{signal.missionsTitle}</p>
+    <p class="mq__missions-lede">{signal.missionsLede}</p>
+    <ul class="mq__mission-list">
+      {signal.missions.map((m) => (
+        <li class="mq__mission" data-mission={m.id}>
+          <span class="mq__check" aria-hidden="true"></span>
+          <span class="mq__goal">{m.goal}</span>
+          <span class="mq__solved mono">{signal.solved}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="mq__win mono" data-win hidden></p>
+  </div>
+</div>
+
+<style>
+  .mq__sub-label {
+    display: block; font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--fg-700); margin-bottom: .5rem;
+  }
+  .mq__field {
+    display: flex; align-items: stretch;
+    border: 1px solid var(--line-2); border-radius: 8px;
+    background: var(--bg-900); overflow: hidden;
+  }
+  .mq__field:focus-within { border-color: var(--brand-500); }
+  .mq__prompt {
+    display: grid; place-items: center; padding: 0 .8rem;
+    background: var(--bg-700); color: var(--fg-700);
+    font-size: 10px; letter-spacing: .16em; border-right: 1px solid var(--line);
+  }
+  .mq__input {
+    flex: 1; min-width: 0; border: 0; background: transparent;
+    color: var(--fg-100); padding: .7rem .85rem; font-size: var(--step-0);
+  }
+  .mq__input:focus { outline: none; }
+  .mq__error { min-height: 1.4em; margin: .4rem 0 0; font-size: var(--step--1); color: var(--warn); }
+
+  .mq__chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+  .mq__chip { padding: .3rem .6rem; font-size: 11px; }
+
+  .mq__panes {
+    display: grid; gap: 1rem; margin-top: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  .mq__pane-title {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fg-700); margin: 0 0 .5rem;
+  }
+  .mq__stream {
+    list-style: none; margin: 0; padding: .5rem;
+    height: 208px; overflow: hidden;
+    background: var(--bg-900); border: 1px solid var(--line); border-radius: 8px;
+    display: flex; flex-direction: column; justify-content: flex-end; gap: .18rem;
+  }
+  .mq__msg {
+    display: flex; gap: .75rem; align-items: baseline;
+    justify-content: space-between; width: 100%;
+    font-family: var(--font-mono); font-size: 11px;
+    padding: .18rem .3rem; border-radius: 4px;
+    animation: mq-in .22s ease-out;
+  }
+  @keyframes mq-in { from { opacity: 0; transform: translateY(6px); } }
+  .mq__topic { color: var(--fg-300); white-space: nowrap; }
+  .mq__value { color: var(--fg-700); margin-left: auto; white-space: nowrap; }
+  .mq__msg--hit { background: color-mix(in oklab, var(--ok) 12%, transparent); }
+  .mq__msg--hit .mq__topic { color: var(--ok); }
+  .mq__msg--miss { opacity: .3; }
+  .mq__msg--miss .mq__topic { text-decoration: line-through; }
+  .mq__empty { font-size: 11px; color: var(--fg-700); padding: .3rem; }
+
+  .mq__missions { margin-top: 1.75rem; }
+  .mq__missions-title { font-weight: 600; margin: 0 0 .25rem; }
+  .mq__missions-lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1rem; }
+  .mq__mission-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+  .mq__mission {
+    display: flex; align-items: center; gap: .7rem;
+    padding: .55rem .75rem; border: 1px solid var(--line); border-radius: 8px;
+    font-size: var(--step--1); color: var(--fg-300);
+    transition: border-color .2s, color .2s;
+  }
+  .mq__check {
+    width: 16px; height: 16px; border-radius: 4px; flex: none;
+    border: 1px solid var(--line-2);
+  }
+  .mq__solved {
+    margin-left: auto; font-size: 10px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ok); opacity: 0;
+  }
+  .mq__mission.is-solved { border-color: color-mix(in oklab, var(--ok) 55%, transparent); color: var(--fg-100); }
+  .mq__check { position: relative; }
+  .mq__mission.is-solved .mq__check { background: var(--ok); border-color: var(--ok); }
+  .mq__mission.is-solved .mq__check::after {
+    content: ''; position: absolute;
+    left: 5px; top: 1.5px; width: 4px; height: 8px;
+    border: solid var(--bg-900); border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .mq__mission.is-solved .mq__solved { opacity: 1; }
+  /* Solved stays ticked; the one the current filter satisfies also glows. */
+  .mq__mission.is-live { background: color-mix(in oklab, var(--ok) 8%, transparent); }
+  .mq__win { margin-top: 1rem; color: var(--ok); font-size: var(--step--1); }
+</style>
+
+<script>
+  import { TOPICS, matches, validate, solves, payload } from './mqtt';
+
+  const root = document.querySelector<HTMLElement>('[data-mq]');
+  if (root) {
+    const input = root.querySelector<HTMLInputElement>('[data-filter]')!;
+    const stream = root.querySelector<HTMLElement>('[data-stream]')!;
+    const inbox = root.querySelector<HTMLElement>('[data-inbox]')!;
+    const emptyNote = root.querySelector<HTMLElement>('[data-empty]')!;
+    const errOut = root.querySelector<HTMLElement>('[data-error]')!;
+    const winOut = root.querySelector<HTMLElement>('[data-win]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const missionEls = [...root.querySelectorAll<HTMLElement>('[data-mission]')];
+
+    const errText: Record<string, string> = {
+      hash: root.dataset.errHash!,
+      plus: root.dataset.errPlus!,
+      empty: root.dataset.errEmpty!,
+    };
+
+    const MAX_ROWS = 9;
+    let hits = 0;
+    let misses = 0;
+    let cursor = Math.floor(Math.random() * TOPICS.length);
+    // Each mission needs a different filter, so a solve has to stick: checking
+    // only the current filter would make "all three" unreachable by definition.
+    const done = new Set<string>();
+    let timer: number | undefined;
+
+    const rowTpl = root.querySelector<HTMLTemplateElement>('[data-row-tpl]')!;
+
+    function row(topic: string, value: string, hit: boolean) {
+      const li = rowTpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      li.dataset.topic = topic;
+      li.classList.add(hit ? 'mq__msg--hit' : 'mq__msg--miss');
+      li.querySelector('.mq__topic')!.textContent = topic;
+      li.querySelector('.mq__value')!.textContent = value;
+      return li;
+    }
+
+    function trim(list: HTMLElement, keep: number) {
+      while (list.children.length > keep) list.firstElementChild!.remove();
+    }
+
+    function publish() {
+      // Walk the topic list with a random skip so the order never looks scripted.
+      cursor = (cursor + 1 + Math.floor(Math.random() * 3)) % TOPICS.length;
+      const topic = TOPICS[cursor];
+      const value = payload(topic);
+      const filter = input.value.trim();
+      const hit = filter !== '' && validate(filter) === null && matches(filter, topic);
+
+      stream.append(row(topic, value, hit));
+      trim(stream, MAX_ROWS);
+
+      if (hit) {
+        hits++;
+        emptyNote.hidden = true;
+        inbox.append(row(topic, value, true));
+        trim(inbox, MAX_ROWS);
+      } else {
+        misses++;
+      }
+      out('hit').textContent = String(hits);
+      out('miss').textContent = String(misses);
+    }
+
+    function evaluate() {
+      const filter = input.value.trim();
+      const err = validate(filter);
+      errOut.textContent = err ? errText[err] : '';
+
+      const scope = err || !filter ? 0 : TOPICS.filter((t) => matches(filter, t)).length;
+      out('scope').textContent = `${scope} / ${TOPICS.length}`;
+
+      for (const el of missionEls) {
+        const id = el.dataset.mission!;
+        if (solves(filter, id)) done.add(id);
+        el.classList.toggle('is-solved', done.has(id));
+        el.classList.toggle('is-live', solves(filter, id));
+      }
+      const all = done.size === missionEls.length;
+      winOut.hidden = !all;
+      if (all) winOut.textContent = root!.dataset.allSolved!;
+    }
+
+    /** Re-judge the traffic already on screen, so nothing contradicts the filter. */
+    function reclassify() {
+      const filter = input.value.trim();
+      const live = filter !== '' && validate(filter) === null;
+      for (const el of stream.querySelectorAll<HTMLElement>('.mq__msg')) {
+        const hit = live && matches(filter, el.dataset.topic!);
+        el.classList.toggle('mq__msg--hit', hit);
+        el.classList.toggle('mq__msg--miss', !hit);
+      }
+    }
+
+    input.addEventListener('input', () => {
+      reclassify();
+      // Changing the subscription clears the inbox, exactly as re-subscribing would.
+      inbox.replaceChildren(emptyNote);
+      emptyNote.hidden = false;
+      hits = 0; misses = 0;
+      out('hit').textContent = '0';
+      out('miss').textContent = '0';
+      evaluate();
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-chip]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        input.value = chip.dataset.chip!;
+        input.dispatchEvent(new Event('input'));
+        input.focus();
+      });
+    });
+
+    evaluate();
+
+    // The broker only runs while someone is watching it.
+    new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && timer === undefined) {
+          timer = window.setInterval(publish, 850);
+        } else if (!e.isIntersecting && timer !== undefined) {
+          clearInterval(timer);
+          timer = undefined;
+        }
+      }
+    }, { threshold: 0.2 }).observe(root);
+  }
+</script>

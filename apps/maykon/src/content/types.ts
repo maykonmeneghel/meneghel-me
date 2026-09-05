@@ -43,6 +43,25 @@ export interface RecordSection {
   press: { title: string; items: Record<string, string> };
 }
 
+export interface SignalGame {
+  subLabel: string;
+  placeholder: string;
+  broker: string;
+  inbox: string;
+  delivered: string;
+  dropped: string;
+  missionsTitle: string;
+  missionsLede: string;
+  /** Ordered; ids are matched against MISSIONS in components/games/mqtt.ts */
+  missions: { id: string; goal: string }[];
+  solved: string;
+  invalidHash: string;
+  invalidPlus: string;
+  invalidEmpty: string;
+  emptyInbox: string;
+  allSolved: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -58,5 +77,6 @@ export interface Content {
   };
   chapters: Chapter[];
   record: RecordSection;
+  signal: SignalGame;
   ui: Record<string, string>;
 }
