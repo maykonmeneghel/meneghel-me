@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — ten chapters, each a working mini-game, then the record | all ten chapters playable |
+| `maykon.meneghel.me` | The CV you can play — eleven chapters, each a working mini-game, then the record | all eleven chapters playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -13,9 +13,10 @@ A family home and a playable CV, as three independently deployed static sites.
 A CV tells you what someone can do. This one lets you try it. The chapters read
 bottom-up through the stack — `SILICON → COPPER → STEEL → SIGNAL → SERVICE →
 SWARM → MIND → GLASS → SYSTEM` — and every one of them ends with a single
-sentence stating what the visitor just learned by playing with it. `FLOW` then
-turns the corner into the present: the 2019 pivot out of the Apple Developer
-Academy, and Tradx.
+sentence stating what the visitor just learned by playing with it. `FLOW` and `FIELD` then turn the
+corner into the present: the 2019 pivot out of the Apple Developer Academy,
+Tradx, and the Gaussian Splatting work in Projeto Mirage. The nine chapters
+prove range; the last two are what he does on a Tuesday.
 
 Three chapters run on artefacts rather than inventions: `COPPER` renders the
 EAGLE file for the AGROM.IO soil probe board, `STEEL` opens on the SolidWorks
@@ -107,6 +108,12 @@ TypeScript modules, tested separately from the DOM:
   set that returns most on the tuning half comes 22,949th on the half it never
   saw. An earlier draft of that sentence said "the bottom two thirds", which is
   the 30th percentile and therefore false; the test now guards the figure.
+- `games/splat.ts` scatters gaussians over a mesh, area-weighted, for the
+  chapter that shows the same part as triangles and as a field. `splat.test.ts`
+  checks that samples stay inside their triangles, that twenty thousand of them
+  average to the centroid — which is what square-rooting the first barycentric
+  coordinate buys — and that a face nine times larger receives nine times the
+  gaussians.
 - `games/system.ts` is the finale's chain: the eight chapters in order, what
   each costs in milliseconds, and which of them fail while still returning a
   number. `system.test.ts` checks every stage stops the trace when broken and

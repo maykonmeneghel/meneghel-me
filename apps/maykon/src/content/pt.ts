@@ -104,9 +104,17 @@ export const pt: Content = {
       takeaway: 'Um backtest é uma <b>hipótese</b>, não um resultado. Qualquer um ajusta uma curva até ela ficar bonita nos dados que já tem; o ofício inteiro é saber quanto aquele número vale nos dados que ele não tem.',
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
     },
+    {
+      id: '11', codename: 'CAMPO', slug: 'field',
+      title: 'E agora o objeto é feito de luz',
+      lede: 'É nisso que eu passo os dias agora, no Projeto Mirage: Gaussian Splatting. Uma cena deixa de ser uma superfície que alguém modelou e vira uma nuvem de gaussianas orientadas, ajustadas por gradiente descendente até que renders delas batam com as fotografias. É o mesmo cérebro de engenharia apontado para outra pergunta — e é onde o trabalho de IA e o de 3D finalmente se encontram.',
+      panel: 'mirage · gaussian splatting',
+      takeaway: 'Uma malha diz onde estão as <b>superfícies</b>, e um engenheiro desenhou cada uma. Um campo de splats diz onde está a <b>luz</b>, e ninguém desenhou nada — ele foi ajustado até o render parar de discordar da fotografia.',
+      stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Fotogrametria', 'Projeto Mirage'],
+    },
   ],
   record: {
-    eyebrow: '11 · TRAJETÓRIA',
+    eyebrow: '12 · TRAJETÓRIA',
     title: 'As provas',
     lede: 'Nove capítulos de demonstração. Este aqui é só evidência. Arraste pelos anos e veja o que estava rodando ao mesmo tempo — porque a manchete honesta desta linha do tempo não é nenhum emprego específico, é o quão raramente houve só um.',
     lanes: {
@@ -381,6 +389,16 @@ export const pt: Content = {
     hintIn: 'Ajuste até o número ficar bonito. Essa é a parte fácil, e é o que todo print de backtest na internet está te mostrando.',
     hintOut: 'Mesmo grafo, mesmos parâmetros, um trecho de mercado em que ele nunca foi ajustado.',
     reveal: 'Entre as 75.429 combinações de parâmetros, o conjunto que mais rendeu na metade em que você ajustou ficou em 22.949º lugar na metade que você não viu. Do primeiro lugar para o vigésimo segundo milésimo. É por isso que um backtest é uma hipótese e não um resultado, e por isso o número bonito é a parte fácil.',
+  },
+  field: {
+    lede: 'A mesma peça do capítulo 03, mostrada dos dois jeitos. De um lado da chave é a malha pela qual ela foi impressa. Do outro é um campo de gaussianas espalhadas sobre essa malha — um substituto para um campo ajustado, para os dois poderem ficar lado a lado.',
+    mesh: 'Malha', splats: 'Gaussianas',
+    count: 'Gaussianas', size: 'Espalhamento', spin: 'arraste para girar',
+    primitives: 'Primitivas', authored: 'Feitas à mão',
+    authoredMesh: 'cada triângulo', authoredSplat: 'nenhuma delas',
+    hintMesh: '997 triângulos, cada um colocado por alguém no SolidWorks em 2017.',
+    hintSplats: 'Ninguém colocou estas. Numa reconstrução de verdade elas começam como ruído e são movidas, esticadas e recoloridas por gradiente descendente até o render parar de discordar das fotografias — e é por isso que a contagem chega às centenas de milhares sem incomodar ninguém.',
+    loading: 'carregando a malha…',
   },
   ui: {
     duty: 'Ciclo de trabalho',

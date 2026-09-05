@@ -104,9 +104,17 @@ export const es: Content = {
       takeaway: 'Un backtest es una <b>hipótesis</b>, no un resultado. Cualquiera ajusta una curva hasta que queda bonita con los datos que ya tiene; todo el oficio está en saber cuánto vale ese número con los datos que no tiene.',
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
     },
+    {
+      id: '11', codename: 'CAMPO', slug: 'field',
+      title: 'Y ahora el objeto está hecho de luz',
+      lede: 'En esto paso los días ahora, en el Projeto Mirage: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Es el mismo cerebro de ingeniería apuntado a otra pregunta — y es donde el trabajo de IA y el de 3D por fin se encuentran.',
+      panel: 'mirage · gaussian splatting',
+      takeaway: 'Una malla dice dónde están las <b>superficies</b>, y un ingeniero dibujó cada una. Un campo de splats dice dónde está la <b>luz</b>, y nadie dibujó nada — se ajustó hasta que el render dejó de contradecir a la fotografía.',
+      stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Fotogrametría', 'Projeto Mirage'],
+    },
   ],
   record: {
-    eyebrow: '11 · TRAYECTORIA',
+    eyebrow: '12 · TRAYECTORIA',
     title: 'Las pruebas',
     lede: 'Nueve capítulos de demostración. Este es solo evidencia. Arrastra por los años y mira qué estaba corriendo a la vez — porque el titular honesto de esta línea de tiempo no es ningún empleo concreto, es lo poco que hubo uno solo.',
     lanes: {
@@ -381,6 +389,16 @@ export const es: Content = {
     hintIn: 'Ajústalo hasta que el número sea bonito. Esa es la parte fácil, y es lo que te enseña cualquier captura de backtest de internet.',
     hintOut: 'Mismo grafo, mismos parámetros, un tramo de mercado al que nunca se ajustó.',
     reveal: 'Entre las 75.429 combinaciones de parámetros, el conjunto que más rindió en la mitad donde ajustaste quedó en el puesto 22.949 en la mitad que no viste. Del primer puesto al vigésimo segundo milésimo. Por eso un backtest es una hipótesis y no un resultado, y por eso el número bonito es la parte fácil.',
+  },
+  field: {
+    lede: 'La misma pieza del capítulo 03, mostrada de las dos formas. A un lado del interruptor es la malla con la que se imprimió. Al otro es un campo de gaussianas repartidas sobre esa malla — un sustituto de uno ajustado, para poder ponerlos lado a lado.',
+    mesh: 'Malla', splats: 'Gaussianas',
+    count: 'Gaussianas', size: 'Dispersión', spin: 'arrastra para girar',
+    primitives: 'Primitivas', authored: 'Hechas a mano',
+    authoredMesh: 'cada triángulo', authoredSplat: 'ninguna',
+    hintMesh: '997 triángulos, cada uno colocado por alguien en SolidWorks en 2017.',
+    hintSplats: 'Nadie colocó estas. En una reconstrucción real empiezan como ruido y son movidas, estiradas y recoloreadas por descenso de gradiente hasta que el render deja de contradecir a las fotografías — por eso la cuenta llega a cientos de miles sin que a nadie le importe.',
+    loading: 'cargando la malla…',
   },
   ui: {
     duty: 'Ciclo de trabajo',

@@ -1,0 +1,281 @@
+---
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import type { Content } from '../../content';
+
+interface Props { field: Content['field'] }
+const { field } = Astro.props;
+
+// Same meshes chapter 03 loads, same content hash, so the browser serves the
+// second chapter from cache rather than downloading them again.
+const modelPath = join(process.cwd(), 'public/models/agrom-parts.json');
+const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest('hex').slice(0, 8);
+---
+<div class="sp" data-sp data-model-version={modelVersion}
+  data-hint-mesh={field.hintMesh} data-hint-splats={field.hintSplats}
+  data-l-mesh={field.authoredMesh} data-l-splat={field.authoredSplat}>
+  <p class="sp__lede">{field.lede}</p>
+
+  <div class="sp__bar">
+    <button type="button" class="btn" data-mode="mesh" aria-pressed="true">{field.mesh}</button>
+    <button type="button" class="btn" data-mode="splat" aria-pressed="false">{field.splats}</button>
+    <span class="sp__spin mono">↔ {field.spin}</span>
+  </div>
+
+  <div class="controls sp__sliders" data-sliders hidden>
+    <label class="control">
+      <span class="control__label">{field.count} <b data-out="count">12 000</b></span>
+      <input type="range" min="400" max="24000" step="200" value="12000" data-count />
+    </label>
+    <label class="control">
+      <span class="control__label">{field.size} <b data-out="size">100%</b></span>
+      <input type="range" min="40" max="220" step="5" value="100" data-size />
+    </label>
+  </div>
+
+  <div class="sp__stage">
+    <canvas class="sp__canvas" data-canvas width="900" height="900"
+      role="img" aria-label="A part shown as a mesh and as a field of gaussians"></canvas>
+    <p class="sp__loading mono" data-loading>{field.loading}</p>
+  </div>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{field.primitives}</span>
+      <span class="readout__v" data-out="prims">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{field.authored}</span>
+      <span class="readout__v" data-out="authored">—</span>
+    </div>
+  </div>
+
+  <p class="sp__hint" data-hint>{field.hintMesh}</p>
+</div>
+
+<style>
+  .sp__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+  .sp__bar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: 1rem; }
+  .sp__spin { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); margin-left: auto; }
+  .sp__sliders { margin-top: 0; margin-bottom: 1rem; }
+
+  .sp__stage { position: relative; display: grid; place-items: center; background: #06070a; border: 1px solid var(--line); border-radius: 8px; }
+  .sp__canvas { width: min(100%, 480px); height: auto; display: block; cursor: grab; touch-action: pan-y; }
+  .sp__canvas:active { cursor: grabbing; }
+  .sp__loading { position: absolute; font-size: 11px; color: var(--fg-700); }
+  .sp__loading[hidden] { display: none; }
+
+  .sp__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--fg-300); max-width: 74ch; min-height: 4.4em; }
+  .sp__hint[data-tone="splat"] { color: var(--info); }
+</style>
+
+<script>
+  import { project, faceNormal, facesCamera, shade, headlight, mix, type Camera, type Vec3 } from './board3d';
+  import { sample, type Splat } from './splat';
+
+  const root = document.querySelector<HTMLElement>('[data-sp]');
+  if (root) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
+    const ctx = canvas.getContext('2d')!;
+    const loading = root.querySelector<HTMLElement>('[data-loading]')!;
+    const sliders = root.querySelector<HTMLElement>('[data-sliders]')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const countIn = root.querySelector<HTMLInputElement>('[data-count]')!;
+    const sizeIn = root.querySelector<HTMLInputElement>('[data-size]')!;
+
+    const cam: Camera = { azimuth: -34, elevation: 22, scale: 1, cx: 0, cy: 0 };
+    let verts: Vec3[] = [];
+    let faces: number[] = [];
+    let splats: Splat[] = [];
+    let radius = 1;
+    let mode: 'mesh' | 'splat' = 'mesh';
+    let spinning = true;
+    let visible = false;
+    let raf = 0;
+
+    /**
+     * A ramp of gaussians, one per brightness step, drawn once and then stamped
+     * thousands of times. Two reasons for the ramp rather than a single white
+     * sprite: building a gradient per splat is what makes a naive renderer
+     * crawl, and — less obvious — alpha-blending white over white converges to
+     * white no matter how low the alpha, so shading carried by opacity simply
+     * washes out once the field is dense. The shade has to be in the colour.
+     */
+    const SPRITE = 64;
+    const LEVELS = 20;
+    const sprites: HTMLCanvasElement[] = Array.from({ length: LEVELS }, (_, level) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = SPRITE;
+      const sctx = c.getContext('2d')!;
+      const grey = Math.round(34 + (level / (LEVELS - 1)) * 205);
+      const g = sctx.createRadialGradient(SPRITE / 2, SPRITE / 2, 0, SPRITE / 2, SPRITE / 2, SPRITE / 2);
+      // Approximates exp(-r^2 / 2σ^2) closely enough at this size.
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        g.addColorStop(t, `rgba(${grey},${grey},${Math.min(255, grey + 6)},${Math.exp(-((t * 2.4) ** 2) / 2).toFixed(4)})`);
+      }
+      sctx.fillStyle = g;
+      sctx.fillRect(0, 0, SPRITE, SPRITE);
+      return c;
+    });
+
+    function rebuild() {
+      const wanted = Number(countIn.value);
+      splats = sample(verts, faces, wanted, 20260905);
+      out('count').textContent = wanted.toLocaleString();
+    }
+
+    function drawMesh(lamp: Vec3) {
+      const tris: { depth: number; pts: { sx: number; sy: number }[]; colour: string }[] = [];
+      for (let i = 0; i < faces.length; i += 3) {
+        const a = verts[faces[i]], b = verts[faces[i + 1]], c = verts[faces[i + 2]];
+        const n = faceNormal(a, b, c);
+        if (!n || !facesCamera(n, cam)) continue;
+        const pa = project(a, cam), pb = project(b, cam), pc = project(c, cam);
+        tris.push({
+          depth: (pa.depth + pb.depth + pc.depth) / 3,
+          pts: [pa, pb, pc],
+          colour: mix('#c9ccd4', shade(n, 0.28, lamp)),
+        });
+      }
+      tris.sort((x, y) => x.depth - y.depth);
+      for (const t of tris) {
+        ctx.beginPath();
+        ctx.moveTo(t.pts[0].sx, t.pts[0].sy);
+        ctx.lineTo(t.pts[1].sx, t.pts[1].sy);
+        ctx.lineTo(t.pts[2].sx, t.pts[2].sy);
+        ctx.closePath();
+        ctx.fillStyle = t.colour;
+        ctx.fill();
+        ctx.strokeStyle = t.colour;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+
+    function drawSplats(lamp: Vec3) {
+      const spread = Number(sizeIn.value) / 100;
+      // Size in world units, so the field keeps its density as you zoom the model.
+      const base = (radius * 0.028) * spread * cam.scale;
+
+      // Back to front, then normal alpha compositing — which is what splatting
+      // actually does. Adding the gaussians instead saturates to flat white
+      // somewhere past a few thousand of them, and the object disappears.
+      const drawn = splats
+        .map((s) => ({ s, p: project(s.p, cam) }))
+        .sort((a, b) => a.p.depth - b.p.depth);
+
+      // Sparse fields need each gaussian to carry more weight; dense ones would
+      // turn to paste at the same opacity.
+      const density = Math.min(1, 3000 / Math.max(splats.length, 1));
+      ctx.globalAlpha = Math.min(0.7, 0.22 + density * 0.4);
+      for (const { s, p } of drawn) {
+        const lit = shade(s.n, 0.1, lamp);
+        const r = base * s.scale;
+        const level = Math.max(0, Math.min(LEVELS - 1, Math.round(lit * (LEVELS - 1))));
+        ctx.drawImage(sprites[level], p.sx - r, p.sy - r, r * 2, r * 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      if (!verts.length) return;
+      cam.cx = w / 2;
+      cam.cy = h / 2;
+      cam.scale = (Math.min(w, h) * 0.42) / radius;
+      const lamp = headlight(cam);
+      if (mode === 'mesh') drawMesh(lamp); else drawSplats(lamp);
+    }
+
+    function paintReadout() {
+      const isMesh = mode === 'mesh';
+      out('prims').textContent = isMesh
+        ? `${(faces.length / 3).toLocaleString()} △`
+        : `${splats.length.toLocaleString()} ◍`;
+      out('authored').textContent = isMesh ? root!.dataset.lMesh! : root!.dataset.lSplat!;
+      out('authored').dataset.state = isMesh ? '' : 'ok';
+      hint.textContent = isMesh ? root!.dataset.hintMesh! : root!.dataset.hintSplats!;
+      if (isMesh) delete hint.dataset.tone; else hint.dataset.tone = 'splat';
+      sliders.hidden = isMesh;
+    }
+
+    function tick() {
+      if (!visible) { raf = 0; return; }
+      if (spinning) { cam.azimuth += 0.28; draw(); }
+      raf = requestAnimationFrame(tick);
+    }
+    const start = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+    let dragging = false, lastX = 0, lastY = 0;
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true; spinning = false;
+      lastX = e.clientX; lastY = e.clientY;
+      try { canvas.setPointerCapture(e.pointerId); } catch { /* not ours to capture */ }
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      cam.azimuth -= (e.clientX - lastX) * 0.5;
+      cam.elevation = Math.max(-89, Math.min(89, cam.elevation - (e.clientY - lastY) * 0.4));
+      lastX = e.clientX; lastY = e.clientY;
+      draw();
+    });
+    const end = () => { dragging = false; };
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+
+    root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        mode = btn.dataset.mode as 'mesh' | 'splat';
+        root.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        paintReadout();
+        draw();
+      });
+    });
+    countIn.addEventListener('input', () => { rebuild(); paintReadout(); draw(); });
+    sizeIn.addEventListener('input', () => {
+      out('size').textContent = `${sizeIn.value}%`;
+      draw();
+    });
+
+    let loaded = false;
+    async function ensureLoaded() {
+      if (loaded) return;
+      loaded = true;
+      try {
+        const res = await fetch(`/models/agrom-parts.json?v=${root!.dataset.modelVersion}`);
+        const data = await res.json();
+        // The cap from chapter 03: the one that fills the frame best.
+        const part = data.parts.find((p: { id: string }) => p.id === 'tampa-os') ?? data.parts[0];
+        const scale = part.mm / 2;
+        verts = [];
+        for (let i = 0; i < part.v.length; i += 3) {
+          verts.push({
+            x: (part.v[i] / data.quant) * scale,
+            y: (part.v[i + 1] / data.quant) * scale,
+            z: (part.v[i + 2] / data.quant) * scale,
+          });
+        }
+        faces = part.f;
+        radius = Math.max(...verts.flatMap((v) => [Math.abs(v.x), Math.abs(v.y), Math.abs(v.z)]));
+        rebuild();
+        loading.hidden = true;
+        paintReadout();
+        draw();
+        start();
+      } catch {
+        loading.textContent = '—';
+      }
+    }
+
+    new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        visible = e.isIntersecting;
+        if (visible) { ensureLoaded(); start(); }
+      }
+    }, { threshold: 0.15 }).observe(root);
+  }
+</script>

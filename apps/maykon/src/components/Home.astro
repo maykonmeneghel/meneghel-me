@@ -13,6 +13,7 @@ import PartLab from './games/PartLab.astro';
 import SystemTrace from './games/SystemTrace.astro';
 import GlassLab from './games/GlassLab.astro';
 import FlowLab from './games/FlowLab.astro';
+import SplatLab from './games/SplatLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -20,12 +21,13 @@ import { content } from '../content';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = content[locale];
-// The eyebrow reads "10 · RECORD"; the rail wants just the codename.
-const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
+// The eyebrow reads "12 · RECORD". Both halves come from it, so adding a
+// chapter renumbers the rail without anyone having to remember to.
+const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) => part.trim());
 ---
 <Base locale={locale} title={c.meta.title} description={c.meta.description}>
   <Hero hero={c.hero} />
-  <Rail chapters={c.chapters} extra={{ id: '10', codename: recordCodename, slug: 'record' }} />
+  <Rail chapters={c.chapters} extra={{ id: recordNumber, codename: recordCodename, slug: 'record' }} />
 
   <main id="chapters">
     {c.chapters.map((chapter) => (
@@ -48,6 +50,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <GlassLab glass={c.glass} />
         ) : chapter.slug === 'flow' ? (
           <FlowLab flow={c.flow} />
+        ) : chapter.slug === 'field' ? (
+          <SplatLab field={c.field} />
         ) : chapter.slug === 'system' ? (
           <SystemTrace system={c.system} chapters={c.chapters} />
         ) : (

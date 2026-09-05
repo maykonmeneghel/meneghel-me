@@ -104,9 +104,17 @@ export const en: Content = {
       takeaway: 'A backtest is a <b>hypothesis</b>, not a result. Anyone can tune a curve until it is beautiful on the data they already have; the entire craft is knowing what that number is worth on the data they do not.',
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Backtesting engine', 'Paper trading'],
     },
+    {
+      id: '11', codename: 'FIELD', slug: 'field',
+      title: 'And now the object is made of light',
+      lede: 'What I spend my days on now, in Projeto Mirage: Gaussian Splatting. A scene stops being a surface someone modelled and becomes a cloud of oriented gaussians, fitted by gradient descent until renders of them match the photographs. It is the same engineering brain pointed at a different question — and it is where the AI work and the 3D work finally meet.',
+      panel: 'mirage · gaussian splatting',
+      takeaway: 'A mesh says where the <b>surfaces</b> are, and an engineer drew every one. A splat field says where the <b>light</b> is, and nobody drew any of it — it was fitted until the render stopped disagreeing with the photograph.',
+      stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Photogrammetry', 'Projeto Mirage'],
+    },
   ],
   record: {
-    eyebrow: '11 · RECORD',
+    eyebrow: '12 · RECORD',
     title: 'The receipts',
     lede: 'Nine chapters of demonstration. This one is just evidence. Drag through the years and watch what was running at the same time — because the honest headline of this timeline is not any single job, it is how rarely there was only one.',
     lanes: {
@@ -381,6 +389,16 @@ export const en: Content = {
     hintIn: 'Tune it until the number is beautiful. That is the easy part, and it is what every backtest screenshot on the internet is showing you.',
     hintOut: 'Same graph, same parameters, a stretch of market it has never been fitted to.',
     reveal: 'Across all 75,429 parameter combinations, the set that returned most on the half you tuned on came 22,949th on the half you had not seen. First place to twenty-two thousandth. That is why a backtest is a hypothesis and not a result, and why the beautiful number is the easy part.',
+  },
+  field: {
+    lede: 'The same part from chapter 03, shown both ways. On the left of the switch it is the mesh that was printed from. On the right it is a field of gaussians scattered over that mesh — a stand-in for a fitted one, so the two can sit side by side.',
+    mesh: 'Mesh', splats: 'Gaussians',
+    count: 'Gaussians', size: 'Spread', spin: 'drag to turn',
+    primitives: 'Primitives', authored: 'Authored by hand',
+    authoredMesh: 'every triangle', authoredSplat: 'none of them',
+    hintMesh: '997 triangles, each one placed by somebody in SolidWorks in 2017.',
+    hintSplats: 'Nobody placed these. In a real reconstruction they start as noise and are moved, stretched and recoloured by gradient descent until the render stops disagreeing with the photographs — which is why the count runs to hundreds of thousands and nobody minds.',
+    loading: 'loading the mesh…',
   },
   ui: {
     duty: 'Duty cycle',

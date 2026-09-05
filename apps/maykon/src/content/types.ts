@@ -234,6 +234,22 @@ export interface FlowGame {
   reveal: string;
 }
 
+export interface FieldGame {
+  lede: string;
+  mesh: string;
+  splats: string;
+  count: string;
+  size: string;
+  spin: string;
+  primitives: string;
+  authored: string;
+  authoredMesh: string;
+  authoredSplat: string;
+  hintMesh: string;
+  hintSplats: string;
+  loading: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -258,5 +274,6 @@ export interface Content {
   system: SystemGame;
   glass: GlassGame;
   flow: FlowGame;
+  field: FieldGame;
   ui: Record<string, string>;
 }
