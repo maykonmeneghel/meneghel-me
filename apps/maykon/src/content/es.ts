@@ -159,6 +159,12 @@ export const es: Content = {
     },
   },
   signal: {
+    levels: ['sitio', 'área', 'dispositivo', 'medida'],
+    anatomyLede: 'Un tópico es una ruta. Cada dispositivo de esta granja publica en una ruta formada por los mismos cuatro niveles — así que una suscripción es, en el fondo, una pregunta sobre qué niveles te importan.',
+    legendPlus: 'coincide con exactamente un nivel, sea cual sea su contenido',
+    legendHash: 'coincide con todo lo que venga debajo, y tiene que ser el último nivel',
+    yourToken: 'escribiste',
+    noToken: '—',
     subLabel: 'Tu suscripción',
     placeholder: 'farm/greenhouse/#',
     broker: 'Broker — todo lo que se está publicando',

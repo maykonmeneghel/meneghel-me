@@ -2,6 +2,10 @@
 import type { Content } from '../../content';
 import { TOPICS } from './mqtt';
 
+// Distinct values at each of the four topic levels, derived from the topic list
+// so the diagram can never drift from what the broker actually publishes.
+const levelValues = [0, 1, 2, 3].map((i) => [...new Set(TOPICS.map((t) => t.split('/')[i]))]);
+
 interface Props { signal: Content['signal'] }
 const { signal } = Astro.props;
 ---
@@ -10,7 +14,31 @@ const { signal } = Astro.props;
   data-err-plus={signal.invalidPlus}
   data-err-empty={signal.invalidEmpty}
   data-all-solved={signal.allSolved}
+  data-no-token={signal.noToken}
 >
+  <div class="mq__anatomy">
+    <p class="mq__anatomy-lede">{signal.anatomyLede}</p>
+
+    <div class="mq__levels">
+      {levelValues.map((values, i) => (
+        <div class="mq__level">
+          <p class="mq__level-name mono">{i + 1} · {signal.levels[i]}</p>
+          <p class="mq__level-token mono" data-token={i}>{signal.noToken}</p>
+          <ul class="mq__level-values">
+            {values.map((v) => (
+              <li class="mq__val mono" data-level={i} data-value={v}>{v}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <ul class="mq__legend">
+      <li><code class="mq__wild mq__wild--plus">+</code> {signal.legendPlus}</li>
+      <li><code class="mq__wild mq__wild--hash">#</code> {signal.legendHash}</li>
+    </ul>
+  </div>
+
   <div class="mq__sub">
     <label class="mq__sub-label mono" for="mq-filter">{signal.subLabel}</label>
     <div class="mq__field">
@@ -81,6 +109,54 @@ const { signal } = Astro.props;
 </div>
 
 <style>
+  .mq__anatomy { margin-bottom: 1.75rem; }
+  .mq__anatomy-lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1rem; max-width: 70ch; }
+
+  .mq__levels {
+    display: grid; gap: .5rem;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 620px) { .mq__levels { grid-template-columns: repeat(2, 1fr); } }
+
+  .mq__level {
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: .6rem .65rem; background: var(--bg-900);
+  }
+  .mq__level-name {
+    font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--fg-700); margin: 0 0 .4rem;
+  }
+  .mq__level-token {
+    font-size: var(--step-0); color: var(--fg-700);
+    margin: 0 0 .5rem; padding-bottom: .5rem;
+    border-bottom: 1px dashed var(--line);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .mq__level-token[data-kind="literal"] { color: var(--fg-100); }
+  .mq__level-token[data-kind="plus"]    { color: var(--info); }
+  .mq__level-token[data-kind="hash"]    { color: var(--trace); }
+
+  .mq__level-values { list-style: none; margin: 0; padding: 0; display: grid; gap: .12rem; }
+  .mq__val {
+    font-size: 11px; color: var(--fg-700);
+    opacity: .38; transition: opacity .15s, color .15s;
+  }
+  /* Lit means "a message on this level can still reach you". */
+  .mq__val.is-lit { opacity: 1; color: var(--ok); }
+
+  .mq__legend {
+    list-style: none; margin: .9rem 0 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: .4rem 1.5rem;
+    font-size: var(--step--1); color: var(--fg-500);
+  }
+  .mq__legend li { display: flex; align-items: baseline; gap: .5rem; }
+  .mq__wild {
+    font-family: var(--font-mono); font-size: var(--step-0);
+    padding: 0 .35rem; border-radius: 4px; border: 1px solid var(--line-2);
+  }
+  .mq__wild--plus { color: var(--info); border-color: color-mix(in oklab, var(--info) 45%, transparent); }
+  .mq__wild--hash { color: var(--trace); border-color: color-mix(in oklab, var(--trace) 45%, transparent); }
+
   .mq__sub-label {
     display: block; font-size: 10px; letter-spacing: .2em;
     text-transform: uppercase; color: var(--fg-700); margin-bottom: .5rem;
@@ -182,6 +258,9 @@ const { signal } = Astro.props;
     const winOut = root.querySelector<HTMLElement>('[data-win]')!;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
     const missionEls = [...root.querySelectorAll<HTMLElement>('[data-mission]')];
+    const tokenEls = [...root.querySelectorAll<HTMLElement>('[data-token]')];
+    const valEls = [...root.querySelectorAll<HTMLElement>('[data-value]')];
+    const noToken = root.dataset.noToken!;
 
     const errText: Record<string, string> = {
       hash: root.dataset.errHash!,
@@ -236,12 +315,42 @@ const { signal } = Astro.props;
       out('miss').textContent = String(misses);
     }
 
+    /**
+     * Light each level value that a still-reachable topic uses. Derived from the
+     * matcher's own output rather than from re-reading the filter, so the
+     * diagram cannot disagree with the inbox.
+     */
+    function paintLevels(filter: string, live: boolean) {
+      const surviving = live ? TOPICS.filter((t) => matches(filter, t)) : [];
+      const reachable = [0, 1, 2, 3].map(
+        (i) => new Set(surviving.map((t) => t.split('/')[i])),
+      );
+      for (const el of valEls) {
+        const lvl = Number(el.dataset.level);
+        el.classList.toggle('is-lit', reachable[lvl].has(el.dataset.value!));
+      }
+
+      const levels = live ? filter.split('/') : [];
+      tokenEls.forEach((el, i) => {
+        // A '#' stands in for itself and for every level it swallows.
+        const hashAt = levels.indexOf('#');
+        const token =
+          hashAt !== -1 && i >= hashAt ? '#' : levels[i] ?? '';
+        el.textContent = token || noToken;
+        el.dataset.kind =
+          token === '#' ? 'hash' : token === '+' ? 'plus' : token ? 'literal' : 'none';
+      });
+    }
+
     function evaluate() {
       const filter = input.value.trim();
       const err = validate(filter);
       errOut.textContent = err ? errText[err] : '';
 
-      const scope = err || !filter ? 0 : TOPICS.filter((t) => matches(filter, t)).length;
+      const live = !err && filter !== '';
+      paintLevels(filter, live);
+
+      const scope = live ? TOPICS.filter((t) => matches(filter, t)).length : 0;
       out('scope').textContent = `${scope} / ${TOPICS.length}`;
 
       for (const el of missionEls) {

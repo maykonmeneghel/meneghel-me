@@ -159,6 +159,12 @@ export const pt: Content = {
     },
   },
   signal: {
+    levels: ['local', 'área', 'dispositivo', 'medida'],
+    anatomyLede: 'Um tópico é um caminho. Todo dispositivo desta fazenda publica em um caminho montado com os mesmos quatro níveis — então uma assinatura é, no fundo, uma pergunta sobre quais níveis te interessam.',
+    legendPlus: 'casa exatamente um nível, seja qual for o conteúdo',
+    legendHash: 'casa tudo o que vier abaixo, e precisa ser o último nível',
+    yourToken: 'você escreveu',
+    noToken: '—',
     subLabel: 'Sua assinatura',
     placeholder: 'farm/greenhouse/#',
     broker: 'Broker — tudo o que está sendo publicado',

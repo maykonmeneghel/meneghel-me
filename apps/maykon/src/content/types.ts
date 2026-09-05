@@ -44,6 +44,13 @@ export interface RecordSection {
 }
 
 export interface SignalGame {
+  /** Names of the four topic levels, shown above the subscription box. */
+  levels: [string, string, string, string];
+  anatomyLede: string;
+  legendPlus: string;
+  legendHash: string;
+  yourToken: string;
+  noToken: string;
   subLabel: string;
   placeholder: string;
   broker: string;

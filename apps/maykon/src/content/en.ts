@@ -159,6 +159,12 @@ export const en: Content = {
     },
   },
   signal: {
+    levels: ['site', 'area', 'device', 'reading'],
+    anatomyLede: 'A topic is a path. Every device on this farm publishes to one built from the same four levels — so a subscription is really a question about which levels you care about.',
+    legendPlus: 'matches exactly one level, whatever is in it',
+    legendHash: 'matches everything below it, and has to be the last level',
+    yourToken: 'you wrote',
+    noToken: '—',
     subLabel: 'Your subscription',
     placeholder: 'farm/greenhouse/#',
     broker: 'Broker — everything being published',
