@@ -120,7 +120,7 @@ export const en: Content = {
       techLead: 'Tech Lead · Apple Internship',
       fullstack: 'Full Stack Developer · Apple Project',
       senior: 'Senior Developer · Apple Project',
-      ghel: 'Technology Advisor · MyRenault (Renault Geely do Brasil)',
+      ghel: 'Technology Advisor · Renault Project',
       holding: 'Administrative Advisor — the family holding',
       tradx: 'COO & Co-founder',
     },
