@@ -31,6 +31,11 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 
   --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+  /* Prose inside a chapter panel. --step--1 is the size for labels and badges;
+     at that size a 74-character line is only about 60% of the panel it sits in,
+     which reads as a narrow ragged column floating in a wide dark box. This is
+     large enough that the same 74 characters fill roughly four fifths of it. */
+  --step-body: clamp(0.88rem, 0.82rem + 0.22vw, 1.02rem);
   --step-0:  clamp(0.95rem, 0.90rem + 0.25vw, 1.05rem);
   --step-1:  clamp(1.20rem, 1.08rem + 0.60vw, 1.55rem);
   --step-2:  clamp(1.60rem, 1.35rem + 1.25vw, 2.40rem);

@@ -74,7 +74,7 @@ const slots = Array.from({ length: MAX_REPLICAS }, (_, i) => i);
 </div>
 
 <style>
-  .sw__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 72ch; }
+  .sw__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; max-width: 74ch; }
 
   .sw__chartwrap { position: relative; }
   .sw__chart {
@@ -112,7 +112,7 @@ const slots = Array.from({ length: MAX_REPLICAS }, (_, i) => i);
   @keyframes sw-boot { 50% { background: color-mix(in oklab, var(--warn) 35%, var(--bg-800)); } }
 
   .sw__actions { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-  .sw__hint { margin: .9rem 0 0; font-size: var(--step--1); color: var(--fg-700); max-width: 68ch; }
+  .sw__hint { margin: .9rem 0 0; font-size: var(--step-body); color: var(--fg-700); max-width: 74ch; }
   .sw__verdict { margin: .9rem 0 0; font-size: var(--step--1); min-height: 1.4em; }
   .sw__verdict[data-h="healthy"]  { color: var(--ok); }
   .sw__verdict[data-h="strained"] { color: var(--warn); }

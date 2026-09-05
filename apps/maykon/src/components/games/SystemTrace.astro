@@ -61,7 +61,7 @@ const cleanMs = totalMs();
 </div>
 
 <style>
-  .sy__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+  .sy__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; max-width: 74ch; }
   .sy__bar { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1.5rem; }
   .sy__break { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
 
@@ -113,7 +113,7 @@ const cleanMs = totalMs();
     transition: opacity .25s, color .25s;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .sy__broken { display: none; font-size: var(--step--1); color: var(--fail); max-width: 62ch; }
+  .sy__broken { display: none; font-size: var(--step-body); color: var(--fail); max-width: 62ch; }
 
   /* --- states --- */
   .sy__stage.is-done .sy__pip { background: var(--ok); border-color: var(--ok); }
@@ -133,7 +133,7 @@ const cleanMs = totalMs();
   .sy__stage.is-broken .sy__broken { display: block; margin-top: .3rem; }
   .sy__stage.is-broken .sy__payload { display: none; }
 
-  .sy__verdict { margin-top: 1rem; font-size: var(--step--1); min-height: 3em; max-width: 70ch; }
+  .sy__verdict { margin-top: 1rem; font-size: var(--step-body); min-height: 3em; max-width: 74ch; }
   .sy__verdict[data-state="ok"] { color: var(--ok); }
   .sy__verdict[data-state="fail"] { color: var(--fail); }
 </style>
