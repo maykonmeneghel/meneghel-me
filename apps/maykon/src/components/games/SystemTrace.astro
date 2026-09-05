@@ -1,0 +1,234 @@
+---
+import type { Content } from '../../content';
+import { STAGES, totalMs, isSilent } from './system';
+
+interface Props { system: Content['system']; chapters: { slug: string; id: string; codename: string }[] }
+const { system, chapters } = Astro.props;
+
+const chapterOf = (slug: string) => chapters.find((c) => c.slug === slug);
+const cleanMs = totalMs();
+---
+<div class="sy" data-sy
+  data-verdict-ok={system.verdictArrived}
+  data-verdict-fail={system.verdictFailed}
+  data-l-play={system.play}
+  data-l-running={system.running}
+  data-l-again={system.again}
+>
+  <p class="sy__lede">{system.lede}</p>
+
+  <div class="sy__bar">
+    <button type="button" class="btn btn--primary" data-play>▶ {system.play}</button>
+    <button type="button" class="btn" data-repair hidden>{system.repair}</button>
+    <span class="sy__break mono">{system.breakHint}</span>
+  </div>
+
+  <ol class="sy__chain" data-chain>
+    {STAGES.map((stage, i) => {
+      const ch = chapterOf(stage.id);
+      const copy = system.stages[stage.id];
+      return (
+        <li class="sy__stage" data-stage={stage.id} data-index={i}>
+          <button type="button" class="sy__hit" data-break={stage.id}
+            aria-pressed="false" aria-label={copy.name}>
+            <span class="sy__rail" aria-hidden="true"><i class="sy__pip"></i></span>
+            <span class="sy__body">
+              <span class="sy__head">
+                <b class="sy__name">{copy.name}</b>
+                <span class="sy__num mono">{ch?.id ?? ''}</span>
+                {isSilent(stage.id) && <span class="sy__silent mono">{system.silentBadge}</span>}
+                <span class="sy__ms mono">{stage.ms === 0 ? '—' : `${stage.ms} ms`}</span>
+              </span>
+              <span class="sy__does">{copy.does}</span>
+              <span class="sy__payload mono" data-payload>{copy.payload}</span>
+              <span class="sy__broken" data-broken>{copy.broken}</span>
+            </span>
+          </button>
+          {ch && <a class="sy__goto mono" href={`#${stage.id}`}>{system.goto} {ch.id} ↗</a>}
+        </li>
+      );
+    })}
+  </ol>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{system.total}</span>
+      <span class="readout__v" data-out="ms">{cleanMs.toFixed(2)} ms</span>
+    </div>
+  </div>
+
+  <p class="sy__verdict" data-verdict></p>
+</div>
+
+<style>
+  .sy__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+  .sy__bar { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1.5rem; }
+  .sy__break { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
+
+  .sy__chain { list-style: none; margin: 0; padding: 0; }
+  .sy__stage { position: relative; display: flex; align-items: flex-start; gap: .75rem; }
+  .sy__goto {
+    flex: none; align-self: center; font-size: 10px; letter-spacing: .1em;
+    color: var(--fg-700); text-decoration: none; padding: .3rem 0;
+  }
+  .sy__goto:hover { color: var(--brand-500); }
+
+  .sy__hit {
+    flex: 1; min-width: 0;
+    display: flex; align-items: stretch; gap: .9rem;
+    background: none; border: 0; padding: 0; text-align: left; cursor: pointer;
+  }
+
+  .sy__rail { flex: none; width: 18px; display: flex; flex-direction: column; align-items: center; }
+  /* The rail is one continuous line; each stage draws its own segment. */
+  .sy__rail::before {
+    content: ''; width: 2px; flex: 1; background: var(--line);
+    transition: background .2s;
+  }
+  .sy__stage:first-child .sy__rail::before { background: transparent; }
+  .sy__pip {
+    width: 11px; height: 11px; border-radius: 50%; flex: none;
+    background: var(--bg-700); border: 2px solid var(--line-2);
+    margin: .55rem 0; transition: background .2s, border-color .2s, box-shadow .2s;
+  }
+  .sy__rail::after {
+    content: ''; width: 2px; flex: 1; background: var(--line);
+    transition: background .2s;
+  }
+  .sy__stage:last-child .sy__rail::after { background: transparent; }
+
+  .sy__body { display: grid; gap: .15rem; padding: .6rem 0 1.1rem; min-width: 0; }
+  .sy__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .55rem; }
+  .sy__name { font-weight: 600; font-size: var(--step-0); }
+  .sy__num { font-size: 10px; color: var(--fg-700); }
+  .sy__ms { font-size: 10px; color: var(--fg-700); margin-left: auto; }
+  .sy__silent {
+    font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--warn); border: 1px solid color-mix(in oklab, var(--warn) 45%, transparent);
+    border-radius: 999px; padding: .1rem .4rem;
+  }
+  .sy__does { font-size: var(--step--1); color: var(--fg-500); }
+  .sy__payload {
+    font-size: 11px; color: var(--fg-700); opacity: 0;
+    transition: opacity .25s, color .25s;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sy__broken { display: none; font-size: var(--step--1); color: var(--fail); max-width: 62ch; }
+
+  /* --- states --- */
+  .sy__stage.is-done .sy__pip { background: var(--ok); border-color: var(--ok); }
+  .sy__stage.is-done .sy__rail::before,
+  .sy__stage.is-done .sy__rail::after { background: color-mix(in oklab, var(--ok) 60%, transparent); }
+  .sy__stage.is-done .sy__payload { opacity: 1; color: var(--ok); }
+
+  .sy__stage.is-live .sy__pip {
+    background: var(--brand-500); border-color: var(--brand-500);
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--brand-500) 22%, transparent);
+  }
+  .sy__stage.is-live .sy__payload { opacity: 1; color: var(--fg-100); }
+
+  .sy__stage.is-broken .sy__pip { background: var(--fail); border-color: var(--fail); }
+  .sy__stage.is-broken .sy__name { color: var(--fail); }
+  .sy__stage.is-broken .sy__does { text-decoration: line-through; opacity: .5; }
+  .sy__stage.is-broken .sy__broken { display: block; margin-top: .3rem; }
+  .sy__stage.is-broken .sy__payload { display: none; }
+
+  .sy__verdict { margin-top: 1rem; font-size: var(--step--1); min-height: 3em; max-width: 70ch; }
+  .sy__verdict[data-state="ok"] { color: var(--ok); }
+  .sy__verdict[data-state="fail"] { color: var(--fail); }
+</style>
+
+<script>
+  import { STAGES, run, totalMs, type StageId } from './system';
+
+  const root = document.querySelector<HTMLElement>('[data-sy]');
+  if (root) {
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const repairBtn = root.querySelector<HTMLButtonElement>('[data-repair]')!;
+    const verdict = root.querySelector<HTMLElement>('[data-verdict]')!;
+    const msOut = root.querySelector<HTMLElement>('[data-out="ms"]')!;
+    const stageEls = new Map<string, HTMLElement>();
+    root.querySelectorAll<HTMLElement>('[data-stage]').forEach((el) => stageEls.set(el.dataset.stage!, el));
+
+    const L = {
+      ok: root.dataset.verdictOk!,
+      fail: root.dataset.verdictFail!,
+      play: root.dataset.lPlay!,
+      running: root.dataset.lRunning!,
+      again: root.dataset.lAgain!,
+    };
+
+    const broken = new Set<StageId>();
+    let flying = false;
+
+    const nameOf = (id: StageId) =>
+      stageEls.get(id)!.querySelector<HTMLElement>('.sy__name')!.textContent!;
+
+    function paintBroken() {
+      for (const [id, el] of stageEls) el.classList.toggle('is-broken', broken.has(id as StageId));
+      repairBtn.hidden = broken.size === 0;
+      msOut.textContent = `${totalMs(broken).toFixed(2)} ms`;
+    }
+
+    function clearRun() {
+      for (const el of stageEls.values()) el.classList.remove('is-done', 'is-live');
+      verdict.textContent = '';
+      delete verdict.dataset.state;
+    }
+
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    async function fly() {
+      if (flying) return;
+      flying = true;
+      clearRun();
+      playBtn.disabled = true;
+      playBtn.textContent = `▶ ${L.running}`;
+
+      const result = run(broken);
+      // Paced for watching, not for realism: the real trace is 71 ms end to end.
+      for (let i = 0; i < STAGES.length; i++) {
+        const el = stageEls.get(STAGES[i].id)!;
+        if (broken.has(STAGES[i].id)) break;
+        el.classList.add('is-live');
+        await wait(260);
+        el.classList.remove('is-live');
+        el.classList.add('is-done');
+      }
+
+      msOut.textContent = `${result.ms.toFixed(2)} ms`;
+      if (result.arrived) {
+        verdict.textContent = L.ok;
+        verdict.dataset.state = 'ok';
+      } else {
+        verdict.textContent = L.fail.replace('{stage}', nameOf(result.failedAt!));
+        verdict.dataset.state = 'fail';
+      }
+
+      playBtn.disabled = false;
+      playBtn.textContent = `▶ ${L.again}`;
+      flying = false;
+    }
+
+    playBtn.addEventListener('click', fly);
+
+    root.querySelectorAll<HTMLButtonElement>('[data-break]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.break as StageId;
+        if (broken.has(id)) broken.delete(id); else broken.add(id);
+        btn.setAttribute('aria-pressed', String(broken.has(id)));
+        clearRun();
+        paintBroken();
+      });
+    });
+
+    repairBtn.addEventListener('click', () => {
+      broken.clear();
+      root.querySelectorAll('[data-break]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      clearRun();
+      paintBroken();
+    });
+
+    paintBroken();
+  }
+</script>

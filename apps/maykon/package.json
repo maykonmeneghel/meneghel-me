@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node src/components/games/mqtt.test.ts && node src/components/games/swarm.test.ts && node src/components/games/perceptron.test.ts && node src/components/games/dbindex.test.ts && node src/components/games/board.test.ts && node src/components/games/board3d.test.ts"
+    "test": "node src/components/games/mqtt.test.ts && node src/components/games/swarm.test.ts && node src/components/games/perceptron.test.ts && node src/components/games/dbindex.test.ts && node src/components/games/board.test.ts && node src/components/games/board3d.test.ts && node src/components/games/system.test.ts"
   },
   "dependencies": {
     "@meneghel/ui": "*",

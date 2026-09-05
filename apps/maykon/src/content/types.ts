@@ -184,6 +184,23 @@ export interface SteelGame {
   parts: Record<string, { kind: string; blurb: string }>;
 }
 
+export interface SystemGame {
+  lede: string;
+  play: string;
+  running: string;
+  again: string;
+  repair: string;
+  total: string;
+  verdictArrived: string;
+  /** Uses {stage}. */
+  verdictFailed: string;
+  breakHint: string;
+  silentBadge: string;
+  goto: string;
+  /** Keyed by StageId. */
+  stages: Record<string, { name: string; does: string; payload: string; broken: string }>;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -205,5 +222,6 @@ export interface Content {
   service: ServiceGame;
   copper: CopperGame;
   steel: SteelGame;
+  system: SystemGame;
   ui: Record<string, string>;
 }

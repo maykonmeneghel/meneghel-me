@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01–07 + timeline playable; 09 to go |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | all nine chapters playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -14,6 +14,13 @@ A CV tells you what someone can do. This one lets you try it. The chapters read
 bottom-up through the stack — `SILICON → COPPER → STEEL → SIGNAL → SERVICE →
 SWARM → MIND → GLASS → SYSTEM` — and every one of them ends with a single
 sentence stating what the visitor just learned by playing with it.
+
+Three chapters run on artefacts rather than inventions: `COPPER` renders the
+EAGLE file for the AGROM.IO soil probe board, `STEEL` opens on the SolidWorks
+render of the assembled sensor and turns its printed parts, and `SYSTEM` closes
+by walking one reading through all eight, using the numbers the earlier chapters
+established. The last one can be broken on purpose, stage by stage, because the
+seams are the argument.
 
 ## Running it
 
@@ -84,7 +91,13 @@ TypeScript modules, tested separately from the DOM:
   camera keeps the underside readable without washing out faces turned away.
   Three of those assertions were written after the bug they describe.
 
-Node 24 strips types natively, so all six run with plain `node` — no runner,
+- `games/system.ts` is the finale's chain: the eight chapters in order, what
+  each costs in milliseconds, and which of them fail while still returning a
+  number. `system.test.ts` checks every stage stops the trace when broken and
+  only when broken, that with two broken the earlier one wins, and that the
+  clock only counts stages actually cleared.
+
+Node 24 strips types natively, so all seven run with plain `node` — no runner,
 no build step, no dev dependency.
 
 ## The one asset that is fetched, not inlined
