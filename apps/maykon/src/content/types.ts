@@ -161,6 +161,24 @@ export interface CopperGame {
   hintOneLayer: string;
 }
 
+export interface SteelGame {
+  lede: string;
+  partsLabel: string;
+  loading: string;
+  spin: string;
+  autoSpin: string;
+  triangles: string;
+  sourceTris: string;
+  span: string;
+  processTitle: string;
+  processLede: string;
+  processes: { label: string; count: number; note: string }[];
+  drawings: string;
+  hint: string;
+  /** Keyed by the part id in public/models/agrom-parts.json. */
+  parts: Record<string, { kind: string; blurb: string }>;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -181,5 +199,6 @@ export interface Content {
   mind: MindGame;
   service: ServiceGame;
   copper: CopperGame;
+  steel: SteelGame;
   ui: Record<string, string>;
 }

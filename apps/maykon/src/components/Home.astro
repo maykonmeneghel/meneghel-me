@@ -9,6 +9,7 @@ import ClusterLab from './games/ClusterLab.astro';
 import PerceptronLab from './games/PerceptronLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
+import PartLab from './games/PartLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -38,6 +39,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <IndexLab service={c.service} />
         ) : chapter.slug === 'copper' ? (
           <BoardLab copper={c.copper} />
+        ) : chapter.slug === 'steel' ? (
+          <PartLab steel={c.steel} />
         ) : (
           <div class="wip">
             <span>{c.ui.wip}</span>

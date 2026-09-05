@@ -1,6 +1,6 @@
 import {
   project, placeShape, partZ, shade, area, ensureCCW, partColour,
-  viewDirection, facesCamera, edgeNormal, headlight,
+  viewDirection, facesCamera, edgeNormal, headlight, faceNormal,
   type Camera, type Part, type Poly,
 } from './board3d.ts';
 import model from '../../data/agrom-board3d.json' with { type: 'json' };
@@ -108,6 +108,18 @@ check(shade(downFace, 0.34, headlight(under)) > 0.7, 'the headlight brings it ba
 // It must not do that by washing everything out: a face turned away stays dark.
 check(shade({ x: 0, y: 0, z: 1 }, 0.34, headlight(under)) < 0.45,
   'a face turned away from the camera is still dark');
+
+// --- triangle normals, for the STL meshes ---
+const up = faceNormal({ x: 0, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, { x: 0, y: 1, z: 0 })!;
+eq([up.x, up.y, up.z], [0, 0, 1], 'a CCW triangle in the xy plane faces up');
+const down = faceNormal({ x: 0, y: 0, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 })!;
+eq([down.x, down.y, down.z], [0, 0, -1], 'reversing the winding flips it');
+const slanted = faceNormal({ x: 0, y: 0, z: 0 }, { x: 2, y: 0, z: 0 }, { x: 0, y: 2, z: 2 })!;
+near(Math.hypot(slanted.x, slanted.y, slanted.z), 1, 1e-12, 'normals come back normalised');
+eq(faceNormal({ x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }, { x: 2, y: 2, z: 2 }), null,
+  'a triangle collapsed to a line returns null rather than NaNs');
+eq(faceNormal({ x: 1, y: 1, z: 1 }, { x: 1, y: 1, z: 1 }, { x: 1, y: 1, z: 1 }), null,
+  'so does a degenerate point');
 
 // --- winding ---
 const cw: Poly = [[0, 0], [0, 1], [1, 1], [1, 0]];

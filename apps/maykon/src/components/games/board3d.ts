@@ -105,6 +105,22 @@ export function facesCamera(normal: Vec3, cam: Camera): boolean {
   return normal.x * v.x + normal.y * v.y + normal.z * v.z > 0;
 }
 
+/**
+ * Outward normal of a triangle wound counter-clockwise seen from outside,
+ * which is what STL guarantees. Returns null for a degenerate face rather than
+ * NaNs, so a collapsed triangle can simply be skipped.
+ */
+export function faceNormal(a: Vec3, b: Vec3, c: Vec3): Vec3 | null {
+  const ux = b.x - a.x, uy = b.y - a.y, uz = b.z - a.z;
+  const vx = c.x - a.x, vy = c.y - a.y, vz = c.z - a.z;
+  const nx = uy * vz - uz * vy;
+  const ny = uz * vx - ux * vz;
+  const nz = ux * vy - uy * vx;
+  const len = Math.hypot(nx, ny, nz);
+  if (!Number.isFinite(len) || len < 1e-12) return null;
+  return { x: nx / len, y: ny / len, z: nz / len };
+}
+
 /** Outward normal of the wall raised on the edge p1 to p2 of a CCW outline. */
 export function edgeNormal(x1: number, y1: number, x2: number, y2: number): Vec3 {
   const dx = x2 - x1, dy = y2 - y1;

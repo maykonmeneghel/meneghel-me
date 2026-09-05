@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 02, 04, 05, 06, 07 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01–07 + timeline playable; 09 to go |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -36,7 +36,7 @@ apps/manu      manu.meneghel.me
 packages/ui    design tokens and base stylesheet, shared by all three
 infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
-tools          one-off asset pipelines (EAGLE board and IDF model -> JSON)
+tools          one-off asset pipelines (EAGLE board, IDF model, STL meshes)
 docs           what is still needed from Maykon
 ```
 
@@ -86,6 +86,18 @@ TypeScript modules, tested separately from the DOM:
 
 Node 24 strips types natively, so all six run with plain `node` — no runner,
 no build step, no dev dependency.
+
+## The one asset that is fetched, not inlined
+
+Everything else on the page is inline. The seven printed parts in chapter 03 are
+not: `tools/extract-parts.py` decimates their STLs to about a thousand triangles
+each and writes `public/models/agrom-parts.json`, 86 KB, fetched only when the
+chapter scrolls into view.
+
+Because it sits in `public/`, the bundler never fingerprints it, and the deploy
+marks everything that is not HTML immutable for a year — so the URL carries a
+content hash computed at build time. Without it a returning visitor would be
+pinned to whatever meshes they downloaded first, permanently.
 
 ## The timeline
 
