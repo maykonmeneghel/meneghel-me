@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Rail from './Rail.astro';
+import Chapter from './Chapter.astro';
+import PwmLab from './games/PwmLab.astro';
+import type { Locale } from '../content';
+import { content } from '../content';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = content[locale];
+---
+<Base locale={locale} title={c.meta.title} description={c.meta.description}>
+  <Hero hero={c.hero} />
+  <Rail chapters={c.chapters} />
+
+  <main id="chapters">
+    {c.chapters.map((chapter) => (
+      <Chapter chapter={chapter} learned={c.ui.learned}>
+        {chapter.slug === 'silicon' ? (
+          <PwmLab ui={c.ui} />
+        ) : (
+          <div class="wip">
+            <span>{c.ui.wip}</span>
+            <span style="color: var(--fg-700)">{c.ui.wipNote}</span>
+          </div>
+        )}
+      </Chapter>
+    ))}
+  </main>
+</Base>

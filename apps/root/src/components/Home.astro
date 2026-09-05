@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import PersonCard from './Person.astro';
+import type { Locale } from '../content';
+import { content } from '../content';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = content[locale];
+
+const doors = [
+  { host: 'maykon.meneghel.me', who: c.now.people.find((p) => p.slug === 'maykon')?.role ?? '', href: 'https://maykon.meneghel.me' },
+  { host: 'manu.meneghel.me', who: c.now.people.find((p) => p.slug === 'manu')?.role ?? '', href: null },
+];
+---
+<Base locale={locale} title={c.meta.title} description={c.meta.description}>
+  <header class="hero">
+    <svg class="crest" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M14 46V20l18 16 18-16v26" fill="none" stroke="#ff2d55" stroke-width="5"
+            stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="14" cy="46" r="4.5" fill="#12100f" stroke="#d9a441" stroke-width="2.5" />
+      <circle cx="50" cy="46" r="4.5" fill="#12100f" stroke="#d9a441" stroke-width="2.5" />
+    </svg>
+    <h1 class="surname">{c.hero.surname}</h1>
+    <p class="motto">{c.hero.motto}</p>
+    <p class="hero__intro">{c.hero.intro}</p>
+    <p class="scrollcue">↓ {c.hero.scroll}</p>
+  </header>
+
+  <section class="band" id="origin">
+    <div class="band__inner">
+      <p class="band__eyebrow">{c.origin.eyebrow}</p>
+      <h2 class="band__title">{c.origin.title}</h2>
+      {c.origin.body.map((para) => <p>{para}</p>)}
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__inner">
+      <p class="band__eyebrow">{c.roots.eyebrow}</p>
+      <h2 class="band__title">{c.roots.title}</h2>
+      <p class="band__lede">{c.roots.lede}</p>
+      <div class="people">
+        {c.roots.people.map((p) => <PersonCard person={p} soon={c.doors.soon} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__inner">
+      <p class="band__eyebrow">{c.now.eyebrow}</p>
+      <h2 class="band__title">{c.now.title}</h2>
+      <p class="band__lede">{c.now.lede}</p>
+      <div class="people">
+        {c.now.people.map((p) => <PersonCard person={p} soon={c.doors.soon} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__inner">
+      <p class="band__eyebrow">{c.values.eyebrow}</p>
+      <h2 class="band__title">{c.values.title}</h2>
+      <div class="values">
+        {c.values.items.map((it) => (
+          <div class="value">
+            <div class="value__k">{it.k}</div>
+            <div class="value__v">{it.v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__inner">
+      <p class="band__eyebrow">{c.doors.eyebrow}</p>
+      <h2 class="band__title">{c.doors.title}</h2>
+      <p class="band__lede">{c.doors.lede}</p>
+      <div class="doors">
+        {doors.map((d) => d.href ? (
+          <a class="door" href={d.href}>
+            <span class="door__host">{d.host}</span>
+            <span class="door__who">{d.who}</span>
+          </a>
+        ) : (
+          <div class="door door--soon">
+            <span class="door__host">{d.host}</span>
+            <span class="door__who">{d.who}</span>
+            <span class="door__badge">{c.doors.soon}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">{c.footer}</footer>
+</Base>

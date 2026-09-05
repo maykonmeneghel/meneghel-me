@@ -1,0 +1,39 @@
+---
+import '@meneghel/ui/base.css';
+import '../styles/home.css';
+import type { Locale } from '../content';
+import { locales, localeNames, prefix } from '../content';
+
+interface Props { locale: Locale; title: string; description: string }
+const { locale, title, description } = Astro.props;
+const site = Astro.site?.origin ?? 'https://meneghel.me';
+---
+<html lang={locale === 'en' ? 'en' : locale === 'pt' ? 'pt-BR' : 'es'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={`${site}${prefix(locale)}/`} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={`${site}${prefix(l)}/`} />)}
+    <link rel="alternate" hreflang="x-default" href={`${site}/`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#12100f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+  </head>
+  <body>
+    <a class="skip" href="#origin">Skip to content</a>
+    <nav class="langbar" aria-label="Language">
+      {locales.map((l) => (
+        <a href={`${prefix(l)}/`} class="langbar__link" aria-current={l === locale ? 'true' : undefined}>{localeNames[l]}</a>
+      ))}
+    </nav>
+    <slot />
+  </body>
+</html>

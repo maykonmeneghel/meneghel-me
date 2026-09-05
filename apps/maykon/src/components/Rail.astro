@@ -1,0 +1,42 @@
+---
+import type { Chapter } from '../content';
+interface Props { chapters: Chapter[] }
+const { chapters } = Astro.props;
+---
+<nav class="rail" aria-label="Chapters" data-rail>
+  {chapters.map((c) => (
+    <a class="rail__item" href={`#${c.slug}`} data-rail-for={c.slug}>
+      <span class="rail__tick"></span>
+      <span class="rail__label">{c.id} {c.codename}</span>
+    </a>
+  ))}
+</nav>
+
+<script>
+  const items = new Map<string, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('[data-rail-for]').forEach((el) => {
+    items.set(el.dataset.railFor!, el);
+  });
+
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  const main = document.querySelector('#chapters');
+  if (rail && main) {
+    // Reveal the rail only once the reader has actually entered the chapters.
+    new IntersectionObserver(
+      ([e]) => rail.classList.toggle('is-visible', e.isIntersecting),
+      { rootMargin: '-10% 0px -70% 0px' },
+    ).observe(main);
+  }
+
+  const spy = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        items.forEach((el) => el.classList.remove('is-active'));
+        items.get(e.target.id)?.classList.add('is-active');
+      }
+    },
+    { rootMargin: '-45% 0px -45% 0px' },
+  );
+  document.querySelectorAll('[data-chapter]').forEach((s) => spy.observe(s));
+</script>

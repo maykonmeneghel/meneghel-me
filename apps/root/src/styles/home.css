@@ -1,0 +1,87 @@
+/* The family house is warmer than the workshop: same brand, softer light. */
+:root {
+  --paper: #12100f;
+  --paper-2: #1a1715;
+  --warm-line: #2c2724;
+  --warm-fg: #ece7e1;
+  --warm-fg-2: #b6aaa1;
+  --warm-fg-3: #7d726a;
+  --gold: #d9a441;
+}
+body { background: var(--paper); color: var(--warm-fg); }
+
+.skip { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--brand-500); color: #fff; padding: .7rem 1rem; }
+.skip:focus { left: 0; }
+
+.langbar { position: fixed; top: 0; right: 0; z-index: 50; display: flex; gap: .15rem; padding: .5rem var(--gutter); font-family: var(--font-mono); font-size: var(--step--1); }
+.langbar__link { padding: .3rem .55rem; border-radius: 6px; color: var(--warm-fg-3); text-decoration: none; background: color-mix(in oklab, var(--paper) 70%, transparent); backdrop-filter: blur(8px); }
+.langbar__link[aria-current] { color: var(--warm-fg); background: var(--paper-2); }
+
+.hero {
+  min-height: 100svh; display: grid; align-content: center; justify-items: center;
+  text-align: center; padding: 6rem var(--gutter) 4rem; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 50% 40%, color-mix(in oklab, var(--brand-600) 16%, transparent), transparent 70%);
+}
+.hero > * { position: relative; }
+.crest { width: 74px; height: 74px; margin-bottom: 1.75rem; opacity: .9; }
+.surname {
+  font-size: clamp(3rem, 1.5rem + 7vw, 8rem); font-weight: 700;
+  letter-spacing: -0.05em; line-height: .9; margin-bottom: .9rem;
+}
+.motto {
+  font-family: var(--font-mono); font-size: var(--step-0);
+  color: var(--gold); letter-spacing: .04em; margin-bottom: 2rem;
+}
+.hero__intro { max-width: 54ch; color: var(--warm-fg-2); font-size: var(--step-1); }
+.scrollcue { margin-top: 3.5rem; font-family: var(--font-mono); font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--warm-fg-3); }
+
+.band { padding: clamp(4rem, 11vh, 8rem) var(--gutter); border-top: 1px solid var(--warm-line); }
+.band__inner { max-width: 1000px; margin-inline: auto; }
+.band__eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: .28em; color: var(--brand-500); margin-bottom: .8rem; }
+.band__title { font-size: var(--step-2); margin-bottom: 1.25rem; }
+.band__lede, .band p { color: var(--warm-fg-2); max-width: 64ch; }
+.band p + p { margin-top: 1rem; }
+
+.people { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-top: 2.5rem; }
+.person {
+  background: var(--paper-2); border: 1px solid var(--warm-line);
+  border-radius: 12px; padding: 1.1rem; text-decoration: none; color: inherit;
+  display: grid; gap: .5rem; align-content: start;
+  transition: border-color .18s, transform .18s;
+}
+a.person:hover { border-color: var(--brand-500); transform: translateY(-3px); }
+.person__frame {
+  aspect-ratio: 4 / 5; border-radius: 8px; display: grid; place-items: center;
+  background:
+    repeating-linear-gradient(45deg, #221e1c 0 10px, #1d1a18 10px 20px);
+  border: 1px solid var(--warm-line);
+  color: var(--warm-fg-3); font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .18em; text-align: center; padding: .5rem;
+}
+.person__name { font-weight: 600; font-size: var(--step-1); }
+.person__role { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--brand-500); }
+.person__gift { color: var(--warm-fg-2); font-size: var(--step--1); }
+.person__go { font-family: var(--font-mono); font-size: 11px; color: var(--gold); }
+
+.values { display: grid; gap: 0; margin-top: 2rem; border-top: 1px solid var(--warm-line); }
+.value { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--warm-line); }
+@media (max-width: 620px) { .value { grid-template-columns: 1fr; gap: .35rem; } }
+.value__k { font-size: var(--step-1); font-weight: 600; }
+.value__v { color: var(--warm-fg-2); }
+
+.doors { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 2.5rem; }
+.door {
+  border: 1px solid var(--warm-line); border-radius: 12px; padding: 1.5rem;
+  text-decoration: none; color: inherit; display: grid; gap: .35rem;
+  transition: border-color .18s, background .18s;
+}
+a.door:hover { border-color: var(--brand-500); background: var(--paper-2); }
+.door__host { font-family: var(--font-mono); font-size: var(--step-1); }
+.door__who { color: var(--warm-fg-2); font-size: var(--step--1); }
+.door--soon { opacity: .55; }
+.door__badge { font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+
+.foot { padding: 3rem var(--gutter); border-top: 1px solid var(--warm-line); text-align: center; color: var(--warm-fg-3); font-family: var(--font-mono); font-size: var(--step--1); }

@@ -1,0 +1,191 @@
+---
+import type { Content } from '../../content';
+interface Props { ui: Content['ui'] }
+const { ui } = Astro.props;
+---
+<div class="pwm" data-pwm>
+  <div class="pwm__stage">
+    <div class="pwm__led-wrap">
+      <div class="pwm__led" data-led></div>
+      <div class="pwm__led-cap"></div>
+      <p class="pwm__led-cap-text mono">GPIO 2</p>
+    </div>
+    <canvas class="pwm__scope" data-scope width="720" height="200"
+      role="img" aria-label="Oscilloscope showing the PWM square wave"></canvas>
+  </div>
+
+  <div class="controls">
+    <label class="control">
+      <span class="control__label">{ui.duty} <b data-out="duty">50%</b></span>
+      <input type="range" min="0" max="100" value="50" step="1" data-in="duty" />
+    </label>
+    <label class="control">
+      <span class="control__label">{ui.frequency} <b data-out="freq">1 Hz</b></span>
+      <input type="range" min="0" max="100" value="0" step="1" data-in="freq" />
+    </label>
+  </div>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{ui.brightness}</span>
+      <span class="readout__v" data-out="bright">50%</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">V<sub>avg</sub></span>
+      <span class="readout__v" data-out="volt">1.65 V</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">analogWrite()</span>
+      <span class="readout__v" data-out="code">128</span>
+    </div>
+  </div>
+
+  <p class="pwm__hint mono" data-hint></p>
+</div>
+
+<style>
+  .pwm__stage {
+    display: grid; grid-template-columns: 120px 1fr; gap: 1.5rem; align-items: center;
+  }
+  @media (max-width: 640px) { .pwm__stage { grid-template-columns: 1fr; justify-items: center; } }
+
+  .pwm__led-wrap { display: grid; justify-items: center; gap: .35rem; }
+  .pwm__led {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #2a0d14;
+    box-shadow: inset 0 0 12px #000;
+    will-change: box-shadow, background;
+  }
+  .pwm__led-cap { width: 26px; height: 18px; background: var(--line-2); border-radius: 0 0 4px 4px; }
+  .pwm__led-cap-text { font-size: 11px; color: var(--fg-700); }
+
+  .pwm__scope {
+    width: 100%; height: auto; border-radius: 8px;
+    background: #06070a; border: 1px solid var(--line);
+  }
+  .pwm__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--warn); min-height: 1.5em; }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-pwm]');
+  if (root) {
+    const led = root.querySelector<HTMLElement>('[data-led]')!;
+    const scope = root.querySelector<HTMLCanvasElement>('[data-scope]')!;
+    const ctx = scope.getContext('2d')!;
+    const dutyIn = root.querySelector<HTMLInputElement>('[data-in="duty"]')!;
+    const freqIn = root.querySelector<HTMLInputElement>('[data-in="freq"]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+
+    // The slider is linear but frequency is logarithmic — 1 Hz to 1 kHz.
+    const freqOf = (v: number) => Math.round(10 ** (v / 100 * 3));
+
+    let duty = 0.5;
+    let freq = 1;
+    let phase = 0;          // seconds into the current PWM period
+    let last = performance.now();
+    let running = false;
+
+    // Persistence of vision: the retina integrates over roughly 50 ms, not over
+    // one animation frame. Without this the readout jitters by several percent
+    // whenever the PWM period does not divide evenly into a frame.
+    const TAU = 0.045;
+    let perceived = 0.5;
+
+    function label() {
+      out('duty').textContent = `${Math.round(duty * 100)}%`;
+      out('freq').textContent = freq >= 1000 ? '1 kHz' : `${freq} Hz`;
+      out('volt').textContent = `${(3.3 * duty).toFixed(2)} V`;
+      out('code').textContent = String(Math.round(duty * 255));
+      hint.textContent =
+        freq <= 24
+          ? '⚠︎ below ~25 Hz your eye resolves each pulse — you see flicker, not dimming'
+          : '';
+    }
+
+    function drawScope() {
+      const w = scope.width, h = scope.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // graticule
+      ctx.strokeStyle = '#161a22'; ctx.lineWidth = 1;
+      for (let x = 0; x <= w; x += w / 12) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+      for (let y = 0; y <= h; y += h / 4)  { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+      const hi = h * 0.18, lo = h * 0.82;
+      const periods = 4;                 // always frame four periods, like a real scope trigger
+      const pw = w / periods;
+
+      // average line
+      const avgY = lo - (lo - hi) * duty;
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, avgY); ctx.lineTo(w, avgY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#a78bfa'; ctx.font = '12px ui-monospace, monospace';
+      ctx.fillText(`Vavg ${(3.3 * duty).toFixed(2)}V`, 8, Math.max(12, avgY - 8));
+
+      // square wave
+      ctx.strokeStyle = '#ff2d55'; ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(255,45,85,.55)'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.moveTo(0, duty > 0 ? hi : lo);
+      for (let p = 0; p < periods; p++) {
+        const x0 = p * pw, xOn = x0 + pw * duty, x1 = x0 + pw;
+        ctx.lineTo(xOn, duty > 0 ? hi : lo);
+        if (duty > 0 && duty < 1) { ctx.lineTo(xOn, lo); ctx.lineTo(x1, lo); ctx.lineTo(x1, hi); }
+        else { ctx.lineTo(x1, duty > 0 ? hi : lo); }
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function frame(now: number) {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      // Integrate the square wave over this frame. This is exactly what the
+      // retina does — which is why high frequencies read as steady dimming
+      // and low ones read as flicker, with no special-casing anywhere.
+      const period = 1 / freq;
+      const onTime = period * duty;
+      let remaining = dt, lit = 0, t = phase;
+      while (remaining > 0) {
+        const inOn = t < onTime;
+        const edge = inOn ? onTime - t : period - t;
+        const step = Math.min(edge, remaining);
+        if (inOn) lit += step;
+        t = (t + step) % period;
+        remaining -= step;
+      }
+      phase = t;
+
+      const instant = dt > 0 ? lit / dt : duty;
+      perceived += (instant - perceived) * (1 - Math.exp(-dt / TAU));
+      const b = perceived;
+      led.style.background = `rgb(${Math.round(42 + 213 * b)} ${Math.round(13 + 32 * b)} ${Math.round(20 + 65 * b)})`;
+      led.style.boxShadow = b > 0.02
+        ? `0 0 ${18 * b + 6}px ${8 * b}px rgba(255,45,85,${0.7 * b}), inset 0 0 10px rgba(255,255,255,${0.35 * b})`
+        : 'inset 0 0 12px #000';
+      out('bright').textContent = `${Math.round(b * 100)}%`;
+
+      if (running) requestAnimationFrame(frame);
+    }
+
+    function sync() {
+      duty = Number(dutyIn.value) / 100;
+      freq = freqOf(Number(freqIn.value));
+      label(); drawScope();
+    }
+    dutyIn.addEventListener('input', sync);
+    freqIn.addEventListener('input', sync);
+    sync();
+
+    // Only burn frames while the panel is actually on screen.
+    new IntersectionObserver((es) => {
+      for (const e of es) {
+        if (e.isIntersecting && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
+        else if (!e.isIntersecting) { running = false; }
+      }
+    }, { threshold: 0.15 }).observe(root);
+  }
+</script>

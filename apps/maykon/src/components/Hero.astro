@@ -1,0 +1,36 @@
+---
+import type { Content } from '../content';
+interface Props { hero: Content['hero'] }
+const { hero } = Astro.props;
+const [first, ...rest] = hero.name.split(' ');
+---
+<header class="hero">
+  <div class="hero__inner">
+    <p class="hero__kicker">{hero.kicker}</p>
+    <h1 class="hero__name">{first} <em>{rest.join(' ')}</em></h1>
+    <p class="hero__headline">{hero.headline}</p>
+    <p class="hero__sub">{hero.sub}</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="#chapters">{hero.cta} ↓</a>
+      <a class="btn" href="https://meneghel.me">meneghel.me</a>
+    </div>
+    <div class="boot mono" data-boot aria-hidden="true">
+      {hero.boot.map((line) => <div class="boot__line">{line}</div>)}
+      <span class="boot__cursor"></span>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Type the boot log out line by line, once, when the page settles.
+  const box = document.querySelector<HTMLElement>('[data-boot]');
+  if (box) {
+    const lines = [...box.querySelectorAll<HTMLElement>('.boot__line')];
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      lines.forEach((l) => l.classList.add('is-on'));
+    } else {
+      lines.forEach((line, i) => setTimeout(() => line.classList.add('is-on'), 260 * i + 400));
+    }
+  }
+</script>

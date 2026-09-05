@@ -1,0 +1,107 @@
+@import "./tokens.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg-900);
+  color: var(--fg-100);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { line-height: 1.1; text-wrap: balance; margin: 0; font-weight: 650; letter-spacing: -0.02em; }
+p { text-wrap: pretty; }
+a { color: inherit; }
+img, svg, canvas { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; }
+
+::selection { background: var(--brand-500); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.mono { font-family: var(--font-mono); font-variant-ligatures: none; }
+
+/* A chapter is one full "lesson" in the playable CV. */
+.chapter {
+  padding-block: clamp(4rem, 12vh, 9rem);
+  padding-inline: var(--gutter);
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+.chapter__inner { max-width: 1080px; margin-inline: auto; }
+.chapter__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brand-500);
+  margin-bottom: 0.9rem;
+}
+.chapter__title { font-size: var(--step-2); margin-bottom: 0.75rem; }
+.chapter__lede { max-width: var(--measure); color: var(--fg-300); font-size: var(--step-1); font-weight: 400; }
+
+/* The instrument panel that houses each mini-game. */
+.panel {
+  margin-top: 2.5rem;
+  background: linear-gradient(180deg, var(--bg-800), var(--bg-900));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel__bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-700);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--fg-500);
+}
+.panel__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line-2); }
+.panel__dot--live { background: var(--ok); box-shadow: 0 0 0 0 color-mix(in oklab, var(--ok) 70%, transparent); animation: pulse 2s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.panel__body { padding: clamp(1rem, 3vw, 1.75rem); }
+
+/* Teaching callout: the one-sentence "what you just learned". */
+.takeaway {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--brand-500);
+  background: color-mix(in oklab, var(--brand-500) 7%, transparent);
+  border-radius: 0 8px 8px 0;
+  font-size: var(--step--1);
+  color: var(--fg-300);
+}
+.takeaway b { color: var(--fg-100); font-weight: 600; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  text-decoration: none;
+  border: 1px solid var(--line-2);
+  background: var(--bg-600);
+  border-radius: 8px;
+  padding: 0.5rem 0.95rem;
+  cursor: pointer;
+  font-size: var(--step--1);
+  font-family: var(--font-mono);
+  transition: border-color .15s, background .15s, transform .06s;
+}
+.btn:hover { border-color: var(--brand-500); background: var(--bg-700); }
+.btn:active { transform: translateY(1px); }
+.btn[aria-pressed="true"], .btn--primary {
+  background: var(--brand-500); border-color: var(--brand-500); color: #fff;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }

@@ -1,0 +1,32 @@
+---
+import type { Chapter } from '../content';
+interface Props { chapter: Chapter; learned: string }
+const { chapter, learned } = Astro.props;
+---
+<section class="chapter" id={chapter.slug} data-chapter={chapter.id}>
+  <div class="chapter__inner">
+    <div class="chapter__head">
+      <p class="chapter__eyebrow">{chapter.id} · {chapter.codename}</p>
+      <h2 class="chapter__title">{chapter.title}</h2>
+      <p class="chapter__lede">{chapter.lede}</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel__bar">
+        <span class="panel__dot panel__dot--live"></span>
+        <span>{chapter.panel}</span>
+      </div>
+      <div class="panel__body">
+        <slot />
+      </div>
+    </div>
+
+    <p class="takeaway">
+      <b>{learned} → </b><span set:html={chapter.takeaway} />
+    </p>
+
+    <div class="stack-tags">
+      {chapter.stack.map((s) => <span>{s}</span>)}
+    </div>
+  </div>
+</section>

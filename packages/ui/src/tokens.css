@@ -1,0 +1,43 @@
+/* Design tokens — sampled from Portfolio-2024.pdf.
+   Primary #FF2D55 is Apple's system pink, which is also the portfolio's accent.
+   Fitting, given the Apple Developer Academy years. */
+:root {
+  --brand-500: #ff2d55;
+  --brand-600: #ff0635;
+  --brand-400: #ff5c7a;
+  --brand-glow: color-mix(in oklab, var(--brand-500) 55%, transparent);
+
+  /* The site is dark by default: it is a workbench, an oscilloscope, a terminal. */
+  --bg-900: #08090c;
+  --bg-800: #0e1015;
+  --bg-700: #14171e;
+  --bg-600: #1c2029;
+  --line:   #262b36;
+  --line-2: #343a48;
+
+  --fg-100: #f2f4f8;
+  --fg-300: #b8bfcc;
+  --fg-500: #7c8598;
+  --fg-700: #4a5262;
+
+  /* Signal colours for the instrumentation widgets */
+  --ok:    #34d399;
+  --warn:  #fbbf24;
+  --fail:  #f43f5e;
+  --info:  #38bdf8;
+  --trace: #a78bfa;
+
+  --font-sans: "Inter var", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+  --step-0:  clamp(0.95rem, 0.90rem + 0.25vw, 1.05rem);
+  --step-1:  clamp(1.20rem, 1.08rem + 0.60vw, 1.55rem);
+  --step-2:  clamp(1.60rem, 1.35rem + 1.25vw, 2.40rem);
+  --step-3:  clamp(2.20rem, 1.65rem + 2.75vw, 4.00rem);
+  --step-4:  clamp(2.90rem, 1.90rem + 5.00vw, 6.50rem);
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --measure: 62ch;
+  --radius: 14px;
+}

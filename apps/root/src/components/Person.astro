@@ -1,0 +1,13 @@
+---
+import type { Person } from '../content';
+interface Props { person: Person; soon: string }
+const { person, soon } = Astro.props;
+const Tag = person.href ? 'a' : 'div';
+---
+<Tag class="person" href={person.href}>
+  <div class="person__frame">PHOTO<br />{person.slug}</div>
+  <span class="person__role">{person.role}</span>
+  <span class="person__name">{person.name}</span>
+  <p class="person__gift">{person.gift}</p>
+  {person.href && <span class="person__go">{new URL(person.href).host} →</span>}
+</Tag>
