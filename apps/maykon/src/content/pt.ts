@@ -299,6 +299,8 @@ export const pt: Content = {
     lede: 'Os produtos em que o projeto mecânico está organizado, reconstruídos a partir dos desenhos pelos quais foram usinados e das listas de material pelas quais foram comprados. Escolha um, desmonte, e leia do que ele é feito.',
     productLabel: 'Produto',
     explode: 'Vista explodida',
+    zoom: 'Zoom',
+    reset: 'Redefinir vista',
     loading: 'carregando as peças impressas…',
     spin: 'arraste para girar',
     autoSpin: 'Girar',

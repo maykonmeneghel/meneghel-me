@@ -52,9 +52,14 @@ const bomOf = (id: string) => {
           <span class="control__label">{steel.explode} <b data-out="explode">0%</b></span>
           <input type="range" min="0" max="100" step="1" value="0" data-explode />
         </label>
+        <label class="control">
+          <span class="control__label">{steel.zoom} <b data-out="zoom">100%</b></span>
+          <input type="range" min="60" max="600" step="10" value="100" data-zoom />
+        </label>
         <div class="st__actions">
           <button type="button" class="btn" data-spin aria-pressed="true">↻ {steel.autoSpin}</button>
           <span class="st__spin mono">↔ {steel.spin}</span>
+          <button type="button" class="btn" data-reset>{steel.reset}</button>
         </div>
       </div>
 
@@ -173,6 +178,7 @@ const bomOf = (id: string) => {
     const ctx = canvas.getContext('2d')!;
     const loading = root.querySelector<HTMLElement>('[data-loading]')!;
     const explodeIn = root.querySelector<HTMLInputElement>('[data-explode]')!;
+    const zoomIn = root.querySelector<HTMLInputElement>('[data-zoom]')!;
     const spinBtn = root.querySelector<HTMLButtonElement>('[data-spin]')!;
     const bomBody = root.querySelector<HTMLElement>('[data-bombody]')!;
     const bomEmpty = root.querySelector<HTMLElement>('[data-bomempty]')!;
@@ -278,7 +284,7 @@ const bomOf = (id: string) => {
       if (!drawables.length) return;
       cam.cx = w / 2;
       cam.cy = h / 2;
-      cam.scale = (Math.min(w, h) * 0.44) / radius;
+      cam.scale = ((Math.min(w, h) * 0.44) / radius) * (Number(zoomIn.value) / 100);
       const lamp = headlight(cam);
       const t = Number(explodeIn.value) / 100;
 
@@ -325,6 +331,39 @@ const bomOf = (id: string) => {
     explodeIn.addEventListener('input', () => {
       out('explode').textContent = `${explodeIn.value}%`;
       draw();
+    });
+    zoomIn.addEventListener('input', () => {
+      out('zoom').textContent = `${zoomIn.value}%`;
+      draw();
+    });
+
+    const setZoom = (next: number) => {
+      const min = Number(zoomIn.min), max = Number(zoomIn.max);
+      const clamped = Math.max(min, Math.min(max, next));
+      const changed = clamped !== Number(zoomIn.value);
+      zoomIn.value = String(Math.round(clamped));
+      out('zoom').textContent = `${zoomIn.value}%`;
+      if (changed) draw();
+      return changed;
+    };
+
+    // The wheel zooms, but only while it has somewhere to go. At either limit it
+    // lets the page scroll on, so nobody gets trapped in the viewer.
+    canvas.addEventListener('wheel', (e) => {
+      const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+      if (setZoom(Number(zoomIn.value) * factor)) e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('dblclick', () => {
+      cam.azimuth = -34;
+      cam.elevation = 18;
+      setZoom(100);
+      explodeIn.value = '0';
+      out('explode').textContent = '0%';
+      draw();
+    });
+    root.querySelector<HTMLButtonElement>('[data-reset]')!.addEventListener('click', () => {
+      canvas.dispatchEvent(new MouseEvent('dblclick'));
     });
     spinBtn.addEventListener('click', () => {
       spinning = !spinning;

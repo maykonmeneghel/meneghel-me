@@ -45,7 +45,7 @@ export function box(w: number, h: number, d: number): Mesh {
  * Tube or solid rod along z, centred on the origin. A top radius of zero gives
  * the cone that tips the mast.
  */
-export function cylinder(rBottom: number, rTop: number, height: number, sides = 24): Mesh {
+export function cylinder(rBottom: number, rTop: number, height: number, sides = 48): Mesh {
   const m: Mesh = { v: [], f: [] };
   const half = height / 2;
   const ring = (r: number, z: number) =>
@@ -73,6 +73,35 @@ export function cylinder(rBottom: number, rTop: number, height: number, sides = 
   if (rBottom > 0) {
     const c = push(m, 0, 0, -half);
     for (let i = 0; i < sides; i++) m.f.push(c, lower[(i + 1) % sides], lower[i]);
+  }
+  return m;
+}
+
+/**
+ * A hollow tube along z: the drawings give Ø76.20 outside and Ø72 inside, so a
+ * 2.1 mm wall. Modelling these as solid rods costs nothing when they are
+ * assembled and everything the moment the view explodes and you can see down
+ * the bore.
+ */
+export function tube(rOuter: number, rInner: number, height: number, sides = 48): Mesh {
+  if (rInner <= 0) return cylinder(rOuter, rOuter, height, sides);
+  const m: Mesh = { v: [], f: [] };
+  const half = height / 2;
+  const ring = (r: number, z: number) =>
+    Array.from({ length: sides }, (_, i) => {
+      const a = (i / sides) * Math.PI * 2;
+      return push(m, Math.cos(a) * r, Math.sin(a) * r, z);
+    });
+
+  const ob = ring(rOuter, -half), ot = ring(rOuter, half);
+  const ib = ring(rInner, -half), it = ring(rInner, half);
+
+  for (let i = 0; i < sides; i++) {
+    const j = (i + 1) % sides;
+    quad(m, ob[i], ob[j], ot[j], ot[i]);   // outside wall
+    quad(m, it[i], it[j], ib[j], ib[i]);   // bore, facing inward
+    quad(m, ot[i], ot[j], it[j], it[i]);   // annular top
+    quad(m, ib[i], ib[j], ob[j], ob[i]);   // annular bottom
   }
   return m;
 }

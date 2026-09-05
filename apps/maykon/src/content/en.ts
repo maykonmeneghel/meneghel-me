@@ -299,6 +299,8 @@ export const en: Content = {
     lede: 'The products the mechanical project is organised into, rebuilt from the drawings they were machined to and the bills of material they were bought against. Pick one, pull it apart, and read what it is made of.',
     productLabel: 'Product',
     explode: 'Exploded view',
+    zoom: 'Zoom',
+    reset: 'Reset view',
     loading: 'loading the printed parts…',
     spin: 'drag to turn',
     autoSpin: 'Spin',

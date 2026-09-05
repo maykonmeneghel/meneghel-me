@@ -1,4 +1,4 @@
-import { box, cylinder, place, merge, bounds } from './solid.ts';
+import { box, cylinder, tube, place, merge, bounds } from './solid.ts';
 import {
   station, corpo, corpoHeight, cabecaOS, cabecaWS, thd, gas, bateria, painel,
   PRODUCTS, buildProduct, TUBE_D, CONE_LEN, TUBE_LEN, COUPLING_LEN, SPACERS,
@@ -53,6 +53,34 @@ const cone = cylinder(0, 6, 15, 20);
 eq(cone.v.length / 3, 20 * 2 + 1, 'a cone needs no cap at its point');
 near(bounds(cone).size[2], 15, 1e-9, 'cone height');
 eq(outwardFraction(cone), 1, 'every cone face points outward');
+
+// --- tube ---
+const t = tube(10, 7, 20, 32);
+eq(t.v.length / 3, 32 * 4, 'a tube is four rings and no cap centres');
+near(bounds(t).size[0], 20, 1e-9, 'as wide as its outer diameter');
+near(bounds(t).size[2], 20, 1e-9, 'and as tall as asked');
+eq(t.f.length / 3, 32 * 8, 'four quads per segment: outside, bore, and two annuli');
+// The bore faces inward, so an outward test on a hollow solid cannot be 100%.
+const outward = outwardFraction(t);
+check(outward > 0.4 && outward < 0.85, 'roughly half its faces point inward, being a bore', `${outward.toFixed(2)}`);
+eq(tube(10, 0, 20, 16).v.length, cylinder(10, 10, 20, 16).v.length,
+  'a tube with no bore is just a cylinder');
+// An inscribed polygon with an even number of sides spans exactly 2r however
+// many sides it has, so width proves nothing. The area is what converges.
+const outerArea = (m: { v: number[] }, sides: number) => {
+  let a = 0;
+  for (let i = 0; i < sides; i++) {
+    const j = (i + 1) % sides;
+    a += m.v[i * 3] * m.v[j * 3 + 1] - m.v[j * 3] * m.v[i * 3 + 1];
+  }
+  return Math.abs(a) / 2;
+};
+const circle = Math.PI * 100;
+const coarse = Math.abs(outerArea(tube(10, 7, 20, 12), 12) - circle);
+const fine = Math.abs(outerArea(tube(10, 7, 20, 48), 48) - circle);
+check(fine < coarse, 'more segments approximate the circle more closely',
+  `48 sides off by ${fine.toFixed(2)} mm², 12 sides by ${coarse.toFixed(2)}`);
+check(fine / circle < 0.01, 'and 48 sides is within a percent of a true circle');
 
 // --- placement and merging ---
 const moved = place(box(2, 2, 2), 10, 0, 0);

@@ -299,6 +299,8 @@ export const es: Content = {
     lede: 'Los productos en que está organizado el proyecto mecánico, reconstruidos a partir de los planos con los que se mecanizaron y las listas de material con las que se compraron. Elige uno, desármalo y lee de qué está hecho.',
     productLabel: 'Producto',
     explode: 'Vista explosionada',
+    zoom: 'Zoom',
+    reset: 'Restablecer vista',
     loading: 'cargando las piezas impresas…',
     spin: 'arrastra para girar',
     autoSpin: 'Girar',

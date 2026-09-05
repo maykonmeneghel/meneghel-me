@@ -142,6 +142,8 @@ export interface CopperGame {
   underneathWord: string;
   hintSolid: string;
   explode: string;
+  zoom: string;
+  reset: string;
   spin: string;
   hintStack: string;
   both: string;
@@ -166,6 +168,8 @@ export interface SteelGame {
   lede: string;
   productLabel: string;
   explode: string;
+  zoom: string;
+  reset: string;
   loading: string;
   spin: string;
   autoSpin: string;

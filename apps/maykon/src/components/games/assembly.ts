@@ -11,7 +11,7 @@
  * Anything printed rather than turned is substituted at runtime by its real
  * STL, placed by `at` and scaled from millimetres.
  */
-import { box, cylinder, place, merge, bounds, type Mesh } from './solid.ts';
+import { box, cylinder, tube, place, merge, bounds, type Mesh } from './solid.ts';
 
 export interface Vec3 { x: number; y: number; z: number }
 
@@ -36,6 +36,9 @@ export const COUPLING_LEN = 60;    // drawing: Conexão Tubos
 export const HEAD_LEN = 44;        // drawing: Suporte Cabeça
 export const PANEL_W = 145;        // drawing: Suporte Painel Solar
 export const PANEL_H = 85;         // drawing
+/** Ø72 inside the Ø76.20 tube: a 2.1 mm wall. (drawing: Espaçador, Conexão) */
+export const BORE_D = 72;
+export const SEGMENTS = 56;
 /** BOM Corpo: two of each, and they set the depths the soil sensors sit at. */
 export const SPACERS = [80, 80, 100, 100, 120, 120];
 
@@ -48,6 +51,7 @@ const ACRYLIC = '#8fa4b8';
 const BOARD = '#0f5132';
 
 const R = TUBE_D / 2;
+const BORE = BORE_D / 2;
 const up = (d: number): Vec3 => ({ x: 0, y: 0, z: d });
 const out = (x: number, y: number, z = 0): Vec3 => ({ x, y, z });
 
@@ -63,14 +67,15 @@ export function corpo(): Piece[] {
     z += height;
   };
 
-  step(cylinder(0, R, CONE_LEN, 28), 'cone', BLUE, CONE_LEN);
+  step(cylinder(0, R, CONE_LEN, SEGMENTS), 'cone', BLUE, CONE_LEN);
   // Couplings and spacers alternate up the shaft; the spacers are what set the
   // depths the buried sensors end up at.
   for (let i = 0; i < SPACERS.length; i++) {
-    if (i < 4) step(cylinder(R * 1.06, R * 1.06, COUPLING_LEN, 28), `coupling-${i}`, STEEL, COUPLING_LEN);
-    step(cylinder(R, R, SPACERS[i], 28), `spacer-${SPACERS[i]}-${i}`, BLUE, SPACERS[i]);
+    // Couplings slip over the tube, so their bore is the tube's outside.
+    if (i < 4) step(tube(R * 1.06, R, COUPLING_LEN, SEGMENTS), `coupling-${i}`, STEEL, COUPLING_LEN);
+    step(tube(R, BORE, SPACERS[i], SEGMENTS), `spacer-${SPACERS[i]}-${i}`, BLUE, SPACERS[i]);
   }
-  step(cylinder(R, R, TUBE_LEN, 28), 'cano', BLUE, TUBE_LEN);
+  step(tube(R, BORE, TUBE_LEN, SEGMENTS), 'cano', BLUE, TUBE_LEN);
   return pieces;
 }
 
@@ -78,12 +83,12 @@ export const corpoHeight = () => bounds(merge(corpo().map((p) => p.mesh!))).size
 
 /** The head: the machined collar, the printed spine and cap, acrylic and the board. */
 function cabeca(variant: 'os' | 'ws'): Piece[] {
-  const collar = place(cylinder(R * 1.05, R * 1.05, HEAD_LEN, 28), 0, 0, 0);
+  const collar = place(tube(R * 1.05, BORE, HEAD_LEN, SEGMENTS), 0, 0, 0);
   const pieces: Piece[] = [
     { id: 'suporte-cabeca', mesh: collar, colour: STEEL, explode: up(0), fromDrawing: true },
-    { id: 'pci', mesh: place(cylinder(35, 35, 1.6, 32), 0, 0, 26), colour: BOARD, explode: up(58), fromDrawing: true },
+    { id: 'pci', mesh: place(cylinder(35, 35, 1.6, SEGMENTS), 0, 0, 26), colour: BOARD, explode: up(58), fromDrawing: true },
     { id: 'barra', stl: 'barra-central', at: { x: 0, y: 0, z: 40 }, colour: WHITE, explode: up(96), fromDrawing: false },
-    { id: 'acrilico', mesh: place(cylinder(34, 34, 3, 32), 0, 0, 62), colour: ACRYLIC, explode: up(134), fromDrawing: true },
+    { id: 'acrilico', mesh: place(cylinder(34, 34, 3, SEGMENTS), 0, 0, 62), colour: ACRYLIC, explode: up(134), fromDrawing: true },
     { id: 'tampa', stl: variant === 'os' ? 'tampa-os' : 'tampa-ws', at: { x: 0, y: 0, z: 86 }, colour: WHITE, explode: up(176), fromDrawing: false },
   ];
   if (variant === 'os') {
@@ -95,8 +100,8 @@ function cabeca(variant: 'os' | 'ws'): Piece[] {
   } else {
     // BOM WS: a UV sensor and a TIL-78 phototransistor instead.
     pieces.push(
-      { id: 'sensor-uv', mesh: place(cylinder(7, 7, 9, 16), -14, 0, 96), colour: DARK, explode: out(-70, 0, 200), fromDrawing: false },
-      { id: 'til-78', mesh: place(cylinder(3, 3, 7, 12), 14, 0, 96), colour: DARK, explode: out(70, 0, 200), fromDrawing: false },
+      { id: 'sensor-uv', mesh: place(cylinder(7, 7, 9, 24), -14, 0, 96), colour: DARK, explode: out(-70, 0, 200), fromDrawing: false },
+      { id: 'til-78', mesh: place(cylinder(3, 3, 7, 20), 14, 0, 96), colour: DARK, explode: out(70, 0, 200), fromDrawing: false },
     );
   }
   return pieces;
@@ -113,16 +118,16 @@ export function thd(): Piece[] {
     const z = -30 + i * 9;
     pieces.push({
       id: `rib-${i}`,
-      mesh: place(cylinder(30, 30, 7, 28), 0, 0, z),
+      mesh: place(tube(i === 3 ? 31 : 30, 11, 7, SEGMENTS), 0, 0, z),
       colour: i === 3 ? BLUE : DARK,   // the blue band in the middle
       explode: up((i - 3) * 26),
       fromDrawing: true,
     });
   }
   pieces.push(
-    { id: 'tampa-acrilico-topo', mesh: place(cylinder(30, 30, 3, 28), 0, 0, 36), colour: ACRYLIC, explode: up(130), fromDrawing: true },
-    { id: 'tampa-acrilico-base', mesh: place(cylinder(30, 30, 3, 28), 0, 0, -38), colour: ACRYLIC, explode: up(-130), fromDrawing: true },
-    { id: 'conector-m12', mesh: place(cylinder(6, 6, 18, 16), 14, 0, 48), colour: STEEL, explode: up(190), fromDrawing: false },
+    { id: 'tampa-acrilico-topo', mesh: place(cylinder(30, 30, 3, SEGMENTS), 0, 0, 36), colour: ACRYLIC, explode: up(130), fromDrawing: true },
+    { id: 'tampa-acrilico-base', mesh: place(cylinder(30, 30, 3, SEGMENTS), 0, 0, -38), colour: ACRYLIC, explode: up(-130), fromDrawing: true },
+    { id: 'conector-m12', mesh: place(tube(6, 3.2, 18, 28), 14, 0, 48), colour: STEEL, explode: up(190), fromDrawing: false },
   );
   return pieces;
 }
@@ -130,7 +135,7 @@ export function thd(): Piece[] {
 /** The gas bank: printed mount and cap, three MQ sensors and a barometer. */
 export function gas(): Piece[] {
   const mq = (x: number, id: string) => ({
-    id, mesh: place(cylinder(9, 9, 14, 16), x, 0, 6), colour: STEEL,
+    id, mesh: place(tube(9, 6.5, 14, 28), x, 0, 6), colour: STEEL,
     explode: up(-70), fromDrawing: false,
   });
   return [
@@ -182,7 +187,7 @@ export function station(): Piece[] {
     // so the station comes apart into products rather than into a haze.
     ...shift(corpo(), 0, 0, -CONE_LEN, 1),
     ...shift(cabecaWS(), 0, 0, mastTop, 1, up(900)),
-    { id: 'arm', mesh: place(cylinder(8, 8, 700, 16), 0, 0, armZ, 'x'), colour: STEEL, explode: up(560), fromDrawing: false },
+    { id: 'arm', mesh: place(tube(8, 6, 700, 28), 0, 0, armZ, 'x'), colour: STEEL, explode: up(560), fromDrawing: false },
     ...shift(painel(), -235, 0, armZ + 10, 1, out(-500, 0, 320)),
     ...shift(gas(), 215, 0, armZ + 6, 1, out(500, 0, 320)),
     ...shift(bateria(), 0, 66, armZ - 200, 1, out(0, 460, 0)),

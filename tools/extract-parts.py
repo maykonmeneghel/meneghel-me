@@ -25,7 +25,7 @@ DEFAULT_DIR = (
 )
 OUT = Path(__file__).resolve().parent.parent / "apps/maykon/public/models/agrom-parts.json"
 
-TARGET_TRIS = 900
+TARGET_TRIS = 2800
 # Coordinates are quantised to this fraction of the part's size before being
 # written as integers, which is what keeps the JSON small.
 QUANT = 2048
@@ -99,7 +99,7 @@ def cluster(tris, divisions):
 def decimate(tris, target):
     """Find the coarsest grid that still leaves roughly `target` triangles."""
     best = None
-    for divisions in (8, 10, 12, 14, 16, 20, 24, 28, 34, 40, 48, 56, 68, 80):
+    for divisions in (8, 10, 12, 14, 16, 20, 24, 28, 34, 40, 48, 56, 68, 80, 96, 120, 150, 190, 240):
         verts, faces = cluster(tris, divisions)
         best = (verts, faces, divisions)
         if len(faces) >= target:
