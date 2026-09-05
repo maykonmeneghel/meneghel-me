@@ -91,6 +91,27 @@ export interface SwarmGame {
   wasteful: string;
 }
 
+export interface MindGame {
+  lede: string;
+  axisX: string;
+  axisY: string;
+  healthy: string;
+  failing: string;
+  adding: string;
+  train: string;
+  pause: string;
+  clear: string;
+  presetSeparable: string;
+  presetXor: string;
+  steps: string;
+  accuracy: string;
+  wrong: string;
+  weights: string;
+  hintPlace: string;
+  hintConverged: string;
+  hintStuck: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -108,5 +129,6 @@ export interface Content {
   record: RecordSection;
   signal: SignalGame;
   swarm: SwarmGame;
+  mind: MindGame;
   ui: Record<string, string>;
 }

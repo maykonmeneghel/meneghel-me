@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 06 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 06, 07 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -54,8 +54,14 @@ TypeScript modules, tested separately from the DOM:
   degrading linearly, that zero replicas is infinite saturation rather than a
   divide-by-zero, and that HPA sizing actually clears the spike.
 
-Node 24 strips types natively, so both run with plain `node` — no runner, no
-build step, no dev dependency.
+- `games/perceptron.ts` is Rosenblatt's 1958 rule. `perceptron.test.ts` asserts
+  both halves of what the chapter claims: separable data always converges, and
+  XOR never does. It also pins the UI's "this is not separable" threshold —
+  over 400 random starts the separable set converged in at most 53 corrections,
+  so warning at 90 cannot fire falsely.
+
+Node 24 strips types natively, so all three run with plain `node` — no runner,
+no build step, no dev dependency.
 
 ## The timeline
 

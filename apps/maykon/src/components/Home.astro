@@ -6,6 +6,7 @@ import Chapter from './Chapter.astro';
 import PwmLab from './games/PwmLab.astro';
 import MqttBench from './games/MqttBench.astro';
 import ClusterLab from './games/ClusterLab.astro';
+import PerceptronLab from './games/PerceptronLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -29,6 +30,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <MqttBench signal={c.signal} />
         ) : chapter.slug === 'swarm' ? (
           <ClusterLab swarm={c.swarm} />
+        ) : chapter.slug === 'mind' ? (
+          <PerceptronLab mind={c.mind} />
         ) : (
           <div class="wip">
             <span>{c.ui.wip}</span>
