@@ -1,0 +1,231 @@
+---
+import type { Content } from '../../content';
+import { DEFAULT_PARAMS } from './strategy';
+
+interface Props { flow: Content['flow'] }
+const { flow } = Astro.props;
+
+/** Node boxes, laid out left to right the way the desk lays them out. */
+const NODES = [
+  { id: 'source',    x: 8,   y: 96,  w: 118, h: 44 },
+  { id: 'rsi',       x: 158, y: 96,  w: 118, h: 44 },
+  { id: 'crossUp',   x: 308, y: 34,  w: 118, h: 44 },
+  { id: 'crossDown', x: 308, y: 158, w: 118, h: 44 },
+  { id: 'entry',     x: 458, y: 34,  w: 112, h: 44 },
+  { id: 'exit',      x: 458, y: 158, w: 112, h: 44 },
+];
+const WIRES = [
+  ['source', 'rsi'], ['rsi', 'crossUp'], ['rsi', 'crossDown'],
+  ['crossUp', 'entry'], ['crossDown', 'exit'],
+];
+const byId = Object.fromEntries(NODES.map((n) => [n.id, n]));
+const path = (a: string, b: string) => {
+  const from = byId[a], to = byId[b];
+  const x1 = from.x + from.w, y1 = from.y + from.h / 2;
+  const x2 = to.x, y2 = to.y + to.h / 2;
+  const mid = (x1 + x2) / 2;
+  return `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`;
+};
+---
+<div class="fl" data-fl data-reveal={flow.reveal} data-hint-in={flow.hintIn} data-hint-out={flow.hintOut}>
+  <p class="fl__lede">{flow.lede}</p>
+
+  <div class="fl__graphwrap">
+    <svg class="fl__graph" viewBox="0 0 582 236" role="img" aria-label="Strategy graph">
+      {WIRES.map(([a, b]) => <path class="fl__wire" d={path(a, b)} />)}
+      {NODES.map((n) => (
+        <g class="fl__node" data-node={n.id}>
+          <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="7" />
+          <text class="fl__nodename" x={n.x + 10} y={n.y + 18}>{flow.nodes[n.id as keyof typeof flow.nodes]}</text>
+          <text class="fl__nodeval" x={n.x + 10} y={n.y + 34} data-nodeval={n.id}></text>
+        </g>
+      ))}
+    </svg>
+  </div>
+
+  <div class="controls">
+    <label class="control">
+      <span class="control__label">{flow.period} <b data-out="period">{DEFAULT_PARAMS.period}</b></span>
+      <input type="range" min="2" max="30" step="1" value={DEFAULT_PARAMS.period} data-p="period" />
+    </label>
+    <label class="control">
+      <span class="control__label">{flow.buyLevel} <b data-out="buy">{DEFAULT_PARAMS.buyLevel}</b></span>
+      <input type="range" min="10" max="60" step="1" value={DEFAULT_PARAMS.buyLevel} data-p="buy" />
+    </label>
+    <label class="control">
+      <span class="control__label">{flow.sellLevel} <b data-out="sell">{DEFAULT_PARAMS.sellLevel}</b></span>
+      <input type="range" min="40" max="90" step="1" value={DEFAULT_PARAMS.sellLevel} data-p="sell" />
+    </label>
+  </div>
+
+  <div class="fl__tabs">
+    <button type="button" class="btn" data-half="in" aria-pressed="true">{flow.inSample}</button>
+    <button type="button" class="btn" data-half="out" aria-pressed="false">{flow.outSample}</button>
+  </div>
+
+  <canvas class="fl__chart" data-chart width="1000" height="420"
+    role="img" aria-label="Price with entries and exits, and the RSI below"></canvas>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{flow.trades}</span>
+      <span class="readout__v" data-out="trades">0</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{flow.returnPct}</span>
+      <span class="readout__v" data-out="ret">0%</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{flow.winRate}</span>
+      <span class="readout__v" data-out="win">0%</span>
+    </div>
+  </div>
+
+  <p class="fl__hint" data-hint>{flow.hintIn}</p>
+  <p class="takeaway fl__reveal" data-revealbox hidden><span data-revealtext></span></p>
+</div>
+
+<style>
+  .fl__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+
+  .fl__graphwrap { overflow-x: auto; }
+  .fl__graph {
+    width: 100%; min-width: 560px; height: auto;
+    background: #06070a; border: 1px solid var(--line); border-radius: 8px;
+  }
+  .fl__wire { fill: none; stroke: var(--line-2); stroke-width: 1.5; }
+  .fl__node rect { fill: var(--bg-700); stroke: var(--line-2); stroke-width: 1; }
+  .fl__node[data-node="entry"] rect { stroke: var(--ok); }
+  .fl__node[data-node="exit"] rect { stroke: var(--fail); }
+  .fl__nodename { fill: var(--fg-300); font-size: 11px; font-family: var(--font-sans); }
+  .fl__nodeval { fill: var(--brand-500); font-size: 11px; font-family: var(--font-mono); }
+
+  .fl__tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 .8rem; }
+  .fl__chart {
+    width: 100%; height: auto; border-radius: 8px;
+    background: #06070a; border: 1px solid var(--line);
+  }
+  .fl__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--fg-300); max-width: 74ch; }
+  .fl__reveal { margin-top: 1rem; border-left-color: var(--warn); background: color-mix(in oklab, var(--warn) 8%, transparent); }
+</style>
+
+<script>
+  import { series, split, backtest, DEFAULT_PARAMS, type Params, type Candle } from './strategy';
+
+  const root = document.querySelector<HTMLElement>('[data-fl]');
+  if (root) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-chart]')!;
+    const ctx = canvas.getContext('2d')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const revealBox = root.querySelector<HTMLElement>('[data-revealbox]')!;
+    const revealText = root.querySelector<HTMLElement>('[data-revealtext]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const nodeVal = (k: string) => root.querySelector<HTMLElement>(`[data-nodeval="${k}"]`)!;
+
+    const halves = split(series(520));
+    const params: Params = { ...DEFAULT_PARAMS };
+    let half: 'in' | 'out' = 'in';
+    // The reveal is worth one appearance, when they first look at the other half.
+    let revealed = false;
+
+    function draw(candles: Candle[], result: ReturnType<typeof backtest>) {
+      const w = canvas.width, h = canvas.height;
+      const priceH = h * 0.66;
+      const rsiTop = priceH + 18;
+      const rsiH = h - rsiTop - 10;
+      ctx.clearRect(0, 0, w, h);
+
+      const closes = candles.map((c) => c.c);
+      const lo = Math.min(...closes), hi = Math.max(...closes);
+      const x = (i: number) => (i / (candles.length - 1)) * (w - 20) + 10;
+      const y = (v: number) => priceH - ((v - lo) / (hi - lo || 1)) * (priceH - 24) - 12;
+
+      ctx.strokeStyle = '#12151c'; ctx.lineWidth = 1;
+      for (let g = 0; g <= 3; g++) {
+        const gy = 12 + ((priceH - 24) / 3) * g;
+        ctx.beginPath(); ctx.moveTo(10, gy); ctx.lineTo(w - 10, gy); ctx.stroke();
+      }
+
+      ctx.beginPath();
+      closes.forEach((c, i) => (i ? ctx.lineTo(x(i), y(c)) : ctx.moveTo(x(i), y(c))));
+      ctx.strokeStyle = '#8b93a5'; ctx.lineWidth = 1.6; ctx.stroke();
+
+      // Each trade is shaded from entry to exit, green if it made money.
+      for (const t of result.trades) {
+        const won = t.pnl > 0;
+        ctx.fillStyle = won ? 'rgba(52,211,153,.14)' : 'rgba(244,63,94,.14)';
+        ctx.fillRect(x(t.entry), 8, Math.max(2, x(t.exit) - x(t.entry)), priceH - 16);
+        for (const [idx, colour] of [[t.entry, '#34d399'], [t.exit, '#f43f5e']] as const) {
+          ctx.beginPath();
+          ctx.arc(x(idx), y(candles[idx].c), 4, 0, Math.PI * 2);
+          ctx.fillStyle = colour; ctx.fill();
+          ctx.strokeStyle = '#06070a'; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+      }
+
+      // RSI below, with the two thresholds the graph is wired to.
+      const ry = (v: number) => rsiTop + rsiH - (v / 100) * rsiH;
+      for (const [level, colour] of [[params.buyLevel, '#34d399'], [params.sellLevel, '#f43f5e']] as const) {
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(10, ry(level)); ctx.lineTo(w - 10, ry(level));
+        ctx.strokeStyle = colour; ctx.lineWidth = 1; ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = colour; ctx.font = '11px ui-monospace, monospace';
+        ctx.fillText(String(level), w - 34, ry(level) - 4);
+      }
+      ctx.beginPath();
+      let started = false;
+      result.rsi.forEach((v, i) => {
+        if (v === null) return;
+        if (started) ctx.lineTo(x(i), ry(v)); else { ctx.moveTo(x(i), ry(v)); started = true; }
+      });
+      ctx.strokeStyle = '#ff2d55'; ctx.lineWidth = 1.6; ctx.stroke();
+    }
+
+    function update() {
+      const candles = half === 'in' ? halves.inSample : halves.outSample;
+      const result = backtest(candles, params);
+
+      nodeVal('rsi').textContent = `period ${params.period}`;
+      nodeVal('crossUp').textContent = `> ${params.buyLevel}`;
+      nodeVal('crossDown').textContent = `< ${params.sellLevel}`;
+      nodeVal('source').textContent = `${candles.length} candles`;
+      nodeVal('entry').textContent = 'long';
+      nodeVal('exit').textContent = 'close';
+
+      out('trades').textContent = String(result.trades.length);
+      out('ret').textContent = `${result.returnPct >= 0 ? '+' : ''}${result.returnPct.toFixed(1)}%`;
+      out('ret').dataset.state = result.returnPct > 0 ? 'ok' : result.returnPct < 0 ? 'fail' : '';
+      out('win').textContent = result.trades.length ? `${Math.round(result.winRate)}%` : '—';
+
+      hint.textContent = half === 'in' ? root!.dataset.hintIn! : root!.dataset.hintOut!;
+      draw(candles, result);
+    }
+
+    root.querySelectorAll<HTMLInputElement>('[data-p]').forEach((input) => {
+      input.addEventListener('input', () => {
+        const key = input.dataset.p!;
+        const v = Number(input.value);
+        if (key === 'period') { params.period = v; out('period').textContent = String(v); }
+        if (key === 'buy') { params.buyLevel = v; out('buy').textContent = String(v); }
+        if (key === 'sell') { params.sellLevel = v; out('sell').textContent = String(v); }
+        update();
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-half]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        half = btn.dataset.half as 'in' | 'out';
+        root.querySelectorAll('[data-half]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        if (half === 'out' && !revealed) {
+          revealed = true;
+          revealText.textContent = root!.dataset.reveal!;
+          revealBox.hidden = false;
+        }
+        update();
+      });
+    });
+
+    update();
+  }
+</script>

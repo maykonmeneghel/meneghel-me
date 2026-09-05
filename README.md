@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | all nine chapters playable |
+| `maykon.meneghel.me` | The CV you can play — ten chapters, each a working mini-game, then the record | all ten chapters playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -13,7 +13,9 @@ A family home and a playable CV, as three independently deployed static sites.
 A CV tells you what someone can do. This one lets you try it. The chapters read
 bottom-up through the stack — `SILICON → COPPER → STEEL → SIGNAL → SERVICE →
 SWARM → MIND → GLASS → SYSTEM` — and every one of them ends with a single
-sentence stating what the visitor just learned by playing with it.
+sentence stating what the visitor just learned by playing with it. `FLOW` then
+turns the corner into the present: the 2019 pivot out of the Apple Developer
+Academy, and Tradx.
 
 Three chapters run on artefacts rather than inventions: `COPPER` renders the
 EAGLE file for the AGROM.IO soil probe board, `STEEL` opens on the SolidWorks
@@ -97,6 +99,14 @@ TypeScript modules, tested separately from the DOM:
   whatever is generated — and the difference the chapter is about: SwiftUI
   declares the gap once on the stack while Flutter needs a spacer between each
   pair of children.
+- `games/strategy.ts` is the Tradx chapter: Wilder's RSI, a trending price
+  series, and a long-only backtest. `strategy.test.ts` checks the indicator
+  against its defining behaviour — pinned at 100 on a series that only rises, 0
+  on one that only falls, smoothed rather than windowed — and then sweeps all
+  75,429 parameter combinations to pin the claim the panel makes on screen: the
+  set that returns most on the tuning half comes 22,949th on the half it never
+  saw. An earlier draft of that sentence said "the bottom two thirds", which is
+  the 30th percentile and therefore false; the test now guards the figure.
 - `games/system.ts` is the finale's chain: the eight chapters in order, what
   each costs in milliseconds, and which of them fail while still returning a
   number. `system.test.ts` checks every stage stops the trace when broken and

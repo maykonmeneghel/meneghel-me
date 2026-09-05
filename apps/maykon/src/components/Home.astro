@@ -12,6 +12,7 @@ import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
 import SystemTrace from './games/SystemTrace.astro';
 import GlassLab from './games/GlassLab.astro';
+import FlowLab from './games/FlowLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -45,6 +46,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <PartLab steel={c.steel} />
         ) : chapter.slug === 'glass' ? (
           <GlassLab glass={c.glass} />
+        ) : chapter.slug === 'flow' ? (
+          <FlowLab flow={c.flow} />
         ) : chapter.slug === 'system' ? (
           <SystemTrace system={c.system} chapters={c.chapters} />
         ) : (

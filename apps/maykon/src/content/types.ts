@@ -217,6 +217,23 @@ export interface GlassGame {
   noteTitle: string;
 }
 
+export interface FlowGame {
+  lede: string;
+  period: string;
+  buyLevel: string;
+  sellLevel: string;
+  run: string;
+  inSample: string;
+  outSample: string;
+  trades: string;
+  returnPct: string;
+  winRate: string;
+  nodes: { source: string; rsi: string; crossUp: string; crossDown: string; entry: string; exit: string };
+  hintIn: string;
+  hintOut: string;
+  reveal: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -240,5 +257,6 @@ export interface Content {
   steel: SteelGame;
   system: SystemGame;
   glass: GlassGame;
+  flow: FlowGame;
   ui: Record<string, string>;
 }
