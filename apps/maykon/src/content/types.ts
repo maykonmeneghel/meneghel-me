@@ -164,23 +164,26 @@ export interface CopperGame {
 
 export interface SteelGame {
   lede: string;
-  assembly: { name: string; kind: string; blurb: string; provenance: string; sourceLabel: string };
-  partsTitle: string;
-  partsLede: string;
-  partsLabel: string;
+  productLabel: string;
+  explode: string;
   loading: string;
   spin: string;
   autoSpin: string;
-  triangles: string;
-  sourceTris: string;
+  pieces: string;
   span: string;
+  fromDrawings: string;
+  bomTitle: string;
+  bomQty: string;
+  bomPart: string;
+  bomSupplier: string;
+  bomNone: string;
+  provenance: string;
   processTitle: string;
   processLede: string;
   processes: { label: string; count: number; note: string }[];
   drawings: string;
-  hint: string;
-  /** Keyed by the part id in public/models/agrom-parts.json. */
-  parts: Record<string, { kind: string; blurb: string }>;
+  /** Keyed by product id. */
+  products: Record<string, { name: string; kind: string; blurb: string }>;
 }
 
 export interface SystemGame {

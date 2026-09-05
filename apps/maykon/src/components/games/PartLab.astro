@@ -3,61 +3,95 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Content } from '../../content';
+import { PRODUCTS } from './assembly';
+import boms from '../../data/agrom-boms.json';
 
 interface Props { steel: Content['steel'] }
 const { steel } = Astro.props;
 
-// The meshes are served from public/, so the bundler never fingerprints them —
-// and the deploy marks everything that is not HTML immutable for a year. Without
-// a version in the URL a returning visitor would be stuck with the old file
-// forever. Hash the contents at build time instead.
-// Resolved from the app root rather than from import.meta.url: this component
-// is bundled into dist/chunks/, where a relative path no longer points at public/.
+// Meshes live in public/, which the bundler never fingerprints, while the deploy
+// marks non-HTML immutable for a year. Hash the contents so an update reaches a
+// returning visitor.
 const modelPath = join(process.cwd(), 'public/models/agrom-parts.json');
 const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest('hex').slice(0, 8);
+
+const bomOf = (id: string) => {
+  const key = PRODUCTS.find((p) => p.id === id)?.bom;
+  return key ? (boms as Record<string, { qty: number; unit: string; part: string; supplier?: string }[]>)[key] ?? [] : [];
+};
 ---
-<div class="st" data-st data-loading={steel.loading} data-parts-copy={JSON.stringify(steel.parts)}
-  data-assembly-copy={JSON.stringify(steel.assembly)} data-model-version={modelVersion}>
+<div class="st" data-st
+  data-model-version={modelVersion}
+  data-products={JSON.stringify(steel.products)}
+  data-boms={JSON.stringify(Object.fromEntries(PRODUCTS.map((p) => [p.id, bomOf(p.id)])))}
+  data-l-none={steel.bomNone}
+>
   <p class="st__lede">{steel.lede}</p>
 
   <div class="st__row">
-    <span class="st__rowlabel mono">{steel.partsLabel}</span>
-    <div class="st__chips" data-parts>
-      <span class="st__loading mono" data-loadnote>{steel.loading}</span>
+    <span class="st__rowlabel mono">{steel.productLabel}</span>
+    <div class="st__chips">
+      {PRODUCTS.map((p, i) => (
+        <button type="button" class="btn mono" data-product={p.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+          {steel.products[p.id]?.name ?? p.id}
+        </button>
+      ))}
     </div>
   </div>
 
-  <div class="st__stage" data-stage>
-    <canvas class="st__canvas" data-canvas width="900" height="900"
-      role="img" aria-label="A 3D-printed part from the AGROM.IO probe"></canvas>
+  <div class="st__split">
+    <div>
+      <div class="st__stage">
+        <canvas class="st__canvas" data-canvas width="900" height="900"
+          role="img" aria-label="A product from the AGROM.IO station, in three dimensions"></canvas>
+        <p class="st__loading mono" data-loading>{steel.loading}</p>
+      </div>
+
+      <div class="controls st__controls">
+        <label class="control">
+          <span class="control__label">{steel.explode} <b data-out="explode">0%</b></span>
+          <input type="range" min="0" max="100" step="1" value="0" data-explode />
+        </label>
+        <div class="st__actions">
+          <button type="button" class="btn" data-spin aria-pressed="true">↻ {steel.autoSpin}</button>
+          <span class="st__spin mono">↔ {steel.spin}</span>
+        </div>
+      </div>
+
       <p class="st__caption">
-      <b data-part-name></b><span data-part-kind></span>
-      <span class="st__blurb" data-part-blurb></span>
-    </p>
+        <b data-part-name></b><span data-part-kind></span>
+        <span class="st__blurb" data-part-blurb></span>
+      </p>
+
+      <div class="readout">
+        <div class="readout__cell">
+          <span class="readout__k">{steel.pieces}</span>
+          <span class="readout__v" data-out="pieces">—</span>
+        </div>
+        <div class="readout__cell">
+          <span class="readout__k">{steel.span}</span>
+          <span class="readout__v" data-out="mm">—</span>
+        </div>
+        <div class="readout__cell">
+          <span class="readout__k">{steel.fromDrawings}</span>
+          <span class="readout__v" data-out="drawn">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="st__bom">
+      <p class="st__bomtitle mono">{steel.bomTitle}</p>
+      <table class="st__table">
+        <thead>
+          <tr><th>{steel.bomQty}</th><th>{steel.bomPart}</th><th>{steel.bomSupplier}</th></tr>
+        </thead>
+        <tbody data-bombody></tbody>
+      </table>
+      <p class="st__bomempty" data-bomempty hidden></p>
+    </div>
   </div>
 
-  <div class="st__bar">
-    <button type="button" class="btn" data-spin aria-pressed="true">↻ {steel.autoSpin}</button>
-    <span class="st__spin mono">↔ {steel.spin}</span>
-  </div>
-
-  <div class="readout">
-    <div class="readout__cell">
-      <span class="readout__k">{steel.span}</span>
-      <span class="readout__v" data-out="mm">—</span>
-    </div>
-    <div class="readout__cell">
-      <span class="readout__k">{steel.triangles}</span>
-      <span class="readout__v" data-out="tris">—</span>
-    </div>
-    <div class="readout__cell">
-      <span class="readout__k">{steel.sourceTris}</span>
-      <span class="readout__v" data-out="src">—</span>
-    </div>
-  </div>
-
-  <p class="st__prov" data-provenance></p>
-  <p class="st__hint">{steel.hint}</p>
+  <p class="st__prov">{steel.provenance}</p>
 
   <div class="st__process">
     <h3 class="st__ptitle">{steel.processTitle}</h3>
@@ -78,188 +112,194 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 </div>
 
 <style>
-  .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.5rem; max-width: 74ch; }
-
-  .st__ptitle--parts { margin-top: 0; }
-  .st__prov {
-    margin: .9rem 0 0; font-size: var(--step--1); color: var(--warn);
-    max-width: 74ch; opacity: .85;
-  }
-  .st__prov:empty { display: none; }
-
-  .st__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
-  .st__rowlabel { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); min-width: 4rem; }
+  .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+  .st__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: baseline; margin-bottom: 1.25rem; }
+  .st__rowlabel { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); min-width: 4.5rem; }
   .st__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
   .st__chips .btn { font-size: 11px; padding: .3rem .6rem; }
-  /* The whole station leads; the parts it is made of follow. */
-  .st__asmchip { margin-right: .5rem; border-color: var(--line-2); }
-  .st__asmchip[aria-pressed="true"] { background: var(--brand-500); border-color: var(--brand-500); color: #fff; }
-  .st__loading { font-size: 11px; color: var(--fg-700); }
+
+  .st__split { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; }
+  @media (max-width: 820px) { .st__split { grid-template-columns: 1fr; } }
 
   .st__stage { position: relative; background: #06070a; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; }
-  .st__canvas { width: min(100%, 480px); height: auto; display: block; cursor: grab; touch-action: pan-y; }
+  .st__canvas { width: 100%; max-width: 460px; height: auto; display: block; cursor: grab; touch-action: pan-y; }
   .st__canvas:active { cursor: grabbing; }
-  .st__caption {
-    margin: 0; padding: 0 1rem 1rem; text-align: center;
-    font-size: var(--step--1); color: var(--fg-500); min-height: 2.6em; max-width: 46ch;
-  }
+  .st__loading { position: absolute; font-size: 11px; color: var(--fg-700); }
+
+  .st__controls { margin-top: 1rem; }
+  .st__actions { display: flex; align-items: center; gap: .8rem; }
+  .st__spin { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+
+  .st__caption { margin: 1rem 0 0; font-size: var(--step--1); color: var(--fg-500); max-width: 56ch; }
   .st__caption b { color: var(--fg-100); font-weight: 600; display: block; }
   .st__blurb { display: block; margin-top: .15rem; }
 
-  .st__bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1rem; }
-  .st__spin { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
-  .st__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--fg-700); max-width: 74ch; }
+  .st__bom { border: 1px solid var(--line); border-radius: 8px; padding: .9rem; background: var(--bg-900); }
+  .st__bomtitle { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); margin: 0 0 .7rem; }
+  .st__table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .st__table th {
+    text-align: left; font-family: var(--font-mono); font-weight: 400;
+    font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--fg-700); padding-bottom: .4rem; border-bottom: 1px solid var(--line);
+  }
+  .st__table td { padding: .3rem 0; vertical-align: top; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
+  .st__table td:first-child { font-family: var(--font-mono); color: var(--brand-500); white-space: nowrap; padding-right: .6rem; }
+  .st__table td:nth-child(2) { color: var(--fg-300); }
+  .st__table td:last-child { color: var(--fg-700); padding-left: .6rem; }
+  .st__bomempty { font-size: var(--step--1); color: var(--fg-700); margin: 0; }
+
+  .st__prov { margin: 1.25rem 0 0; font-size: var(--step--1); color: var(--warn); opacity: .85; max-width: 74ch; }
 
   .st__process { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
   .st__ptitle { font-size: var(--step-1); margin-bottom: .4rem; }
   .st__plede { color: var(--fg-300); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 70ch; }
   .st__plist { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
   .st__pitem { display: flex; align-items: baseline; gap: .9rem; }
-  .st__pcount {
-    min-width: 2.4rem; text-align: right;
-    font-size: var(--step-1); color: var(--brand-500); font-variant-numeric: tabular-nums;
-  }
+  .st__pcount { min-width: 2.4rem; text-align: right; font-size: var(--step-1); color: var(--brand-500); font-variant-numeric: tabular-nums; }
   .st__pbody { display: grid; }
   .st__pbody b { font-weight: 600; font-size: var(--step--1); }
   .st__pnote { font-size: 11px; color: var(--fg-700); }
-  .st__drawings {
-    margin: 1.25rem 0 0; font-size: 10px; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--fg-700);
-  }
+  .st__drawings { margin: 1.25rem 0 0; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
 </style>
 
 <script>
-  import { project, faceNormal, shade, headlight, mix, facesCamera, type Camera, type Vec3 } from './board3d';
-  import { station } from './assembly';
-  import { merge, bounds, type Mesh } from './solid';
-
-  interface PackedPart {
-    id: string; name: string;
-    mm: number; source: number; tris: number;
-    v: number[]; f: number[];
-  }
+  import { project, faceNormal, facesCamera, shade, headlight, mix, type Camera, type Vec3 } from './board3d';
+  import { place, bounds, type Mesh } from './solid';
+  import { PRODUCTS, buildProduct, type Piece, type ProductId } from './assembly';
 
   const root = document.querySelector<HTMLElement>('[data-st]');
   if (root) {
     const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
     const ctx = canvas.getContext('2d')!;
-    const chips = root.querySelector<HTMLElement>('[data-parts]')!;
-    const loadNote = root.querySelector<HTMLElement>('[data-loadnote]')!;
+    const loading = root.querySelector<HTMLElement>('[data-loading]')!;
+    const explodeIn = root.querySelector<HTMLInputElement>('[data-explode]')!;
+    const spinBtn = root.querySelector<HTMLButtonElement>('[data-spin]')!;
+    const bomBody = root.querySelector<HTMLElement>('[data-bombody]')!;
+    const bomEmpty = root.querySelector<HTMLElement>('[data-bomempty]')!;
     const nameOut = root.querySelector<HTMLElement>('[data-part-name]')!;
     const kindOut = root.querySelector<HTMLElement>('[data-part-kind]')!;
     const blurbOut = root.querySelector<HTMLElement>('[data-part-blurb]')!;
-    const copy: Record<string, { kind: string; blurb: string }> = JSON.parse(root.dataset.partsCopy!);
-    const assemblyCopy: { name: string; kind: string; blurb: string; provenance: string; sourceLabel: string } =
-      JSON.parse(root.dataset.assemblyCopy!);
-    const provenance = root.querySelector<HTMLElement>('[data-provenance]')!;
-    const spinBtn = root.querySelector<HTMLButtonElement>('[data-spin]')!;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
 
-    const cam: Camera = { azimuth: -30, elevation: 24, scale: 1, cx: 0, cy: 0 };
+    type Copy = { name: string; kind: string; blurb: string };
+    type BomLine = { qty: number; unit: string; part: string; supplier?: string };
+    const copy: Record<string, Copy> = JSON.parse(root.dataset.products!);
+    const boms: Record<string, BomLine[]> = JSON.parse(root.dataset.boms!);
 
-    /** What the canvas is currently drawing: one or more coloured meshes. */
-    interface Piece { verts: Vec3[]; faces: number[]; colour: string }
+    const cam: Camera = { azimuth: -34, elevation: 18, scale: 1, cx: 0, cy: 0 };
+    /** Printed parts, once their STLs have arrived. */
+    let stls: Record<string, { mesh: Mesh; mm: number }> = {};
+    let current: ProductId = 'station';
     let pieces: Piece[] = [];
-    /** Half the model's largest dimension, used to fit it in the frame. */
-    let radius = 1;
     let spinning = true;
     let visible = false;
     let raf = 0;
 
-    function fit(all: Piece[]) {
-      let lo = [Infinity, Infinity, Infinity];
-      let hi = [-Infinity, -Infinity, -Infinity];
-      for (const piece of all) {
-        for (const v of piece.verts) {
-          const c = [v.x, v.y, v.z];
-          for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], c[k]); hi[k] = Math.max(hi[k], c[k]); }
+    interface Drawable { verts: Vec3[]; faces: number[]; colour: string; explode: Vec3 }
+    let drawables: Drawable[] = [];
+    let radius = 1;
+    let centre: Vec3 = { x: 0, y: 0, z: 0 };
+
+    function meshOf(p: Piece): Mesh | null {
+      if (p.mesh) return p.mesh;
+      if (!p.stl) return null;
+      const part = stls[p.stl];
+      if (!part) return null;
+      // STLs arrive normalised to span 2 on their longest axis; mm restores them.
+      const scale = part.mm / 2;
+      const at = p.at ?? { x: 0, y: 0, z: 0 };
+      return {
+        v: part.mesh.v.map((v, i) => v * scale + (i % 3 === 0 ? at.x : i % 3 === 1 ? at.y : at.z)),
+        f: part.mesh.f,
+      };
+    }
+
+    function load(id: ProductId) {
+      current = id;
+      pieces = buildProduct(id);
+      drawables = [];
+      for (const p of pieces) {
+        const mesh = meshOf(p);
+        if (!mesh) continue;
+        const verts: Vec3[] = [];
+        for (let i = 0; i < mesh.v.length; i += 3) {
+          verts.push({ x: mesh.v[i], y: mesh.v[i + 1], z: mesh.v[i + 2] });
         }
+        drawables.push({ verts, faces: mesh.f, colour: p.colour, explode: p.explode });
       }
-      const centre = hi.map((h, k) => (h + lo[k]) / 2);
-      // Centre the model on the origin so rotation spins about the object, not
-      // about wherever it happened to be modelled.
-      for (const piece of all) {
-        for (const v of piece.verts) { v.x -= centre[0]; v.y -= centre[1]; v.z -= centre[2]; }
-      }
-      radius = Math.max(...hi.map((h, k) => (h - lo[k]) / 2));
-      return { size: hi.map((h, k) => h - lo[k]) };
-    }
 
-    function loadAssembly() {
-      const built = station();
-      pieces = built.map((b) => ({
-        verts: Array.from({ length: b.mesh.v.length / 3 }, (_, i) => ({
-          x: b.mesh.v[i * 3], y: b.mesh.v[i * 3 + 1], z: b.mesh.v[i * 3 + 2],
-        })),
-        faces: b.mesh.f,
-        colour: b.colour,
+      // Fit to the exploded extent so nothing leaves the frame when pulled apart.
+      const all: Mesh[] = drawables.map((d) => ({
+        v: d.verts.flatMap((v) => [v.x + d.explode.x, v.y + d.explode.y, v.z + d.explode.z]),
+        f: [],
       }));
-      const { size } = fit(pieces);
-      cam.elevation = 6;
-      nameOut.textContent = assemblyCopy.name;
-      kindOut.textContent = assemblyCopy.kind;
-      blurbOut.textContent = assemblyCopy.blurb;
-      provenance.textContent = assemblyCopy.provenance;
-      out('mm').textContent = `${Math.round(Math.max(...size))} mm`;
-      out('tris').textContent = pieces.reduce((n, p) => n + p.faces.length / 3, 0).toLocaleString();
-      out('src').textContent = assemblyCopy.sourceLabel;
-      draw();
-    }
+      const b = bounds({ v: all.flatMap((m) => m.v), f: [] });
+      centre = { x: (b.lo[0] + b.hi[0]) / 2, y: (b.lo[1] + b.hi[1]) / 2, z: (b.lo[2] + b.hi[2]) / 2 };
+      radius = Math.max(...b.size) / 2 || 1;
 
-    function loadPart(p: PackedPart, quant: number) {
-      // Each part was normalised to span 2 on its longest axis; mm restores it.
-      const scale = p.mm / 2;
-      const verts: Vec3[] = [];
-      for (let i = 0; i < p.v.length; i += 3) {
-        verts.push({
-          x: (p.v[i] / quant) * scale,
-          y: (p.v[i + 1] / quant) * scale,
-          z: (p.v[i + 2] / quant) * scale,
-        });
-      }
-      pieces = [{ verts, faces: p.f, colour: '#c9ccd4' }];
-      fit(pieces);
-      cam.elevation = 24;
-      provenance.textContent = '';
-      // Names come from Maykon's own files and stay as they are; what the part
-      // is gets described in the reader's language.
-      const said = copy[p.id] ?? { kind: '', blurb: '' };
-      nameOut.textContent = p.name;
+      const said = copy[id] ?? { name: id, kind: '', blurb: '' };
+      nameOut.textContent = said.name;
       kindOut.textContent = said.kind;
       blurbOut.textContent = said.blurb;
-      out('mm').textContent = `${p.mm} mm`;
-      out('tris').textContent = p.tris.toLocaleString();
-      out('src').textContent = p.source.toLocaleString();
+
+      const assembled = bounds({ v: drawables.flatMap((d) => d.verts.flatMap((v) => [v.x, v.y, v.z])), f: [] });
+      out('pieces').textContent = String(pieces.length);
+      out('mm').textContent = `${Math.round(Math.max(...assembled.size))} mm`;
+      const drawn = pieces.filter((p) => p.fromDrawing).length;
+      out('drawn').textContent = `${drawn} / ${pieces.length}`;
+      out('drawn').dataset.state = drawn === pieces.length ? 'ok' : '';
+
+      renderBom(id);
       draw();
+    }
+
+    function renderBom(id: ProductId) {
+      const lines = boms[id] ?? [];
+      bomBody.replaceChildren();
+      bomEmpty.hidden = lines.length > 0;
+      if (!lines.length) {
+        bomEmpty.textContent = root!.dataset.lNone!;
+        return;
+      }
+      for (const line of lines) {
+        const tr = document.createElement('tr');
+        for (const text of [`${line.qty} ${line.unit}`.trim(), line.part, line.supplier ?? '']) {
+          const td = document.createElement('td');
+          td.textContent = text;
+          tr.append(td);
+        }
+        bomBody.append(tr);
+      }
     }
 
     function draw() {
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      if (!pieces.length) return;
-
+      if (!drawables.length) return;
       cam.cx = w / 2;
       cam.cy = h / 2;
       cam.scale = (Math.min(w, h) * 0.44) / radius;
       const lamp = headlight(cam);
+      const t = Number(explodeIn.value) / 100;
 
       const faces: { depth: number; pts: { sx: number; sy: number }[]; colour: string }[] = [];
-      for (const piece of pieces) {
-        for (let i = 0; i < piece.faces.length; i += 3) {
-          const a = piece.verts[piece.faces[i]];
-          const b = piece.verts[piece.faces[i + 1]];
-          const c = piece.verts[piece.faces[i + 2]];
+      for (const d of drawables) {
+        const dx = d.explode.x * t - centre.x;
+        const dy = d.explode.y * t - centre.y;
+        const dz = d.explode.z * t - centre.z;
+        for (let i = 0; i < d.faces.length; i += 3) {
+          const a = d.verts[d.faces[i]], b = d.verts[d.faces[i + 1]], c = d.verts[d.faces[i + 2]];
           const n = faceNormal(a, b, c);
           if (!n || !facesCamera(n, cam)) continue;
-          const pa = project(a, cam), pb = project(b, cam), pc = project(c, cam);
+          const shift = (v: Vec3) => ({ x: v.x + dx, y: v.y + dy, z: v.z + dz });
+          const pa = project(shift(a), cam), pb = project(shift(b), cam), pc = project(shift(c), cam);
           faces.push({
             depth: (pa.depth + pb.depth + pc.depth) / 3,
             pts: [pa, pb, pc],
-            colour: mix(piece.colour, shade(n, 0.28, lamp)),
+            colour: mix(d.colour, shade(n, 0.3, lamp)),
           });
         }
       }
-
       faces.sort((x, y) => x.depth - y.depth);
       for (const f of faces) {
         ctx.beginPath();
@@ -269,8 +309,6 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
         ctx.closePath();
         ctx.fillStyle = f.colour;
         ctx.fill();
-        // Painting a hairline of the same colour closes the seams that
-        // antialiasing leaves between adjacent triangles.
         ctx.strokeStyle = f.colour;
         ctx.lineWidth = 0.6;
         ctx.stroke();
@@ -279,19 +317,30 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 
     function tick() {
       if (!visible) { raf = 0; return; }
-      if (spinning) { cam.azimuth += 0.32; draw(); }
+      if (spinning) { cam.azimuth += 0.3; draw(); }
       raf = requestAnimationFrame(tick);
     }
+    const start = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
-    function start() {
-      if (!raf) { raf = requestAnimationFrame(tick); }
-    }
+    explodeIn.addEventListener('input', () => {
+      out('explode').textContent = `${explodeIn.value}%`;
+      draw();
+    });
+    spinBtn.addEventListener('click', () => {
+      spinning = !spinning;
+      spinBtn.setAttribute('aria-pressed', String(spinning));
+      start();
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-product]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        root.querySelectorAll('[data-product]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        load(btn.dataset.product as ProductId);
+      });
+    });
 
-    // --- drag ---
     let dragging = false, lastX = 0, lastY = 0;
     canvas.addEventListener('pointerdown', (e) => {
-      dragging = true;
-      spinning = false;
+      dragging = true; spinning = false;
       spinBtn.setAttribute('aria-pressed', 'false');
       lastX = e.clientX; lastY = e.clientY;
       try { canvas.setPointerCapture(e.pointerId); } catch { /* not ours to capture */ }
@@ -307,50 +356,25 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
     canvas.addEventListener('pointerup', end);
     canvas.addEventListener('pointercancel', end);
 
-    spinBtn.addEventListener('click', () => {
-      spinning = !spinning;
-      spinBtn.setAttribute('aria-pressed', String(spinning));
-      start();
-    });
-
-    // The meshes are 87 KB, so they are only fetched once someone gets here.
     let loaded = false;
     async function ensureLoaded() {
       if (loaded) return;
       loaded = true;
       try {
         const res = await fetch(`/models/agrom-parts.json?v=${root!.dataset.modelVersion}`);
-        const data: { quant: number; parts: PackedPart[] } = await res.json();
-        loadNote.remove();
-
-        const asmBtn = document.createElement('button');
-        asmBtn.type = 'button';
-        asmBtn.className = 'btn mono st__asmchip';
-        asmBtn.textContent = assemblyCopy.name;
-        asmBtn.setAttribute('aria-pressed', 'true');
-        asmBtn.addEventListener('click', () => {
-          chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === asmBtn)));
-          loadAssembly();
-        });
-        chips.append(asmBtn);
-
-        data.parts.forEach((p) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'btn mono';
-          btn.textContent = p.name;
-          btn.setAttribute('aria-pressed', 'false');
-          btn.addEventListener('click', () => {
-            chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-            loadPart(p, data.quant);
-          });
-          chips.append(btn);
-        });
-        loadAssembly();
-        start();
+        const data = await res.json();
+        for (const p of data.parts) {
+          stls[p.id] = {
+            mm: p.mm,
+            mesh: { v: p.v.map((n: number) => n / data.quant), f: p.f },
+          };
+        }
       } catch {
-        loadNote.textContent = '—';
+        // The turned parts still render; only the printed ones are missing.
       }
+      loading.hidden = true;
+      load(current);
+      start();
     }
 
     new IntersectionObserver((entries) => {

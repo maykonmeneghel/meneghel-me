@@ -46,7 +46,7 @@ apps/manu      manu.meneghel.me
 packages/ui    design tokens and base stylesheet, shared by all three
 infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
-tools          one-off asset pipelines (EAGLE board, IDF model, STL meshes)
+tools          one-off asset pipelines (EAGLE board, IDF model, STL meshes, BOMs)
 docs           what is still needed from Maykon
 ```
 
@@ -108,6 +108,16 @@ TypeScript modules, tested separately from the DOM:
   set that returns most on the tuning half comes 22,949th on the half it never
   saw. An earlier draft of that sentence said "the bottom two thirds", which is
   the 30th percentile and therefore false; the test now guards the figure.
+- `games/assembly.ts` rebuilds the AGROM.IO products from their drawings, with
+  the printed parts dropped in from their STLs and an explode vector per piece.
+  `solid.test.ts` checks the primitives are wound outward, that the mast is the
+  drawn lengths stacked with nothing invented between them, that the body has
+  the four couplings and six spacers its BOM lists, and that exploding a product
+  actually makes it occupy more room — measured, rather than counting how many
+  pieces carry an offset, which a three-piece assembly can never satisfy.
+- `tools/extract-boms.py` reads the seven bills of material out of their .xlsx
+  workbooks — a zip of XML, so stdlib suffices — into 82 line items with
+  quantities and the suppliers they were bought from.
 - `games/splat.ts` scatters gaussians over a mesh, area-weighted, for the
   chapter that shows the same part as triangles and as a field. `splat.test.ts`
   checks that samples stay inside their triangles, that twenty thousand of them
