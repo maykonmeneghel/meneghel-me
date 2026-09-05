@@ -3,7 +3,6 @@ import {
   station, corpo, corpoHeight, cabecaOS, cabecaWS, thd, gas, air, painel, pcb,
   ASSEMBLIES, buildAssembly, TUBE_D, CONE_LEN, TUBE_LEN, COUPLING_LEN,
 } from './assembly.ts';
-import boms from '../../data/agrom-boms.json' with { type: 'json' };
 import { faceNormal } from './board3d.ts';
 
 let fail = 0;
@@ -142,7 +141,9 @@ near(TUBE_D / 25.4, 3, 1e-9, 'the mast tube is 3 inches on the nose');
 
 // --- the mast is exactly its bill of material ---
 const body = corpo();
-eq(body.filter((p) => p.id.startsWith('Conexão Tubos')).length, 4, 'BOM Corpo lists four couplings, and there are four');
+// The quantities come from BOM Corpo, which is no longer shipped but is what
+// these counts were taken from: four couplings, two each of three spacers.
+eq(body.filter((p) => p.id.startsWith('Conexão Tubos')).length, 4, 'four couplings, as the BOM listed');
 eq(body.filter((p) => p.id.startsWith('Espaçador ') && p.id !== 'Espaçador 1000').length, 6, 'and six spacers');
 eq(body.filter((p) => p.id === 'Espaçador 80').length, 2, 'two of the 80');
 eq(body.filter((p) => p.id === 'Espaçador 100').length, 2, 'two of the 100');
@@ -185,16 +186,6 @@ const h = bounds(merge(pieces.filter((p) => p.mesh).map((p) => p.mesh!))).size[2
 check(h > 1800 && h < 2400, 'and stands about two metres', `${h.toFixed(0)} mm`);
 check(pieces.some((p) => p.stl), 'with printed parts dropped into it');
 
-// --- every assembly that claims a bill of material has one ---
-for (const { id, bom } of ASSEMBLIES) {
-  if (!bom) continue;
-  const list = (boms as Record<string, unknown[]>)[bom];
-  check(Array.isArray(list) && list.length > 0, `${id}: its bill of material was extracted`, bom);
-}
-const withSupplier = Object.values(boms as Record<string, { supplier?: string }[]>)
-  .flat().filter((i) => i.supplier).length;
-check(withSupplier > 5, 'and the BOMs carry real suppliers, not just part names',
-  `${withSupplier} lines name one`);
 
 console.log(fail === 0 ? '\nAll assertions passed.' : `\n${fail} failing assertion(s).`);
 process.exit(fail === 0 ? 0 : 1);

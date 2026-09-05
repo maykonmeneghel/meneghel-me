@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Content } from '../../content';
 import { ASSEMBLIES } from './assembly';
-import boms from '../../data/agrom-boms.json';
 
 interface Props { steel: Content['steel'] }
 const { steel } = Astro.props;
@@ -15,16 +14,10 @@ const { steel } = Astro.props;
 const modelPath = join(process.cwd(), 'public/models/agrom-parts.json');
 const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest('hex').slice(0, 8);
 
-const bomOf = (id: string) => {
-  const key = ASSEMBLIES.find((a) => a.id === id)?.bom;
-  return key ? (boms as Record<string, { qty: number; unit: string; part: string; supplier?: string }[]>)[key] ?? [] : [];
-};
 ---
 <div class="st" data-st
   data-model-version={modelVersion}
   data-products={JSON.stringify(steel.products)}
-  data-boms={JSON.stringify(Object.fromEntries(ASSEMBLIES.map((a) => [a.id, bomOf(a.id)])))}
-  data-l-none={steel.bomNone}
 >
   <p class="st__lede">{steel.lede}</p>
 
@@ -39,8 +32,6 @@ const bomOf = (id: string) => {
     </div>
   </div>
 
-  <div class="st__split">
-    <div>
       <div class="st__stage">
         <canvas class="st__canvas" data-canvas width="900" height="900"
           role="img" aria-label="A product from the AGROM.IO station, in three dimensions"></canvas>
@@ -79,19 +70,6 @@ const bomOf = (id: string) => {
         </div>
 
       </div>
-    </div>
-
-    <div class="st__side">
-      <p class="st__bomtitle mono">{steel.bomTitle}</p>
-      <table class="st__table">
-        <thead>
-          <tr><th>{steel.bomQty}</th><th>{steel.bomPart}</th><th>{steel.bomSupplier}</th></tr>
-        </thead>
-        <tbody data-bombody></tbody>
-      </table>
-      <p class="st__bomempty" data-bomempty hidden></p>
-    </div>
-  </div>
 
   <p class="st__prov">{steel.provenance}</p>
 
@@ -120,11 +98,9 @@ const bomOf = (id: string) => {
   .st__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
   .st__chips .btn { font-size: 11px; padding: .3rem .6rem; }
 
-  .st__split { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; }
-  @media (max-width: 820px) { .st__split { grid-template-columns: 1fr; } }
 
   .st__stage { position: relative; background: #06070a; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; }
-  .st__canvas { width: 100%; max-width: 460px; height: auto; display: block; cursor: grab; touch-action: pan-y; }
+  .st__canvas { width: 100%; max-width: 560px; height: auto; display: block; cursor: grab; touch-action: pan-y; }
   .st__canvas:active { cursor: grabbing; }
   .st__loading { position: absolute; font-size: 11px; color: var(--fg-700); }
 
@@ -135,15 +111,6 @@ const bomOf = (id: string) => {
   .st__caption { margin: 1rem 0 0; font-size: var(--step--1); color: var(--fg-500); max-width: 56ch; }
   .st__caption b { color: var(--fg-100); font-weight: 600; display: block; }
   .st__blurb { display: block; margin-top: .15rem; }
-
-  .st__side { border: 1px solid var(--line); border-radius: 8px; padding: .9rem; background: var(--bg-900); }
-  /* BOM rows are built by the script, so they never carry Astro's scoping
-     attribute and the component's own CSS would not reach them. */
-  .st__table :global(td) { padding: .3rem 0; vertical-align: top; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
-  .st__table :global(td:first-child) { font-family: var(--font-mono); color: var(--brand-500); white-space: nowrap; padding-right: .6rem; }
-  .st__table :global(td:nth-child(2)) { color: var(--fg-300); }
-  .st__table :global(td:last-child) { color: var(--fg-700); padding-left: .6rem; }
-  .st__bomempty { font-size: var(--step--1); color: var(--fg-700); margin: 0; }
 
   .st__prov { margin: 1.25rem 0 0; font-size: var(--step--1); color: var(--warn); opacity: .85; max-width: 74ch; }
 
@@ -181,9 +148,7 @@ const bomOf = (id: string) => {
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
 
     type Copy = { name: string; kind: string; blurb: string };
-    type BomLine = { qty: number; unit: string; part: string; supplier?: string };
     const copy: Record<string, Copy> = JSON.parse(root.dataset.products!);
-    const boms: Record<string, BomLine[]> = JSON.parse(root.dataset.boms!);
 
     const cam: Camera = { azimuth: -34, elevation: 18, scale: 1, cx: 0, cy: 0 };
     /** Printed parts, once their STLs have arrived. */
@@ -245,7 +210,6 @@ const bomOf = (id: string) => {
       out('pieces').textContent = String(pieces.length);
       out('mm').textContent = `${Math.round(Math.max(...assembled.size))} mm`;
 
-      renderBom(id);
       draw();
     }
 

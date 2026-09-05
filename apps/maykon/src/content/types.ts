@@ -175,11 +175,6 @@ export interface SteelGame {
   autoSpin: string;
   pieces: string;
   span: string;
-  bomTitle: string;
-  bomQty: string;
-  bomPart: string;
-  bomSupplier: string;
-  bomNone: string;
   provenance: string;
   processTitle: string;
   processLede: string;
