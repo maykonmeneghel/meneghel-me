@@ -212,16 +212,20 @@ export interface GlassGame {
   accent: string;
   layout: string;
   radius: string;
-  chart: string;
   stacked: string;
   inline: string;
-  on: string;
-  off: string;
+  device: string;
+  iphone: string;
+  android: string;
   /** Card contents shown inside the phone. */
-  card: { sensor: string; status: string; label: string; updated: string };
+  card: {
+    sensor: string; status: string; age: string; delta: string;
+    depth: string; depthLabel: string; soil: string; soilLabel: string;
+  };
   /** Uses {n}. */
   note: string;
   noteTitle: string;
+  swiftOnAndroid: string;
 }
 
 export interface FlowGame {

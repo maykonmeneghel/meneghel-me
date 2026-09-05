@@ -1,5 +1,5 @@
 import {
-  swiftUI, flutter, spacingOf, spacerCount, fontOf, ACCENTS, DEFAULT_STATE,
+  swiftUI, flutter, spacingOf, spacerCount, fontOf, hasChart, ACCENTS, DEFAULT_STATE,
   type ScreenState, type Accent, type Layout,
 } from './screen.ts';
 
@@ -26,12 +26,26 @@ for (const accent of Object.keys(ACCENTS) as Accent[]) {
 }
 
 // --- the switch that changes the shape of the screen, not just its gaps ---
-check(swiftUI(st({ layout: 'stacked' })).includes('VStack('), 'stacked is a VStack');
-check(swiftUI(st({ layout: 'inline' })).includes('HStack('), 'inline is an HStack');
-check(!swiftUI(st({ layout: 'inline' })).includes('VStack('), 'and not both at once');
-check(flutter(st({ layout: 'stacked' })).includes('child: Column('), 'stacked is a Column');
-check(flutter(st({ layout: 'inline' })).includes('child: Row('), 'inline is a Row');
-check(!flutter(st({ layout: 'inline' })).includes('child: Column('), 'and not both at once');
+// The card nests: an outer stack holds the header, and the body inside it is
+// the one the arrangement switches. So neither dialect ever contains only one
+// kind — what changes is the balance.
+const count = (text: string, needle: RegExp) => (text.match(needle) ?? []).length;
+const swStacked = swiftUI(st({ layout: 'stacked' }));
+const swInline = swiftUI(st({ layout: 'inline' }));
+// Header and value rows are horizontal in both, so counting HStack or Row
+// distinguishes nothing. What changes is the body wrapper.
+eq(count(swStacked, /VStack\(/g), 2, 'stacked nests a VStack body inside the card');
+eq(count(swInline, /VStack\(/g), 1, 'inline keeps only the card, and lays its body across');
+check(swInline.includes('HStack(alignment: .firstTextBaseline, spacing: 12)'),
+  'the inline body is a baseline-aligned HStack');
+check(swStacked.includes('VStack(alignment: .leading, spacing: 14)'),
+  'the stacked body is a leading-aligned VStack');
+
+const dtStacked = flutter(st({ layout: 'stacked' }));
+const dtInline = flutter(st({ layout: 'inline' }));
+check(dtInline.includes('Expanded(child:'),
+  'Flutter has to wrap the value in Expanded to share a row, which SwiftUI does not');
+check(!dtStacked.includes('Expanded(child:'), 'and does not need it when stacking');
 
 // The detail worth the chapter: Flutter's spacer changes axis with the stack,
 // while SwiftUI writes the same spacing: parameter either way.
@@ -56,25 +70,55 @@ check(flutter(st({ layout: 'inline' })).includes('TextBaseline.alphabetic'),
 check(flutter(st({ layout: 'stacked' })).includes('CrossAxisAlignment.start'),
   'a column aligns on the leading edge');
 
-// --- the chart is present or absent in both, together ---
-check(swiftUI(st({ chart: true })).includes('MoistureChart'), 'swift draws the chart when asked');
-check(!swiftUI(st({ chart: false })).includes('MoistureChart'), 'and leaves it out when not');
-check(flutter(st({ chart: true })).includes('MoistureChart'), 'dart draws the chart when asked');
-check(!flutter(st({ chart: false })).includes('MoistureChart'), 'and leaves it out when not');
+// --- the chart follows the arrangement, in both, together ---
+// There is no room for a chart across a row, so the layout decides rather than
+// a separate switch nobody could see the effect of.
+check(hasChart('stacked') && !hasChart('inline'), 'only the stacked card has room for a chart');
+for (const layout of ['stacked', 'inline'] as Layout[]) {
+  const wanted = hasChart(layout);
+  eq(swiftUI(st({ layout })).includes('MoistureChart'), wanted, `swift: chart present iff ${layout}`);
+  eq(flutter(st({ layout })).includes('MoistureChart'), wanted, `dart: chart present iff ${layout}`);
+  // The divider and the footer stats belong to the same taller card.
+  eq(swiftUI(st({ layout })).includes('Divider'), wanted, `swift: divider present iff ${layout}`);
+  eq(flutter(st({ layout })).includes('Divider'), wanted, `dart: divider present iff ${layout}`);
+}
+
+// --- everything the preview draws has to exist in both sources ---
+// A gradient or a chip shown in the phone and missing from the code would make
+// the whole comparison a lie.
+for (const layout of ['stacked', 'inline'] as Layout[]) {
+  const sw = swiftUI(st({ layout }));
+  const dt = flutter(st({ layout }));
+  for (const [name, inSwift, inDart] of [
+    ['the sensor label', 'reading.sensor', 'reading.sensor'],
+    ['the age chip', 'TimeChip', 'TimeChip'],
+    ['the delta chip', 'DeltaChip', 'DeltaChip'],
+    ['the status pill', 'StatusPill', 'StatusPill'],
+    ['the gradient', 'LinearGradient', 'LinearGradient'],
+    ['the hairline border', 'strokeBorder', 'Border.all'],
+    ['the percent sign', '"%"', "'%'"],
+  ] as const) {
+    check(sw.includes(inSwift), `${layout} swift has ${name}`);
+    check(dt.includes(inDart), `${layout} dart has ${name}`);
+  }
+}
 
 // --- the difference the chapter is actually about ---
 // SwiftUI states the gap once on the stack; Flutter spells out a spacer between
 // every pair of children. That is a genuine difference, not a staged one.
-const withChart = spacerCount(st({ chart: true }));
-eq(withChart.swift, 1, 'SwiftUI declares spacing once, on the stack');
-check(withChart.dart >= 3, 'Flutter needs an explicit spacer between each pair', `${withChart.dart}`);
-check(withChart.dart > withChart.swift, 'which is more places to change when the design does');
-const withoutChart = spacerCount(st({ chart: false }));
-check(withoutChart.dart < withChart.dart, 'dropping the chart drops one of Flutter’s spacers too');
-eq(withoutChart.swift, 1, 'while SwiftUI still says it once');
+const stacked = spacerCount(st({ layout: 'stacked' }));
+check(stacked.dart > stacked.swift, 'Flutter needs more explicit spacers than SwiftUI does',
+  `${stacked.dart} vs ${stacked.swift}`);
+const inlined = spacerCount(st({ layout: 'inline' }));
+check(inlined.dart < stacked.dart, 'the shorter inline card needs fewer of them');
+// The ratio is the claim, not an arbitrary ceiling: whatever the card grows
+// into, Flutter needs more explicit spacers to express the same gaps.
+check(stacked.dart / Math.max(stacked.swift, 1) >= 1.5,
+  'and needs meaningfully more of them, not just one more',
+  `${stacked.dart} vs ${stacked.swift}`);
 
 // --- neither generator emits something obviously broken ---
-for (const state of [st(), st({ chart: false }), st({ layout: 'inline', accent: 'ok', radius: 0 }), st({ layout: 'inline', chart: false })]) {
+for (const state of [st(), st({ layout: 'inline' }), st({ layout: 'inline', accent: 'ok', radius: 0 }), st({ accent: 'info', radius: 32 })]) {
   for (const [name, code] of [['swift', swiftUI(state)], ['dart', flutter(state)]] as const) {
     const opens = (code.match(/\(/g) ?? []).length;
     const closes = (code.match(/\)/g) ?? []).length;
