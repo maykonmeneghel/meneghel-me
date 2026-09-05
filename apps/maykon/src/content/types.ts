@@ -132,6 +132,7 @@ export interface ServiceGame {
 
 export interface CopperGame {
   lede: string;
+  viewLabel: string;
   layersLabel: string;
   view2d: string;
   view3d: string;
@@ -163,6 +164,10 @@ export interface CopperGame {
 
 export interface SteelGame {
   lede: string;
+  assemblyCaption: string;
+  assemblyAlt: string;
+  partsTitle: string;
+  partsLede: string;
   partsLabel: string;
   loading: string;
   spin: string;

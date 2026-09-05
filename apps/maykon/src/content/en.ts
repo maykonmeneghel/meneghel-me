@@ -251,6 +251,7 @@ export const en: Content = {
   },
   copper: {
     lede: 'This is not an illustration. It is AGROM.brd, the board I laid out in 2017 for the soil probe — 70 mm across, two copper layers, 54 components — read straight out of the EAGLE file and drawn here. Pick a net and follow it.',
+    viewLabel: 'View',
     layersLabel: 'Layers',
     view2d: 'Flat',
     view3d: 'Stack',
@@ -279,7 +280,11 @@ export const en: Content = {
     hintOneLayer: 'Half the board just vanished. Everything missing is running on the other face — and the only reason it can is that the two faces are stitched together by vias.',
   },
   steel: {
-    lede: 'Seven parts I modelled in SolidWorks and printed, loaded here from the same STLs that went to the printer. Turn one over.',
+    lede: 'This is the soil sensor as I rendered it from the assembly in 2017: a ribbed body that grips the earth, a sealed seam where the two halves meet, and an M12 head for the cable.',
+    assemblyCaption: 'Sensor THD Soil — the assembled unit, rendered from the SolidWorks assembly',
+    assemblyAlt: 'Render of the assembled AGROM.IO soil sensor',
+    partsTitle: 'What it is made of',
+    partsLede: 'The seven printed parts, loaded from the same STLs that went to the printer. Turn one over.',
     partsLabel: 'Part',
     loading: 'loading meshes…',
     spin: 'drag to turn',

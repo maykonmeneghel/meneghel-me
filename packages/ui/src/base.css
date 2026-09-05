@@ -24,6 +24,10 @@ a { color: inherit; }
 img, svg, canvas { max-width: 100%; display: block; }
 button { font: inherit; color: inherit; }
 
+/* The hidden attribute loses to any explicit display in a rule, which silently
+   left panels on screen that had been switched off. Settle it once, globally. */
+[hidden] { display: none !important; }
+
 ::selection { background: var(--brand-500); color: #fff; }
 
 :focus-visible {

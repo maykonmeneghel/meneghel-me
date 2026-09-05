@@ -251,6 +251,7 @@ export const pt: Content = {
   },
   copper: {
     lede: 'Isto não é uma ilustração. É o AGROM.brd, a placa que eu roteei em 2017 para a sonda de solo — 70 mm de diâmetro, duas camadas de cobre, 54 componentes — lido direto do arquivo do EAGLE e desenhado aqui. Escolha uma net e siga ela.',
+    viewLabel: 'Vista',
     layersLabel: 'Camadas',
     view2d: 'Plana',
     view3d: 'Empilhada',
@@ -279,7 +280,11 @@ export const pt: Content = {
     hintOneLayer: 'Metade da placa sumiu. Tudo o que falta está correndo na outra face — e o único motivo de isso ser possível é que as duas faces estão costuradas por vias.',
   },
   steel: {
-    lede: 'Sete peças que eu modelei no SolidWorks e imprimi, carregadas aqui dos mesmos STLs que foram para a impressora. Vire uma.',
+    lede: 'Este é o sensor de solo como eu renderizei da montagem em 2017: corpo estriado que agarra a terra, junta vedada onde as duas metades se encontram, e cabeça M12 para o cabo.',
+    assemblyCaption: 'Sensor THD Soil — a unidade montada, renderizada da montagem no SolidWorks',
+    assemblyAlt: 'Render do sensor de solo AGROM.IO montado',
+    partsTitle: 'Do que ele é feito',
+    partsLede: 'As sete peças impressas, carregadas dos mesmos STLs que foram para a impressora. Vire uma.',
     partsLabel: 'Peça',
     loading: 'carregando malhas…',
     spin: 'arraste para girar',

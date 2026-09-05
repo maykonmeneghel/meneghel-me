@@ -19,6 +19,15 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 <div class="st" data-st data-loading={steel.loading} data-parts-copy={JSON.stringify(steel.parts)} data-model-version={modelVersion}>
   <p class="st__lede">{steel.lede}</p>
 
+  <figure class="st__assembly">
+    <img src="/img/agrom-sensor.jpg" alt={steel.assemblyAlt}
+      width="959" height="682" loading="lazy" decoding="async" />
+    <figcaption class="mono">{steel.assemblyCaption}</figcaption>
+  </figure>
+
+  <h3 class="st__ptitle st__ptitle--parts">{steel.partsTitle}</h3>
+  <p class="st__plede">{steel.partsLede}</p>
+
   <div class="st__row">
     <span class="st__rowlabel mono">{steel.partsLabel}</span>
     <div class="st__chips" data-parts>
@@ -76,7 +85,19 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 </div>
 
 <style>
-  .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+  .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.5rem; max-width: 74ch; }
+
+  .st__assembly { margin: 0 0 2.5rem; display: grid; justify-items: center; gap: .8rem; }
+  /* The alpha was composited against this exact colour, so the seam is invisible. */
+  .st__assembly img {
+    width: min(100%, 620px); height: auto; border-radius: 10px;
+    background: #08090c; border: 1px solid var(--line);
+  }
+  .st__assembly figcaption {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--fg-700); text-align: center; max-width: 52ch;
+  }
+  .st__ptitle--parts { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
 
   .st__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
   .st__rowlabel { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); min-width: 4rem; }

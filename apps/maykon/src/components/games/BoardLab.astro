@@ -48,16 +48,20 @@ const pctOf = (x: number, y: number) => ({
 
   <div class="cu__controls">
     <div class="cu__group">
-      <span class="cu__grouplabel mono">{copper.layersLabel}</span>
-      <button type="button" class="btn cu__chip" data-layer="both" aria-pressed="true">{copper.both}</button>
-      <button type="button" class="btn cu__chip" data-layer="top" aria-pressed="false">{copper.topOnly}</button>
-      <button type="button" class="btn cu__chip" data-layer="bot" aria-pressed="false">{copper.bottomOnly}</button>
-      <span class="cu__spacer"></span>
+      <span class="cu__grouplabel mono">{copper.viewLabel}</span>
       <button type="button" class="btn cu__chip" data-view="flat" aria-pressed="true">{copper.view2d}</button>
       <button type="button" class="btn cu__chip" data-view="stack" aria-pressed="false">{copper.view3d}</button>
       <button type="button" class="btn cu__chip" data-view="solid" aria-pressed="false">{copper.viewSolid}</button>
     </div>
-    <div class="cu__group">
+
+    {/* Layers and nets only mean something on the drawn views. */}
+    <div class="cu__group" data-copper-only>
+      <span class="cu__grouplabel mono">{copper.layersLabel}</span>
+      <button type="button" class="btn cu__chip" data-layer="both" aria-pressed="true">{copper.both}</button>
+      <button type="button" class="btn cu__chip" data-layer="top" aria-pressed="false">{copper.topOnly}</button>
+      <button type="button" class="btn cu__chip" data-layer="bot" aria-pressed="false">{copper.bottomOnly}</button>
+    </div>
+    <div class="cu__group" data-copper-only>
       <span class="cu__grouplabel mono">{copper.netsLabel}</span>
       <button type="button" class="btn cu__chip" data-net="" aria-pressed="true">{copper.allNets}</button>
       {featured.map((n) => (
@@ -301,6 +305,7 @@ const pctOf = (x: number, y: number) => ({
     };
     const canvasEl = root.querySelector<HTMLElement>('[data-canvas]')!;
     const solidbar = root.querySelector<HTMLElement>('[data-solidbar]')!;
+    const copperOnly = [...root.querySelectorAll<HTMLElement>('[data-copper-only]')];
 
     let net = '';
     let layer: 'both' | 'top' | 'bot' = 'both';
@@ -350,6 +355,9 @@ const pctOf = (x: number, y: number) => ({
       stackbar.hidden = next !== 'stack';
       solidbar.hidden = next !== 'solid';
       canvasEl.hidden = next !== 'solid';
+      // The assembled view is a photograph of the board, not a drawing of it:
+      // picking layers or highlighting a net has nothing to act on there.
+      for (const el of copperOnly) el.hidden = next === 'solid';
       // Opening the stack tilts it to an angle where the gap is legible.
       tiltX = next === 'stack' ? 62 : 0;
       spinZ = next === 'stack' ? -22 : 0;
