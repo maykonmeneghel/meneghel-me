@@ -20,10 +20,23 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
   <p class="st__lede">{steel.lede}</p>
 
   <figure class="st__assembly">
-    <img src="/img/agrom-sensor.jpg" alt={steel.assemblyAlt}
-      width="959" height="682" loading="lazy" decoding="async" />
+    <img class="st__hero" src="/img/agrom-station.jpg" alt={steel.assemblyAlt}
+      width="546" height="1120" loading="lazy" decoding="async" />
     <figcaption class="mono">{steel.assemblyCaption}</figcaption>
   </figure>
+
+  <div class="st__details">
+    <figure>
+      <img src="/img/agrom-head.jpg" alt={steel.detailHeadAlt}
+        width="546" height="1120" loading="lazy" decoding="async" />
+      <figcaption class="mono">{steel.detailHeadCaption}</figcaption>
+    </figure>
+    <figure>
+      <img src="/img/agrom-sensor.jpg" alt={steel.detailSensorAlt}
+        width="959" height="682" loading="lazy" decoding="async" />
+      <figcaption class="mono">{steel.detailSensorCaption}</figcaption>
+    </figure>
+  </div>
 
   <h3 class="st__ptitle st__ptitle--parts">{steel.partsTitle}</h3>
   <p class="st__plede">{steel.partsLede}</p>
@@ -87,15 +100,27 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 <style>
   .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.5rem; max-width: 74ch; }
 
-  .st__assembly { margin: 0 0 2.5rem; display: grid; justify-items: center; gap: .8rem; }
-  /* The alpha was composited against this exact colour, so the seam is invisible. */
-  .st__assembly img {
-    width: min(100%, 620px); height: auto; border-radius: 10px;
-    background: #08090c; border: 1px solid var(--line);
+  .st__assembly { margin: 0 0 1rem; display: grid; justify-items: center; gap: .8rem; }
+  /* The station render is a tall portrait: bound it by height, not by width. */
+  .st__hero {
+    max-height: min(62vh, 560px); width: auto; max-width: 100%;
+    border-radius: 10px; border: 1px solid var(--line);
   }
-  .st__assembly figcaption {
+  .st__details {
+    display: grid; gap: 1rem; margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items: end;
+  }
+  .st__details figure { margin: 0; display: grid; justify-items: center; gap: .6rem; }
+  .st__details img {
+    max-height: 260px; width: auto; max-width: 100%;
+    border-radius: 8px; border: 1px solid var(--line);
+    /* The sensor render was flattened against this colour; the seam disappears. */
+    background: #08090c;
+  }
+  .st__assembly figcaption, .st__details figcaption {
     font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--fg-700); text-align: center; max-width: 52ch;
+    color: var(--fg-700); text-align: center; max-width: 46ch;
   }
   .st__ptitle--parts { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
 

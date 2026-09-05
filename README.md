@@ -91,6 +91,12 @@ TypeScript modules, tested separately from the DOM:
   camera keeps the underside readable without washing out faces turned away.
   Three of those assertions were written after the bug they describe.
 
+- `games/screen.ts` emits the same card as SwiftUI and as Flutter from one
+  state. `screen.test.ts` checks both dialects carry every value, that the
+  chart appears and disappears in both together, that brackets balance in
+  whatever is generated — and the difference the chapter is about: SwiftUI
+  declares the gap once on the stack while Flutter needs a spacer between each
+  pair of children.
 - `games/system.ts` is the finale's chain: the eight chapters in order, what
   each costs in milliseconds, and which of them fail while still returning a
   number. `system.test.ts` checks every stage stops the trace when broken and
@@ -118,6 +124,18 @@ pinned to whatever meshes they downloaded first, permanently.
 transcribed from the LinkedIn export and cross-checked against the 2024 portfolio.
 Roles overlap on purpose: the point of the scrubber is that from 2017 onward there
 were almost never fewer than two running at the same time, peaking at four in 2023.
+
+## A trap worth writing down
+
+Astro scopes a component's `<style>` by stamping a `data-astro-cid-*` attribute
+on the elements in its template. Anything a script creates afterwards — with
+`createElement`, or by assigning `innerHTML` — never gets that attribute, so the
+component's own CSS silently does not apply to it. It cost an hour twice: once
+on the MQTT stream rows, which lost their colours and their strikethrough, and
+again on the syntax-highlighted tokens in chapter 08, which rendered grey.
+
+Two ways out, both used here: clone a `<template>` from the markup so the
+attribute comes with the node, or write the rule as `.parent :global(.child)`.
 
 ## Choices worth explaining
 

@@ -166,6 +166,10 @@ export interface SteelGame {
   lede: string;
   assemblyCaption: string;
   assemblyAlt: string;
+  detailHeadCaption: string;
+  detailHeadAlt: string;
+  detailSensorCaption: string;
+  detailSensorAlt: string;
   partsTitle: string;
   partsLede: string;
   partsLabel: string;
@@ -201,6 +205,23 @@ export interface SystemGame {
   stages: Record<string, { name: string; does: string; payload: string; broken: string }>;
 }
 
+export interface GlassGame {
+  lede: string;
+  accent: string;
+  density: string;
+  radius: string;
+  chart: string;
+  compact: string;
+  comfortable: string;
+  on: string;
+  off: string;
+  /** Card contents shown inside the phone. */
+  card: { sensor: string; status: string; label: string; updated: string };
+  /** Uses {n}. */
+  note: string;
+  noteTitle: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -223,5 +244,6 @@ export interface Content {
   copper: CopperGame;
   steel: SteelGame;
   system: SystemGame;
+  glass: GlassGame;
   ui: Record<string, string>;
 }

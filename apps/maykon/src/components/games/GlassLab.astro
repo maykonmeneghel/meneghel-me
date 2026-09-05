@@ -1,0 +1,257 @@
+---
+import type { Content } from '../../content';
+import { DEFAULT_STATE, ACCENTS } from './screen';
+
+interface Props { glass: Content['glass'] }
+const { glass } = Astro.props;
+---
+<div class="gl" data-gl data-note={glass.note}>
+  <p class="gl__lede">{glass.lede}</p>
+
+  <div class="gl__controls">
+    <div class="gl__group">
+      <span class="gl__label mono">{glass.accent}</span>
+      {(Object.keys(ACCENTS) as (keyof typeof ACCENTS)[]).map((k) => (
+        <button type="button" class="gl__swatch" data-accent={k}
+          aria-pressed={k === DEFAULT_STATE.accent ? 'true' : 'false'}
+          style={`--sw:${ACCENTS[k].css}`} aria-label={k}></button>
+      ))}
+    </div>
+    <div class="gl__group">
+      <span class="gl__label mono">{glass.density}</span>
+      <button type="button" class="btn gl__chip" data-density="comfortable" aria-pressed="true">{glass.comfortable}</button>
+      <button type="button" class="btn gl__chip" data-density="compact" aria-pressed="false">{glass.compact}</button>
+    </div>
+    <div class="gl__group">
+      <span class="gl__label mono">{glass.chart}</span>
+      <button type="button" class="btn gl__chip" data-chart aria-pressed="true"
+        data-on={glass.on} data-off={glass.off}>{glass.on}</button>
+    </div>
+    <label class="control gl__radius">
+      <span class="control__label">{glass.radius} <b data-out="radius">{DEFAULT_STATE.radius}</b></span>
+      <input type="range" min="0" max="32" step="1" value={DEFAULT_STATE.radius} data-radius />
+    </label>
+  </div>
+
+  <div class="gl__stage">
+    <div class="gl__phone">
+      <div class="gl__screen">
+        <div class="gl__card" data-card>
+          <span class="gl__sensor" data-gap>{glass.card.sensor}</span>
+          <span class="gl__value" data-gap data-accent-target>43<i>%</i></span>
+          <span class="gl__pill" data-gap>{glass.card.status}</span>
+          <svg class="gl__chartsvg" data-chartsvg viewBox="0 0 200 44" aria-hidden="true">
+            <polyline points="0,32 22,28 44,33 66,22 88,26 110,14 132,18 154,9 176,13 200,6" />
+          </svg>
+        </div>
+        <p class="gl__updated">{glass.card.updated}</p>
+      </div>
+    </div>
+
+    <div class="gl__code">
+      <div class="gl__tabs">
+        <button type="button" class="btn gl__tab" data-fw="swift" aria-pressed="true">SwiftUI</button>
+        <button type="button" class="btn gl__tab" data-fw="dart" aria-pressed="false">Flutter</button>
+        <span class="gl__file mono" data-file>ReadingCard.swift</span>
+      </div>
+      <pre class="gl__pre mono"><code data-code></code></pre>
+    </div>
+  </div>
+
+  <p class="takeaway gl__note">
+    <b>{glass.noteTitle} → </b><span data-note-text></span>
+  </p>
+</div>
+
+<style>
+  .gl__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+
+  .gl__controls { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; margin-bottom: 1.5rem; }
+  .gl__group { display: flex; align-items: center; gap: .45rem; }
+  .gl__label { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .gl__chip { font-size: 11px; padding: .3rem .6rem; }
+  .gl__radius { max-width: 220px; flex: 1 1 180px; }
+  .gl__swatch {
+    width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+    background: var(--sw); border: 2px solid transparent; box-shadow: 0 0 0 1px var(--line-2);
+  }
+  .gl__swatch[aria-pressed="true"] { border-color: var(--bg-900); box-shadow: 0 0 0 2px var(--sw); }
+
+  .gl__stage { display: grid; gap: 1.5rem; grid-template-columns: minmax(220px, 260px) 1fr; align-items: start; }
+  @media (max-width: 760px) { .gl__stage { grid-template-columns: 1fr; justify-items: center; } }
+
+  .gl__phone {
+    width: 100%; max-width: 260px; aspect-ratio: 9 / 17;
+    border: 2px solid var(--line-2); border-radius: 28px; padding: 12px;
+    background: #0b0d12; box-shadow: inset 0 0 0 6px #05060a;
+  }
+  .gl__screen { height: 100%; display: grid; align-content: start; gap: .6rem; padding-top: 1.4rem; }
+  .gl__card {
+    display: grid; justify-items: start;
+    padding: 16px;
+    background: linear-gradient(180deg, #1a1e27, #14171e);
+    border: 1px solid var(--line);
+    /* Both the radius and the gaps come straight from the same state as the code. */
+    border-radius: var(--gl-radius, 18px);
+  }
+  .gl__card [data-gap] + [data-gap],
+  .gl__card [data-gap] + svg { margin-top: var(--gl-gap, 14px); }
+  .gl__sensor { font-size: 10px; letter-spacing: .1em; color: var(--fg-500); font-family: var(--font-mono); }
+  .gl__value { font-size: 44px; font-weight: 600; line-height: 1; color: var(--gl-accent, #ff2d55); }
+  .gl__value i { font-size: 20px; font-style: normal; margin-left: 2px; }
+  .gl__pill {
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: .2rem .55rem; border-radius: 999px;
+    color: var(--ok); border: 1px solid color-mix(in oklab, var(--ok) 45%, transparent);
+  }
+  .gl__chartsvg { width: 100%; height: 44px; }
+  .gl__chartsvg polyline { fill: none; stroke: var(--gl-accent, #ff2d55); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+  .gl__updated { margin: 0; font-size: 10px; color: var(--fg-700); font-family: var(--font-mono); }
+
+  .gl__code { min-width: 0; }
+  .gl__tabs { display: flex; gap: .4rem; align-items: center; margin-bottom: .6rem; }
+  .gl__tab { font-size: 11px; padding: .3rem .7rem; }
+  .gl__file { margin-left: auto; font-size: 10px; color: var(--fg-700); }
+  .gl__pre {
+    margin: 0; padding: 1rem; overflow-x: auto;
+    background: #06070a; border: 1px solid var(--line); border-radius: 8px;
+    font-size: 11.5px; line-height: 1.6; color: var(--fg-300);
+    max-height: 460px; overflow-y: auto;
+  }
+  /* The token spans are produced by the script, so they never carry Astro's
+     scoping attribute. The container stays scoped; the children must not be.
+     This is the same trap that hid the MQTT stream rows in chapter 04. */
+  .gl__pre :global(.k) { color: #ff7a9c; }
+  .gl__pre :global(.t) { color: #7dd3fc; }
+  .gl__pre :global(.s) { color: #86efac; }
+  .gl__pre :global(.n) { color: #fbbf24; }
+  .gl__pre :global(.c) { color: var(--fg-700); font-style: italic; }
+
+  .gl__note { margin-top: 1.5rem; }
+</style>
+
+<script>
+  import {
+    swiftUI, flutter, spacingOf, spacerCount, ACCENTS, DEFAULT_STATE,
+    type ScreenState, type Accent, type Density,
+  } from './screen';
+
+  const root = document.querySelector<HTMLElement>('[data-gl]');
+  if (root) {
+    const codeOut = root.querySelector<HTMLElement>('[data-code]')!;
+    const fileOut = root.querySelector<HTMLElement>('[data-file]')!;
+    const card = root.querySelector<HTMLElement>('[data-card]')!;
+    const chartSvg = root.querySelector<SVGElement>('[data-chartsvg]')!;
+    const radiusOut = root.querySelector<HTMLElement>('[data-out="radius"]')!;
+    const noteOut = root.querySelector<HTMLElement>('[data-note-text]')!;
+    const noteTpl = root.dataset.note!;
+
+    const state: ScreenState = { ...DEFAULT_STATE };
+    let framework: 'swift' | 'dart' = 'swift';
+
+    const KEYWORDS: Record<'swift' | 'dart', RegExp> = {
+      swift: /(?:struct|let|var|some|body|in|return|func|self)\b/y,
+      dart: /(?:class|extends|const|final|required|super|this|return|build|override)\b/y,
+    };
+
+    const escape = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    /**
+     * Single pass with sticky patterns, rather than chained replaces: a chain
+     * lets a later rule match the markup an earlier one just inserted, which
+     * quietly shredded hex colours like 0xFF38BDF8 into nested spans.
+     */
+    function highlight(code: string, lang: 'swift' | 'dart'): string {
+      // A null class means "emit as plain text". The lowercase-identifier rule
+      // exists only to swallow whole names like borderRadius, so the type rule
+      // cannot pick the capital out of the middle of one.
+      const rules: [string | null, RegExp][] = [
+        ['c', /\/\/[^\n]*/y],
+        ['s', /'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"/y],
+        ['n', /0x[0-9A-Fa-f]+|\d+(?:\.\d+)?/y],
+        ['k', KEYWORDS[lang]],
+        [null, /[a-z_$][A-Za-z0-9_]*/y],
+        ['t', /[A-Z][A-Za-z0-9_]*/y],
+      ];
+      let out = '';
+      let i = 0;
+      while (i < code.length) {
+        let matched = false;
+        for (const [cls, re] of rules) {
+          re.lastIndex = i;
+          const m = re.exec(code);
+          if (m && m.index === i && m[0].length > 0) {
+            out += cls ? `<span class="${cls}">${escape(m[0])}</span>` : escape(m[0]);
+            i += m[0].length;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          out += escape(code[i]);
+          i += 1;
+        }
+      }
+      return out;
+    }
+
+    function render() {
+      // The phone is driven by the same numbers the code prints.
+      card.style.setProperty('--gl-radius', `${state.radius}px`);
+      card.style.setProperty('--gl-gap', `${spacingOf(state.density)}px`);
+      card.style.setProperty('--gl-accent', ACCENTS[state.accent].css);
+      chartSvg.hidden = !state.chart;
+      radiusOut.textContent = String(state.radius);
+
+      const code = framework === 'swift' ? swiftUI(state) : flutter(state);
+      fileOut.textContent = framework === 'swift' ? 'ReadingCard.swift' : 'reading_card.dart';
+      codeOut.innerHTML = highlight(code, framework);
+
+      noteOut.textContent = noteTpl.replace('{n}', String(spacerCount(state).dart));
+    }
+
+    const press = (sel: string, on: (el: HTMLElement) => boolean) => {
+      root.querySelectorAll<HTMLElement>(sel).forEach((el) => el.setAttribute('aria-pressed', String(on(el))));
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('[data-accent]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.accent = btn.dataset.accent as Accent;
+        press('[data-accent]', (el) => el === btn);
+        render();
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-density]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.density = btn.dataset.density as Density;
+        press('[data-density]', (el) => el === btn);
+        render();
+      });
+    });
+
+    const chartBtn = root.querySelector<HTMLButtonElement>('[data-chart]')!;
+    chartBtn.addEventListener('click', () => {
+      state.chart = !state.chart;
+      chartBtn.setAttribute('aria-pressed', String(state.chart));
+      chartBtn.textContent = state.chart ? chartBtn.dataset.on! : chartBtn.dataset.off!;
+      render();
+    });
+
+    root.querySelector<HTMLInputElement>('[data-radius]')!.addEventListener('input', (e) => {
+      state.radius = Number((e.target as HTMLInputElement).value);
+      render();
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-fw]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        framework = btn.dataset.fw as 'swift' | 'dart';
+        press('[data-fw]', (el) => el === btn);
+        render();
+      });
+    });
+
+    render();
+  }
+</script>
