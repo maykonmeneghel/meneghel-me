@@ -5,6 +5,7 @@ import Rail from './Rail.astro';
 import Chapter from './Chapter.astro';
 import PwmLab from './games/PwmLab.astro';
 import MqttBench from './games/MqttBench.astro';
+import ClusterLab from './games/ClusterLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -26,6 +27,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <PwmLab ui={c.ui} />
         ) : chapter.slug === 'signal' ? (
           <MqttBench signal={c.signal} />
+        ) : chapter.slug === 'swarm' ? (
+          <ClusterLab swarm={c.swarm} />
         ) : (
           <div class="wip">
             <span>{c.ui.wip}</span>

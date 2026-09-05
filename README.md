@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 06 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -41,11 +41,21 @@ docs           what is still needed from Maykon
 
 ## Testing
 
-`apps/maykon/src/components/games/mqtt.ts` implements MQTT topic-filter matching
-from the OASIS spec, and `mqtt.test.ts` next to it asserts the spec's own worked
-examples — including that `sport/tennis/player1/#` matches the parent topic
-`sport/tennis/player1`, which is the rule everyone gets wrong. Node 24 strips
-types natively, so the suite runs with plain `node`, no runner and no build step.
+The two mini-games with real models behind them keep those models in plain
+TypeScript modules, tested separately from the DOM:
+
+- `games/mqtt.ts` implements MQTT topic-filter matching from the OASIS spec.
+  `mqtt.test.ts` asserts the spec's own worked examples — including that
+  `sport/tennis/player1/#` matches the parent topic `sport/tennis/player1`,
+  which is the rule everyone gets wrong.
+- `games/swarm.ts` is the cluster model: the traffic curve, the queueing
+  latency blow-up near saturation, and the Kubernetes HPA sizing formula.
+  `swarm.test.ts` pins the shapes — that latency hangs a cliff rather than
+  degrading linearly, that zero replicas is infinite saturation rather than a
+  divide-by-zero, and that HPA sizing actually clears the spike.
+
+Node 24 strips types natively, so both run with plain `node` — no runner, no
+build step, no dev dependency.
 
 ## The timeline
 

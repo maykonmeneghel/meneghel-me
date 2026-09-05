@@ -69,6 +69,28 @@ export interface SignalGame {
   allSolved: string;
 }
 
+export interface SwarmGame {
+  lede: string;
+  traffic: string;
+  replicas: string;
+  latency: string;
+  dropped: string;
+  cost: string;
+  saturation: string;
+  auto: string;
+  autoHint: string;
+  manualHint: string;
+  ready: string;
+  starting: string;
+  reset: string;
+  spike: string;
+  /** Verdicts, shown as a running assessment. */
+  healthy: string;
+  strained: string;
+  failing: string;
+  wasteful: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -85,5 +107,6 @@ export interface Content {
   chapters: Chapter[];
   record: RecordSection;
   signal: SignalGame;
+  swarm: SwarmGame;
   ui: Record<string, string>;
 }

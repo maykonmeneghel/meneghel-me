@@ -1,0 +1,334 @@
+---
+import type { Content } from '../../content';
+import { MAX_REPLICAS, MIN_REPLICAS, HPA_TARGET } from './swarm';
+
+interface Props { swarm: Content['swarm'] }
+const { swarm } = Astro.props;
+const slots = Array.from({ length: MAX_REPLICAS }, (_, i) => i);
+---
+<div class="sw" data-sw
+  data-l-healthy={swarm.healthy}
+  data-l-strained={swarm.strained}
+  data-l-failing={swarm.failing}
+  data-l-wasteful={swarm.wasteful}
+  data-l-auto-hint={swarm.autoHint}
+  data-l-manual-hint={swarm.manualHint}
+>
+  <p class="sw__lede">{swarm.lede}</p>
+
+  <div class="sw__chartwrap">
+    <canvas class="sw__chart" data-chart width="900" height="220"
+      role="img" aria-label="Incoming traffic against served capacity"></canvas>
+    <span class="sw__spike mono" data-spike hidden>▲ {swarm.spike}</span>
+    <div class="sw__key mono">
+      <span class="sw__key-item"><i class="sw__swatch sw__swatch--load"></i>{swarm.traffic}</span>
+      <span class="sw__key-item"><i class="sw__swatch sw__swatch--cap"></i>{swarm.replicas} × 60 rps</span>
+    </div>
+  </div>
+
+  <div class="sw__pods" data-pods aria-hidden="true">
+    {slots.map((i) => <span class="sw__pod" data-pod={i}></span>)}
+  </div>
+  <p class="sw__podkey mono">
+    <span><i class="sw__swatch sw__swatch--ready"></i>{swarm.ready} <b data-out="ready">0</b></span>
+    <span><i class="sw__swatch sw__swatch--boot"></i>{swarm.starting} <b data-out="booting">0</b></span>
+  </p>
+
+  <div class="controls">
+    <label class="control">
+      <span class="control__label">{swarm.replicas} <b data-out="replicas">3</b></span>
+      <input type="range" min={MIN_REPLICAS} max={MAX_REPLICAS} value="3" step="1" data-replicas />
+    </label>
+    <div class="sw__actions">
+      <button type="button" class="btn" data-auto aria-pressed="false">
+        {swarm.auto} · {Math.round(HPA_TARGET * 100)}%
+      </button>
+      <button type="button" class="btn" data-reset>{swarm.reset}</button>
+    </div>
+  </div>
+  <p class="sw__hint mono" data-hint>{swarm.manualHint}</p>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{swarm.traffic}</span>
+      <span class="readout__v" data-out="rps">0</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{swarm.saturation}</span>
+      <span class="readout__v" data-out="rho">0%</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{swarm.latency}</span>
+      <span class="readout__v" data-out="lat">0 ms</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{swarm.dropped}</span>
+      <span class="readout__v" data-out="drops">0</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{swarm.cost}</span>
+      <span class="readout__v" data-out="cost">$0</span>
+    </div>
+  </div>
+  <p class="sw__verdict mono" data-verdict></p>
+</div>
+
+<style>
+  .sw__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 72ch; }
+
+  .sw__chartwrap { position: relative; }
+  .sw__chart {
+    width: 100%; height: auto; border-radius: 8px;
+    background: #06070a; border: 1px solid var(--line);
+  }
+  .sw__spike {
+    position: absolute; top: .6rem; left: .7rem;
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--fail);
+  }
+  .sw__key, .sw__podkey {
+    display: flex; flex-wrap: wrap; gap: 1.2rem;
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--fg-700); margin: .55rem 0 0;
+  }
+  .sw__key-item, .sw__podkey span { display: flex; align-items: center; gap: .4rem; }
+  .sw__podkey b { color: var(--fg-300); font-weight: 500; }
+  .sw__swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .sw__swatch--load  { background: var(--brand-500); }
+  .sw__swatch--cap   { background: var(--info); }
+  .sw__swatch--ready { background: var(--ok); }
+  .sw__swatch--boot  { background: var(--warn); }
+
+  .sw__pods { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: 1.25rem; }
+  .sw__pod {
+    width: 26px; height: 26px; border-radius: 5px;
+    background: var(--bg-700); border: 1px solid var(--line);
+    transition: background .18s, border-color .18s, opacity .18s;
+    opacity: .25;
+  }
+  .sw__pod[data-state="ready"]  { opacity: 1; background: color-mix(in oklab, var(--ok) 60%, var(--bg-800)); border-color: var(--ok); }
+  .sw__pod[data-state="hot"]    { opacity: 1; background: color-mix(in oklab, var(--fail) 55%, var(--bg-800)); border-color: var(--fail); }
+  .sw__pod[data-state="boot"]   { opacity: 1; background: var(--bg-700); border-color: var(--warn); animation: sw-boot 1s ease-in-out infinite; }
+  @keyframes sw-boot { 50% { background: color-mix(in oklab, var(--warn) 35%, var(--bg-800)); } }
+
+  .sw__actions { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  .sw__hint { margin: .9rem 0 0; font-size: var(--step--1); color: var(--fg-700); max-width: 68ch; }
+  .sw__verdict { margin: .9rem 0 0; font-size: var(--step--1); min-height: 1.4em; }
+  .sw__verdict[data-h="healthy"]  { color: var(--ok); }
+  .sw__verdict[data-h="strained"] { color: var(--warn); }
+  .sw__verdict[data-h="failing"]  { color: var(--fail); }
+  .sw__verdict[data-h="wasteful"] { color: var(--info); }
+
+  .control:has(input:disabled) { opacity: .45; }
+</style>
+
+<script>
+  import {
+    trafficAt, saturation, latencyOf, droppedRps, desiredReplicas, healthOf,
+    capacityOf, monthlyCost, CAPACITY_PER_POD, MAX_REPLICAS, MIN_REPLICAS,
+    POD_STARTUP, SCALE_DOWN_DELAY,
+  } from './swarm';
+
+  const root = document.querySelector<HTMLElement>('[data-sw]');
+  if (root) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-chart]')!;
+    const ctx = canvas.getContext('2d')!;
+    const slider = root.querySelector<HTMLInputElement>('[data-replicas]')!;
+    const autoBtn = root.querySelector<HTMLButtonElement>('[data-auto]')!;
+    const resetBtn = root.querySelector<HTMLButtonElement>('[data-reset]')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const verdict = root.querySelector<HTMLElement>('[data-verdict]')!;
+    const spikeTag = root.querySelector<HTMLElement>('[data-spike]')!;
+    const podEls = [...root.querySelectorAll<HTMLElement>('[data-pod]')];
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+
+    const label: Record<string, string> = {
+      healthy: root.dataset.lHealthy!,
+      strained: root.dataset.lStrained!,
+      failing: root.dataset.lFailing!,
+      wasteful: root.dataset.lWasteful!,
+    };
+
+    const WINDOW = 12;      // seconds of history on the chart
+    const HZ = 20;          // simulation steps per second
+    let scaleMax = 760;     // chart ceiling, eased so it never jumps
+
+    /** Pods are just the time each becomes ready; before that it serves nothing. */
+    let pods: number[] = Array.from({ length: 3 }, () => 0);
+    let target = 3;
+    let auto = false;
+    let sinceBelow = 0;     // how long the autoscaler has wanted fewer pods
+    let t = 0;
+    let dropped = 0;
+    const history: { rps: number; cap: number }[] = [];
+
+    function readyCount() {
+      return pods.filter((readyAt) => readyAt <= t).length;
+    }
+
+    function setTarget(next: number) {
+      const clamped = Math.min(MAX_REPLICAS, Math.max(MIN_REPLICAS, next));
+      if (clamped === target) return;
+      if (clamped > target) {
+        // Scaling up is a request, not an event: the new pods have to boot.
+        for (let i = target; i < clamped; i++) pods.push(t + POD_STARTUP);
+      } else {
+        // Shed the newest pods first, so booting ones go before serving ones.
+        pods.sort((a, b) => a - b);
+        pods.length = clamped;
+      }
+      target = clamped;
+      slider.value = String(target);
+      out('replicas').textContent = String(target);
+    }
+
+    function step(dt: number) {
+      t += dt;
+      const rps = trafficAt(t);
+      const ready = readyCount();
+
+      if (auto) {
+        const want = desiredReplicas(rps);
+        if (want > target) {
+          sinceBelow = 0;
+          setTarget(want);
+        } else if (want < target) {
+          // Real autoscalers wait before shrinking, or they thrash.
+          sinceBelow += dt;
+          if (sinceBelow >= SCALE_DOWN_DELAY) { setTarget(want); sinceBelow = 0; }
+        } else {
+          sinceBelow = 0;
+        }
+      }
+
+      const cap = capacityOf(ready);
+      dropped += droppedRps(rps, ready) * dt;
+
+      history.push({ rps, cap });
+      while (history.length > WINDOW * HZ) history.shift();
+
+      return { rps, ready, cap };
+    }
+
+    function paint(rps: number, ready: number, cap: number) {
+      const rho = saturation(rps, ready);
+      const health = healthOf(rho);
+
+      out('rps').textContent = `${Math.round(rps)} rps`;
+      out('rho').textContent = Number.isFinite(rho) ? `${Math.round(rho * 100)}%` : '∞';
+      out('rho').dataset.state = health === 'failing' ? 'fail' : health === 'strained' ? 'warn' : 'ok';
+      out('lat').textContent = `${Math.round(latencyOf(rho))} ms`;
+      out('lat').dataset.state = health === 'failing' ? 'fail' : health === 'strained' ? 'warn' : 'ok';
+      out('drops').textContent = Math.round(dropped).toLocaleString();
+      out('drops').dataset.state = dropped > 0 ? 'fail' : 'ok';
+      out('cost').textContent = `$${monthlyCost(target)}/mo`;
+      out('ready').textContent = String(ready);
+      out('booting').textContent = String(target - ready);
+
+      verdict.textContent = label[health];
+      verdict.dataset.h = health;
+      spikeTag.hidden = rps < 350;
+
+      const hot = rho >= 1;
+      podEls.forEach((el, i) => {
+        if (i >= target) { el.dataset.state = ''; return; }
+        const booting = pods[i] !== undefined && pods[i] > t;
+        el.dataset.state = booting ? 'boot' : hot ? 'hot' : 'ready';
+      });
+
+      draw(cap);
+    }
+
+    function draw(cap: number) {
+      const w = canvas.width, h = canvas.height;
+
+      const peak = history.reduce((m, s) => Math.max(m, s.rps, s.cap), 0);
+      const want = Math.max(760, peak * 1.12);
+      scaleMax += (want - scaleMax) * 0.06;
+
+      const y = (v: number) => h - (Math.min(v, scaleMax) / scaleMax) * (h - 16) - 8;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#161a22'; ctx.lineWidth = 1;
+      for (let g = 0; g <= 4; g++) {
+        const gy = 8 + ((h - 16) / 4) * g;
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+      }
+
+      if (history.length < 2) return;
+      const dx = w / (WINDOW * HZ - 1);
+      const at = (i: number) => i * dx;
+
+      // Where the load line sits above the capacity line, requests are dying.
+      ctx.beginPath();
+      ctx.moveTo(at(0), y(Math.max(history[0].rps, history[0].cap)));
+      history.forEach((s, i) => ctx.lineTo(at(i), y(Math.max(s.rps, s.cap))));
+      for (let i = history.length - 1; i >= 0; i--) ctx.lineTo(at(i), y(history[i].cap));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(244,63,94,.22)';
+      ctx.fill();
+
+      ctx.beginPath();
+      history.forEach((s, i) => (i ? ctx.lineTo(at(i), y(s.cap)) : ctx.moveTo(at(i), y(s.cap))));
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.stroke();
+
+      ctx.beginPath();
+      history.forEach((s, i) => (i ? ctx.lineTo(at(i), y(s.rps)) : ctx.moveTo(at(i), y(s.rps))));
+      ctx.strokeStyle = '#ff2d55'; ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(255,45,85,.5)'; ctx.shadowBlur = 6;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Right-aligned and clamped inside the plot, clear of the spike badge.
+      ctx.fillStyle = '#4a5262'; ctx.font = '11px ui-monospace, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${Math.round(cap)} rps`, w - 10, Math.min(Math.max(y(cap) - 7, 15), h - 6));
+      ctx.textAlign = 'left';
+    }
+
+    slider.addEventListener('input', () => {
+      if (auto) return;
+      setTarget(Number(slider.value));
+    });
+
+    autoBtn.addEventListener('click', () => {
+      auto = !auto;
+      autoBtn.setAttribute('aria-pressed', String(auto));
+      slider.disabled = auto;
+      hint.textContent = auto ? root!.dataset.lAutoHint! : root!.dataset.lManualHint!;
+      sinceBelow = 0;
+    });
+
+    resetBtn.addEventListener('click', () => { dropped = 0; });
+
+    // Fixed-step simulation so the physics do not depend on the frame rate.
+    let last = performance.now();
+    let acc = 0;
+    let running = false;
+
+    // The simulation ticks at 20 Hz but the screen repaints at 60, so most
+    // frames run no step at all. Holding the last state outside the loop keeps
+    // those frames from painting zeros.
+    let latest = { rps: trafficAt(0), ready: 3, cap: capacityOf(3) };
+
+    function frame(now: number) {
+      if (!running) return;
+      acc += Math.min((now - last) / 1000, 0.25);
+      last = now;
+      while (acc >= 1 / HZ) { latest = step(1 / HZ); acc -= 1 / HZ; }
+      paint(latest.rps, latest.ready, latest.cap);
+      requestAnimationFrame(frame);
+    }
+
+    new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && !running) {
+          running = true; last = performance.now(); acc = 0;
+          requestAnimationFrame(frame);
+        } else if (!e.isIntersecting) {
+          running = false;
+        }
+      }
+    }, { threshold: 0.15 }).observe(root);
+  }
+</script>

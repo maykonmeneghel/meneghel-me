@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node src/components/games/mqtt.test.ts"
+    "test": "node src/components/games/mqtt.test.ts && node src/components/games/swarm.test.ts"
   },
   "dependencies": {
     "@meneghel/ui": "*",
