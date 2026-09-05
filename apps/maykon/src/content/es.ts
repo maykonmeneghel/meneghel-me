@@ -8,7 +8,7 @@ export const es: Content = {
   },
   nav: { chapters: 'Capítulos', family: 'La familia', contact: 'Contacto', resume: 'Currículum' },
   hero: {
-    kicker: 'Ingeniero Full-Stack Sénior · Máster en Tecnologías de la Salud · Especialista en IA',
+    kicker: 'Ingeniero Full-Stack Sénior · Máster en Bioingeniería · Especialista en IA',
     name: 'Maykon Meneghel',
     headline: 'Construyo la pila entera — de la pista de cobre a la red neuronal.',
     sub: 'La mayoría de los currículums cuentan lo que alguien sabe hacer. Este te deja probarlo. Cada capítulo de abajo es un minijuego que funciona: vas a enrutar una PCB, suscribirte a un tópico MQTT, escalar un clúster bajo carga y entrenar un modelo — sin salir de esta página.',
@@ -75,7 +75,7 @@ export const es: Content = {
     {
       id: '07', codename: 'MENTE', slug: 'mind',
       title: 'Enseña a la máquina a decidir',
-      lede: 'Aquí es donde mi posgrado en IA y mi máster en Tecnologías de la Salud dejan de ser líneas en un diploma. Un modelo no es magia: es una frontera, dibujada y redibujada hasta que los errores paran.',
+      lede: 'Aquí es donde mi posgrado en IA y mi máster en Bioingeniería dejan de ser líneas en un diploma. Un modelo no es magia: es una frontera, dibujada y redibujada hasta que los errores paran.',
       panel: 'perceptron.py — época 0',
       takeaway: 'El modelo nunca vio tu regla. Solo vio tus errores, y movió la línea un poco después de cada uno. Repite eso unos cientos de veces y tienes lo que llaman <b>aprendizaje</b>.',
       stack: ['PyTorch', 'GANs', 'PLN', 'Clasificación y regresión', 'Minería de datos'],
@@ -119,7 +119,8 @@ export const es: Content = {
       junior: 'Desarrollador Júnior · Proyecto Apple',
       techLead: 'Tech Lead · Apple Internship',
       fullstack: 'Desarrollador Full Stack · Proyecto Apple',
-      ghel: 'Technology Advisor',
+      senior: 'Desarrollador Sénior · Proyecto Apple',
+      ghel: 'Technology Advisor · MyRenault (Renault Geely do Brasil)',
       holding: 'Consejero Administrativo — el holding familiar',
       tradx: 'COO y Cofundador',
     },

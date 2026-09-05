@@ -41,7 +41,7 @@ export const es: RootContent = {
     people: [
       { slug: 'manu', name: 'Emanuelle', role: 'Mi esposa', gift: 'PLACEHOLDER — quién es ella, en una frase que aprobaría.', href: 'https://manu.meneghel.me' },
       { slug: 'hija', name: 'Nuestra hija', role: 'Llega pronto', gift: 'PLACEHOLDER — lo que quieres que encuentre ya listo al llegar.' },
-      { slug: 'bebel', name: 'Bebel', role: 'La perrita', gift: 'Lleva años estando en todas partes de esta casa — incluso dentro de una app que construí, donde acabó siendo el perfil de ejemplo. PLACEHOLDER — la raza, la edad y cómo llegó.' },
+      { slug: 'bebel', name: 'Bebel', role: 'La perrita', gift: 'Yorkshire terrier, {age} años, y lleva una década estando en todas partes de esta casa — incluso dentro de una app que construí, donde acabó siendo el perfil de ejemplo.' },
       { slug: 'maykon', name: 'Maykon', role: 'Ingeniero, padre, hijo', gift: 'Construye cosas — de la pista de cobre a la red neuronal.', href: 'https://maykon.meneghel.me' },
     ],
   },
@@ -61,5 +61,5 @@ export const es: RootContent = {
     lede: 'Esta casa tiene habitaciones. Entra en la que quieras.',
     soon: 'pronto',
   },
-  footer: 'PLACEHOLDER — Hecho en casa, en {ciudad} — {estado}.',
+  footer: 'Hecho en casa, en Curitiba — Paraná, Brasil.',
 };

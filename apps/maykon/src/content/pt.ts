@@ -8,7 +8,7 @@ export const pt: Content = {
   },
   nav: { chapters: 'Capítulos', family: 'A família', contact: 'Contato', resume: 'Currículo' },
   hero: {
-    kicker: 'Engenheiro Full-Stack Sênior · Mestre em Tecnologias em Saúde · Especialista em IA',
+    kicker: 'Engenheiro Full-Stack Sênior · Mestre em Bioengenharia · Especialista em IA',
     name: 'Maykon Meneghel',
     headline: 'Eu construo a pilha inteira — da trilha de cobre à rede neural.',
     sub: 'A maioria dos currículos conta o que alguém sabe fazer. Este aqui deixa você experimentar. Cada capítulo abaixo é um mini-jogo que funciona: você vai rotear uma PCB, assinar um tópico MQTT, escalar um cluster sob carga e treinar um modelo — sem sair desta página.',
@@ -75,7 +75,7 @@ export const pt: Content = {
     {
       id: '07', codename: 'MENTE', slug: 'mind',
       title: 'Ensine a máquina a decidir',
-      lede: 'É aqui que a minha pós em IA e o mestrado em Tecnologias em Saúde deixam de ser linhas num diploma. Um modelo não é mágica: é uma fronteira, desenhada e redesenhada até os erros pararem.',
+      lede: 'É aqui que a minha pós em IA e o mestrado em Bioengenharia deixam de ser linhas num diploma. Um modelo não é mágica: é uma fronteira, desenhada e redesenhada até os erros pararem.',
       panel: 'perceptron.py — época 0',
       takeaway: 'O modelo nunca viu a sua regra. Ele viu apenas os seus erros, e moveu a linha um pouquinho depois de cada um. Repita isso algumas centenas de vezes e você tem o que chamam de <b>aprendizado</b>.',
       stack: ['PyTorch', 'GANs', 'PLN', 'Classificação e regressão', 'Mineração de dados'],
@@ -119,7 +119,8 @@ export const pt: Content = {
       junior: 'Desenvolvedor Júnior · Projeto Apple',
       techLead: 'Tech Lead · Apple Internship',
       fullstack: 'Desenvolvedor Full Stack · Projeto Apple',
-      ghel: 'Technology Advisor',
+      senior: 'Desenvolvedor Sênior · Projeto Apple',
+      ghel: 'Technology Advisor · MyRenault (Renault Geely do Brasil)',
       holding: 'Conselheiro Administrativo — a holding da família',
       tradx: 'COO e Cofundador',
     },

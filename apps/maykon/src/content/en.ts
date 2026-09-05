@@ -8,7 +8,7 @@ export const en: Content = {
   },
   nav: { chapters: 'Chapters', family: 'The family', contact: 'Contact', resume: 'Résumé' },
   hero: {
-    kicker: 'Senior Full-Stack Engineer · M.Sc. in Health Technologies · AI Specialist',
+    kicker: 'Senior Full-Stack Engineer · M.Sc. in Bioengineering · AI Specialist',
     name: 'Maykon Meneghel',
     headline: 'I build the whole stack — from the copper trace to the neural network.',
     sub: 'Most CVs tell you what someone can do. This one lets you try it. Every chapter below is a working mini-game: you will route a PCB, subscribe to an MQTT topic, scale a cluster under load and train a model — without leaving this page.',
@@ -75,7 +75,7 @@ export const en: Content = {
     {
       id: '07', codename: 'MIND', slug: 'mind',
       title: 'Teach the machine to decide',
-      lede: 'This is where my postgraduate work in AI and my Master in Health Technologies stop being lines on a diploma. A model is not magic: it is a boundary, drawn and redrawn until the mistakes stop.',
+      lede: 'This is where my postgraduate work in AI and my Master in Bioengineering stop being lines on a diploma. A model is not magic: it is a boundary, drawn and redrawn until the mistakes stop.',
       panel: 'perceptron.py — epoch 0',
       takeaway: 'The model never saw your rule. It only saw your mistakes, and moved the line a little after each one. Repeat that a few hundred times and you get what people call <b>learning</b>.',
       stack: ['PyTorch', 'GANs', 'NLP', 'Classification & regression', 'Data mining'],
@@ -119,7 +119,8 @@ export const en: Content = {
       junior: 'Junior Developer · Apple Project',
       techLead: 'Tech Lead · Apple Internship',
       fullstack: 'Full Stack Developer · Apple Project',
-      ghel: 'Technology Advisor',
+      senior: 'Senior Developer · Apple Project',
+      ghel: 'Technology Advisor · MyRenault (Renault Geely do Brasil)',
       holding: 'Administrative Advisor — the family holding',
       tradx: 'COO & Co-founder',
     },

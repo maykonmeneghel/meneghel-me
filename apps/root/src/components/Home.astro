@@ -3,10 +3,17 @@ import Base from '../layouts/Base.astro';
 import PersonCard from './Person.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
+import { bebel, ageOf } from '../content/pets';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = content[locale];
+
+// Bebel's age is filled in at build time; see content/pets.ts.
+const withAge = (p: (typeof c.now.people)[number]) =>
+  p.slug === 'bebel'
+    ? { ...p, gift: p.gift.replace('{age}', String(ageOf(bebel.bornYear))) }
+    : p;
 
 const doors = [
   { host: 'maykon.meneghel.me', who: c.now.people.find((p) => p.slug === 'maykon')?.role ?? '', href: 'https://maykon.meneghel.me' },
@@ -52,7 +59,7 @@ const doors = [
       <h2 class="band__title">{c.now.title}</h2>
       <p class="band__lede">{c.now.lede}</p>
       <div class="people">
-        {c.now.people.map((p) => <PersonCard person={p} soon={c.doors.soon} />)}
+        {c.now.people.map((p) => <PersonCard person={withAge(p)} soon={c.doors.soon} />)}
       </div>
     </div>
   </section>

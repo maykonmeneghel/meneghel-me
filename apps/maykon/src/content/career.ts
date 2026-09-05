@@ -38,8 +38,9 @@ export const careerItems: CareerItem[] = [
   { id: 'residency',   lane: 'industry',  org: 'Eldorado · Apple',       start: [2022, 4],  end: [2022, 9] },
   { id: 'junior',      lane: 'industry',  org: 'Eldorado · Apple',       start: [2022, 10], end: [2024, 3] },
   { id: 'techLead',    lane: 'industry',  org: 'Eldorado · Apple',       start: [2023, 2],  end: [2023, 4] },
-  { id: 'fullstack',   lane: 'industry',  org: 'Eldorado · Apple',       start: [2024, 4],  end: null, emphasis: true },
-  { id: 'ghel',        lane: 'industry',  org: 'GHEL',                   start: [2025, 6],  end: null },
+  { id: 'fullstack',   lane: 'industry',  org: 'Eldorado · Apple',       start: [2024, 4],  end: [2026, 5] },
+  { id: 'senior',      lane: 'industry',  org: 'Eldorado · Apple',       start: [2026, 6],  end: null, emphasis: true },
+  { id: 'ghel',        lane: 'industry',  org: 'GHEL',                   start: [2025, 6],  end: null, emphasis: true },
 
   // Ventures
   { id: 'holding',     lane: 'venture',   org: 'RJ Meneghel Holding',    start: [2021, 11], end: [2023, 12] },
