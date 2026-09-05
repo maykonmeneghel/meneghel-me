@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game | chapter 01 playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapter 01 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -37,6 +37,13 @@ infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
 docs           what is still needed from Maykon
 ```
+
+## The timeline
+
+`docs/` aside, the one piece of hard data in the repo is `apps/maykon/src/content/career.ts`,
+transcribed from the LinkedIn export and cross-checked against the 2024 portfolio.
+Roles overlap on purpose: the point of the scrubber is that from 2017 onward there
+were almost never fewer than two running at the same time, peaking at four in 2023.
 
 ## Choices worth explaining
 

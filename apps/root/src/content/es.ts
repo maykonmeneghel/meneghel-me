@@ -41,6 +41,7 @@ export const es: RootContent = {
     people: [
       { slug: 'manu', name: 'Emanuelle', role: 'Mi esposa', gift: 'PLACEHOLDER — quién es ella, en una frase que aprobaría.', href: 'https://manu.meneghel.me' },
       { slug: 'hija', name: 'Nuestra hija', role: 'Llega pronto', gift: 'PLACEHOLDER — lo que quieres que encuentre ya listo al llegar.' },
+      { slug: 'bebel', name: 'Bebel', role: 'La perrita', gift: 'Lleva años estando en todas partes de esta casa — incluso dentro de una app que construí, donde acabó siendo el perfil de ejemplo. PLACEHOLDER — la raza, la edad y cómo llegó.' },
       { slug: 'maykon', name: 'Maykon', role: 'Ingeniero, padre, hijo', gift: 'Construye cosas — de la pista de cobre a la red neuronal.', href: 'https://maykon.meneghel.me' },
     ],
   },

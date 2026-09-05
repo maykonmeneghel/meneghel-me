@@ -16,6 +16,33 @@ export interface Chapter {
   stack: string[];
 }
 
+export interface RecordSection {
+  eyebrow: string;
+  title: string;
+  lede: string;
+  /** Lane headings on the timeline. */
+  lanes: { education: string; research: string; industry: string; venture: string };
+  /** careerItem id -> role title. */
+  roles: Record<string, string>;
+  scrubber: {
+    /** Uses {n} and {year}. */
+    simultaneous: string;
+    one: string;
+    none: string;
+    today: string;
+    drag: string;
+  };
+  ventures: {
+    title: string;
+    lede: string;
+    founder: string;
+    coFounder: string;
+    sectors: Record<string, string>;
+  };
+  publications: { title: string; lede: string; items: Record<string, string> };
+  press: { title: string; items: Record<string, string> };
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -30,5 +57,6 @@ export interface Content {
     boot: string[];
   };
   chapters: Chapter[];
+  record: RecordSection;
   ui: Record<string, string>;
 }

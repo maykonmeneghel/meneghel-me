@@ -4,16 +4,19 @@ import Hero from './Hero.astro';
 import Rail from './Rail.astro';
 import Chapter from './Chapter.astro';
 import PwmLab from './games/PwmLab.astro';
+import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = content[locale];
+// The eyebrow reads "10 · RECORD"; the rail wants just the codename.
+const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
 ---
 <Base locale={locale} title={c.meta.title} description={c.meta.description}>
   <Hero hero={c.hero} />
-  <Rail chapters={c.chapters} />
+  <Rail chapters={c.chapters} extra={{ id: '10', codename: recordCodename, slug: 'record' }} />
 
   <main id="chapters">
     {c.chapters.map((chapter) => (
@@ -28,5 +31,7 @@ const c = content[locale];
         )}
       </Chapter>
     ))}
+
+    <Record record={c.record} />
   </main>
 </Base>

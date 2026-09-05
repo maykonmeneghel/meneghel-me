@@ -1,0 +1,380 @@
+---
+import type { Content } from '../content';
+import {
+  careerItems, ventures, publications, press,
+  TIMELINE_START, TIMELINE_END, toDecimal, NOW,
+  type Lane,
+} from '../content/career';
+
+interface Props { record: Content['record'] }
+const { record } = Astro.props;
+
+const SPAN = TIMELINE_END - TIMELINE_START;
+const pct = (dec: number) => ((dec - TIMELINE_START) / SPAN) * 100;
+
+const nowDec = toDecimal(NOW);
+
+// Positions are computed at build time; the browser only moves the playhead.
+const rows = careerItems.map((item) => {
+  const start = toDecimal(item.start);
+  const end = item.end ? toDecimal(item.end) + 1 / 12 : nowDec;
+  return {
+    ...item,
+    left: pct(start),
+    width: Math.max(pct(end) - pct(start), 0.7),
+    startDec: start,
+    // Sentinel for open-ended roles. Must sit beyond any real decimal year:
+    // 99 reads as the year 99 AD, which silently ends every current role.
+    endDec: item.end ? end : 9999,
+  };
+});
+
+const laneOrder: Lane[] = ['education', 'research', 'industry', 'venture'];
+const grouped = laneOrder.map((lane) => ({
+  lane,
+  label: record.lanes[lane],
+  items: rows.filter((r) => r.lane === lane),
+}));
+
+const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
+---
+<section class="chapter" id="record" data-chapter="10">
+  <div class="chapter__inner">
+    <div class="chapter__head">
+      <p class="chapter__eyebrow">{record.eyebrow}</p>
+      <h2 class="chapter__title">{record.title}</h2>
+      <p class="chapter__lede">{record.lede}</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel__bar">
+        <span class="panel__dot panel__dot--live"></span>
+        <span>timeline · 2012 → {NOW[0]}</span>
+      </div>
+      <div class="panel__body">
+        <div
+          class="tl"
+          data-timeline
+          data-start={TIMELINE_START}
+          data-end={TIMELINE_END}
+          data-now={nowDec.toFixed(4)}
+          data-tpl-many={record.scrubber.simultaneous}
+          data-tpl-one={record.scrubber.one}
+          data-tpl-none={record.scrubber.none}
+          data-tpl-today={record.scrubber.today}
+        >
+          <div class="tl__head">
+            <div class="tl__readout">
+              <span class="tl__year mono" data-year>{NOW[0]}</span>
+              <span class="tl__today mono" data-today hidden>{record.scrubber.today}</span>
+              <span class="tl__count mono" data-count></span>
+            </div>
+            <span class="tl__drag mono">← {record.scrubber.drag} →</span>
+          </div>
+
+          <div class="tl__chart" data-chart>
+            <div class="tl__overlay" aria-hidden="true">
+              <div class="tl__axis">
+                {ticks.map((t) => (
+                  <span class="tl__tick" style={`left:${pct(t)}%`}>{t}</span>
+                ))}
+              </div>
+              <div class="tl__playhead" data-playhead style={`left:${pct(nowDec)}%`}>
+                <span class="tl__playhead-grip"></span>
+              </div>
+            </div>
+
+            {grouped.map((g) => (
+              <div class="tl__lane" data-lane={g.lane}>
+                <p class="tl__lane-label mono">{g.label}</p>
+                {g.items.map((item) => (
+                  <div
+                    class="tl__row"
+                    data-row
+                    data-from={item.startDec.toFixed(4)}
+                    data-to={item.endDec.toFixed(4)}
+                  >
+                    <div class="tl__name">
+                      <span class="tl__role">{record.roles[item.id]}</span>
+                      <span class="tl__org mono">{item.org}</span>
+                    </div>
+                    <div class="tl__track">
+                      <span
+                        class:list={['tl__bar', item.emphasis && 'tl__bar--strong', !item.end && 'tl__bar--open']}
+                        style={`left:${item.left}%; width:${item.width}%`}
+                      ></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <label class="tl__slider">
+            <span class="sr-only">{record.scrubber.drag}</span>
+            <input
+              type="range"
+              min={TIMELINE_START}
+              max={NOW[0] + (NOW[1] - 1) / 12}
+              step="0.0834"
+              value={nowDec}
+              data-scrub
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="proof">
+      <div class="proof__col">
+        <h3 class="proof__title">{record.ventures.title}</h3>
+        <p class="proof__lede">{record.ventures.lede}</p>
+        <ul class="proof__list">
+          {ventures.map((v) => (
+            <li class="proof__item">
+              <span class="proof__k">{v.name}</span>
+              <span class="proof__v mono">
+                {v.role === 'founder' ? record.ventures.founder : record.ventures.coFounder}
+                {' · '}{record.ventures.sectors[v.sector]}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="proof__col">
+        <h3 class="proof__title">{record.publications.title}</h3>
+        <p class="proof__lede">{record.publications.lede}</p>
+        <ul class="proof__list">
+          {publications.map((p) => (
+            <li class="proof__item">
+              <span class="proof__k">{record.publications.items[p.id]}</span>
+              <span class="proof__v mono">
+                {p.year} · {p.venue}
+                {p.doi && <> · <a href={`https://doi.org/${p.doi}`} rel="noopener">doi:{p.doi}</a></>}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 class="proof__title proof__title--spaced">{record.press.title}</h3>
+        <ul class="proof__list">
+          {press.map((p) => (
+            <li class="proof__item">
+              <span class="proof__k">{record.press.items[p.id]}</span>
+              <span class="proof__v mono">{p.outlet} · {p.year}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+
+  .tl { --tl-label: clamp(104px, 24vw, 250px); }
+
+  .tl__head {
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    align-items: baseline; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .tl__readout { display: flex; align-items: baseline; gap: .85rem; flex-wrap: wrap; }
+  .tl__year {
+    font-size: var(--step-3); font-weight: 500; line-height: 1;
+    color: var(--fg-100); font-variant-numeric: tabular-nums;
+  }
+  .tl__count { font-size: var(--step-0); color: var(--brand-500); }
+  .tl__today {
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--bg-900); background: var(--ok);
+    padding: .2rem .45rem; border-radius: 4px; align-self: center;
+  }
+  .tl__drag { font-size: 11px; letter-spacing: .18em; color: var(--fg-700); text-transform: uppercase; }
+
+  .tl__chart { position: relative; padding-top: 28px; touch-action: pan-y; cursor: ew-resize; }
+
+  .tl__overlay { position: absolute; left: var(--tl-label); right: 0; top: 0; bottom: 0; pointer-events: none; }
+  .tl__axis { position: absolute; top: 0; left: 0; right: 0; height: 24px; }
+  .tl__tick {
+    position: absolute; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 10px; color: var(--fg-700);
+  }
+  .tl__tick::after {
+    content: ''; position: absolute; left: 50%; top: 1.35em;
+    width: 1px; height: 6px; background: var(--line);
+  }
+
+  .tl__playhead { position: absolute; top: 24px; bottom: 0; width: 1px; background: var(--brand-500); }
+  .tl__playhead::before {
+    content: ''; position: absolute; inset: 0 -12px;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand-500) 14%, transparent), transparent);
+  }
+  .tl__playhead-grip {
+    position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+    width: 11px; height: 11px; border-radius: 50%;
+    background: var(--brand-500); box-shadow: 0 0 0 3px var(--bg-800);
+  }
+
+  .tl__lane { margin-top: 1.35rem; }
+  .tl__lane-label {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--fg-700); margin: 0 0 .4rem;
+  }
+  .tl__lane[data-lane="education"] { --lane: var(--info); }
+  .tl__lane[data-lane="research"]  { --lane: var(--trace); }
+  .tl__lane[data-lane="industry"]  { --lane: var(--brand-500); }
+  .tl__lane[data-lane="venture"]   { --lane: var(--ok); }
+
+  .tl__row {
+    display: grid; grid-template-columns: var(--tl-label) 1fr;
+    align-items: center;
+    opacity: .34; transition: opacity .18s;
+  }
+  .tl__row.is-on { opacity: 1; }
+
+  .tl__name { display: grid; padding-right: .9rem; min-width: 0; }
+  .tl__role {
+    font-size: var(--step--1); line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tl__org { font-size: 10px; color: var(--fg-700); }
+
+  .tl__track { position: relative; height: 34px; }
+  .tl__bar {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 8px; border-radius: 999px;
+    background: color-mix(in oklab, var(--lane) 45%, transparent);
+  }
+  .tl__bar--strong { background: var(--lane); }
+  /* Roles with no end date fade out rather than stopping at a hard edge. */
+  .tl__bar--open {
+    -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent);
+    mask-image: linear-gradient(90deg, #000 78%, transparent);
+  }
+
+  .tl__slider { display: block; margin-top: 1.75rem; padding-left: var(--tl-label); }
+
+  /* ---- proof grid ---- */
+  .proof {
+    display: grid; gap: clamp(1.5rem, 4vw, 3rem);
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    margin-top: 3rem;
+  }
+  .proof__title { font-size: var(--step-1); margin-bottom: .5rem; }
+  .proof__title--spaced { margin-top: 2.25rem; }
+  .proof__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.1rem; }
+  .proof__list { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; }
+  .proof__item {
+    display: grid; gap: .15rem;
+    padding-left: .9rem; border-left: 2px solid var(--line);
+  }
+  .proof__k { font-size: var(--step--1); color: var(--fg-100); }
+  .proof__v { font-size: 11px; color: var(--fg-700); }
+  .proof__v a { color: var(--fg-500); }
+  .proof__v a:hover { color: var(--brand-500); }
+</style>
+
+<script>
+  const tl = document.querySelector<HTMLElement>('[data-timeline]');
+  if (tl) {
+    const chart = tl.querySelector<HTMLElement>('[data-chart]')!;
+    const overlay = tl.querySelector<HTMLElement>('.tl__overlay')!;
+    const playhead = tl.querySelector<HTMLElement>('[data-playhead]')!;
+    const scrub = tl.querySelector<HTMLInputElement>('[data-scrub]')!;
+    const yearOut = tl.querySelector<HTMLElement>('[data-year]')!;
+    const todayOut = tl.querySelector<HTMLElement>('[data-today]')!;
+    const countOut = tl.querySelector<HTMLElement>('[data-count]')!;
+    const rows = [...tl.querySelectorAll<HTMLElement>('[data-row]')];
+
+    const START = Number(tl.dataset.start);
+    const END = Number(tl.dataset.end);
+    const NOW = Number(tl.dataset.now);
+    const SPAN = END - START;
+
+    const tplMany = tl.dataset.tplMany!;
+    const tplOne = tl.dataset.tplOne!;
+    const tplNone = tl.dataset.tplNone!;
+    const tplToday = tl.dataset.tplToday!;
+
+    const ranges = rows.map((r) => ({
+      el: r,
+      from: Number(r.dataset.from),
+      to: Number(r.dataset.to),
+    }));
+
+    function render(year: number) {
+      playhead.style.left = `${((year - START) / SPAN) * 100}%`;
+
+      let active = 0;
+      for (const r of ranges) {
+        const on = year >= r.from && year <= r.to;
+        r.el.classList.toggle('is-on', on);
+        if (on) active++;
+      }
+
+      const isNow = Math.abs(year - NOW) < 0.05;
+      yearOut.textContent = String(Math.floor(year));
+      todayOut.hidden = !isNow;
+      countOut.textContent =
+        active === 0 ? tplNone : active === 1 ? tplOne : tplMany.replace('{n}', String(active));
+    }
+
+    scrub.addEventListener('input', () => render(Number(scrub.value)));
+
+    // Dragging anywhere on the chart is more natural than hunting for the slider.
+    const yearAt = (clientX: number) => {
+      const box = overlay.getBoundingClientRect();
+      const ratio = Math.min(Math.max((clientX - box.left) / box.width, 0), 1);
+      return START + ratio * SPAN;
+    };
+    const commit = (clientX: number) => {
+      const y = Math.min(yearAt(clientX), Number(scrub.max));
+      scrub.value = String(y);
+      render(y);
+    };
+    let dragging = false;
+    chart.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      chart.setPointerCapture(e.pointerId);
+      commit(e.clientX);
+    });
+    chart.addEventListener('pointermove', (e) => { if (dragging) commit(e.clientX); });
+    chart.addEventListener('pointerup', () => { dragging = false; });
+    chart.addEventListener('pointercancel', () => { dragging = false; });
+
+    render(NOW);
+
+    // Sweep once, the first time it comes into view: the overlap is the point,
+    // and nobody discovers it from a static chart.
+    let swept = false;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    new IntersectionObserver((entries, obs) => {
+      for (const e of entries) {
+        if (!e.isIntersecting || swept) continue;
+        swept = true;
+        obs.disconnect();
+        if (reduced) { render(NOW); return; }
+
+        const DURATION = 2400;
+        const t0 = performance.now();
+        const step = (t: number) => {
+          const k = Math.min((t - t0) / DURATION, 1);
+          // ease-out so the recent, busiest years get the most dwell time
+          const eased = 1 - Math.pow(1 - k, 3);
+          const y = START + (NOW - START) * eased;
+          scrub.value = String(y);
+          render(y);
+          if (k < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, { threshold: 0.25 }).observe(tl);
+  }
+</script>

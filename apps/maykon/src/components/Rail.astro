@@ -1,10 +1,12 @@
 ---
 import type { Chapter } from '../content';
-interface Props { chapters: Chapter[] }
-const { chapters } = Astro.props;
+interface RailEntry { id: string; codename: string; slug: string }
+interface Props { chapters: Chapter[]; extra?: RailEntry }
+const { chapters, extra } = Astro.props;
+const entries: RailEntry[] = [...chapters, ...(extra ? [extra] : [])];
 ---
 <nav class="rail" aria-label="Chapters" data-rail>
-  {chapters.map((c) => (
+  {entries.map((c) => (
     <a class="rail__item" href={`#${c.slug}`} data-rail-for={c.slug}>
       <span class="rail__tick"></span>
       <span class="rail__label">{c.id} {c.codename}</span>
