@@ -65,11 +65,19 @@ TypeScript modules, tested separately from the DOM:
   degrading linearly, that zero replicas is infinite saturation rather than a
   divide-by-zero, and that HPA sizing actually clears the spike.
 
-- `games/perceptron.ts` is Rosenblatt's 1958 rule. `perceptron.test.ts` asserts
-  both halves of what the chapter claims: separable data always converges, and
-  XOR never does. It also pins the UI's "this is not separable" threshold —
-  over 400 random starts the separable set converged in at most 53 corrections,
-  so warning at 90 cannot fire falsely.
+- `games/gan.ts` follows StockGAN, the generative adversarial network for price
+  series Maykon wrote in 2021. Its loss functions are ports, constants included:
+  the compound generator loss `l1 * adversarial + l2 * mse`, binary cross-entropy
+  under Keras label smoothing, and the polynomial learning-rate decay. The
+  generator and critic are stand-ins, and the file says so. `gan.test.ts` pins
+  the lesson: the setting that minimises error and the setting that produces
+  market-like movement are different settings, so lambda is a decision. It also
+  proves the thing label smoothing is for — under smoothing at 0.2 the loss is
+  minimised at p = 0.9, so the discriminator is never allowed total certainty.
+  The seeded generator warms up four steps before its first draw, because
+  straight out of the seed the first value never once fell below a half over two
+  thousand consecutive seeds, which had been silently truncating every normal
+  draw.
 
 - `games/dbindex.ts` is the query planner's arithmetic over a stated table
   distribution, so every number the panel prints is checkable. `dbindex.test.ts`

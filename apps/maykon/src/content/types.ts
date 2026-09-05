@@ -41,6 +41,8 @@ export interface RecordSection {
   };
   publications: { title: string; lede: string; items: Record<string, string> };
   press: { title: string; items: Record<string, string> };
+  /** The line the page ends on. */
+  closing: { line: string; note: string };
 }
 
 export interface SignalGame {
@@ -93,23 +95,36 @@ export interface SwarmGame {
 
 export interface MindGame {
   lede: string;
-  axisX: string;
-  axisY: string;
-  healthy: string;
-  failing: string;
-  adding: string;
-  train: string;
-  pause: string;
-  clear: string;
-  presetSeparable: string;
-  presetXor: string;
-  steps: string;
-  accuracy: string;
-  wrong: string;
-  weights: string;
-  hintPlace: string;
-  hintConverged: string;
-  hintStuck: string;
+  paper: string;
+  reading: string;
+  question: string;
+  slotA: string;
+  slotB: string;
+  pick: string;
+  real: string;
+  generated: string;
+  criticSays: string;
+  next: string;
+  reset: string;
+  rounds: string;
+  you: string;
+  network: string;
+  fooled: string;
+  lambdaLabel: string;
+  lambdaHis: string;
+  meterTruth: string;
+  meterReal: string;
+  arch: string;
+  archGen: string;
+  archDisc: string;
+  archNote: string;
+  hintStart: string;
+  hintRight: string;
+  hintWrong: string;
+  hintLow: string;
+  hintHigh: string;
+  hintHis: string;
+  verdict: string;
 }
 
 export interface ServiceGame {

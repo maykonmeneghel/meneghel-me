@@ -6,7 +6,7 @@ import Chapter from './Chapter.astro';
 import PwmLab from './games/PwmLab.astro';
 import MqttBench from './games/MqttBench.astro';
 import ClusterLab from './games/ClusterLab.astro';
-import PerceptronLab from './games/PerceptronLab.astro';
+import GanLab from './games/GanLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
@@ -39,7 +39,7 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
         ) : chapter.slug === 'swarm' ? (
           <ClusterLab swarm={c.swarm} />
         ) : chapter.slug === 'mind' ? (
-          <PerceptronLab mind={c.mind} />
+          <GanLab mind={c.mind} />
         ) : chapter.slug === 'service' ? (
           <IndexLab service={c.service} />
         ) : chapter.slug === 'copper' ? (

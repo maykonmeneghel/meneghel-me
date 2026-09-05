@@ -168,10 +168,27 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
         </ul>
       </div>
     </div>
+
+    <p class="closing">
+      <span class="closing__line">{record.closing.line}</span>
+      <span class="closing__note">{record.closing.note}</span>
+    </p>
   </div>
 </section>
 
 <style>
+  /* The last thing on the page, so it gets the room to be the last thing. */
+  .closing {
+    margin: 4rem 0 0; padding-top: 2.25rem;
+    border-top: 1px solid var(--line);
+    display: grid; gap: .9rem; max-width: 62ch;
+  }
+  .closing__line {
+    font-size: var(--step-2); line-height: 1.25; font-weight: 500;
+    color: var(--fg-100); text-wrap: balance;
+  }
+  .closing__note { font-size: var(--step-0); color: var(--fg-500); }
+
   .sr-only {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip-path: inset(50%); white-space: nowrap;
