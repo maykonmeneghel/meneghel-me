@@ -203,11 +203,11 @@ export interface SystemGame {
 export interface GlassGame {
   lede: string;
   accent: string;
-  density: string;
+  layout: string;
   radius: string;
   chart: string;
-  compact: string;
-  comfortable: string;
+  stacked: string;
+  inline: string;
   on: string;
   off: string;
   /** Card contents shown inside the phone. */

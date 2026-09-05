@@ -18,9 +18,9 @@ const { glass } = Astro.props;
       ))}
     </div>
     <div class="gl__group">
-      <span class="gl__label mono">{glass.density}</span>
-      <button type="button" class="btn gl__chip" data-density="comfortable" aria-pressed="true">{glass.comfortable}</button>
-      <button type="button" class="btn gl__chip" data-density="compact" aria-pressed="false">{glass.compact}</button>
+      <span class="gl__label mono">{glass.layout}</span>
+      <button type="button" class="btn gl__chip" data-layout="stacked" aria-pressed="true">{glass.stacked}</button>
+      <button type="button" class="btn gl__chip" data-layout="inline" aria-pressed="false">{glass.inline}</button>
     </div>
     <div class="gl__group">
       <span class="gl__label mono">{glass.chart}</span>
@@ -88,6 +88,7 @@ const { glass } = Astro.props;
   .gl__screen { height: 100%; display: grid; align-content: start; gap: .6rem; padding-top: 1.4rem; }
   .gl__card {
     display: grid; justify-items: start;
+    transition: gap .2s;
     padding: 16px;
     background: linear-gradient(180deg, #1a1e27, #14171e);
     border: 1px solid var(--line);
@@ -96,8 +97,19 @@ const { glass } = Astro.props;
   }
   .gl__card [data-gap] + [data-gap],
   .gl__card [data-gap] + svg { margin-top: var(--gl-gap, 14px); }
+
+  /* Inline lays the card out across instead of down, baseline-aligned, exactly
+     as the HStack and the Row in the source beside it. */
+  .gl__card[data-layout="inline"] {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    gap: var(--gl-gap, 18px);
+  }
+  .gl__card[data-layout="inline"] [data-gap] + [data-gap],
+  .gl__card[data-layout="inline"] [data-gap] + svg { margin-top: 0; }
+  .gl__card[data-layout="inline"] .gl__chartsvg { flex: 1 1 100%; height: 30px; align-self: stretch; }
+  .gl__card[data-layout="inline"] .gl__sensor { flex: 1 1 100%; }
   .gl__sensor { font-size: 10px; letter-spacing: .1em; color: var(--fg-500); font-family: var(--font-mono); }
-  .gl__value { font-size: 44px; font-weight: 600; line-height: 1; color: var(--gl-accent, #ff2d55); }
+  .gl__value { font-size: var(--gl-font, 44px); font-weight: 600; line-height: 1; color: var(--gl-accent, #ff2d55); }
   .gl__value i { font-size: 20px; font-style: normal; margin-left: 2px; }
   .gl__pill {
     font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
@@ -132,8 +144,8 @@ const { glass } = Astro.props;
 
 <script>
   import {
-    swiftUI, flutter, spacingOf, spacerCount, ACCENTS, DEFAULT_STATE,
-    type ScreenState, type Accent, type Density,
+    swiftUI, flutter, spacingOf, spacerCount, fontOf, ACCENTS, DEFAULT_STATE,
+    type ScreenState, type Accent, type Layout,
   } from './screen';
 
   const root = document.querySelector<HTMLElement>('[data-gl]');
@@ -199,7 +211,10 @@ const { glass } = Astro.props;
     function render() {
       // The phone is driven by the same numbers the code prints.
       card.style.setProperty('--gl-radius', `${state.radius}px`);
-      card.style.setProperty('--gl-gap', `${spacingOf(state.density)}px`);
+      card.style.setProperty('--gl-gap', `${spacingOf(state.layout)}px`);
+      // The preview has to change shape too, or the switch is a lie.
+      card.dataset.layout = state.layout;
+      card.style.setProperty('--gl-font', `${fontOf(state.layout)}px`);
       card.style.setProperty('--gl-accent', ACCENTS[state.accent].css);
       chartSvg.hidden = !state.chart;
       radiusOut.textContent = String(state.radius);
@@ -223,10 +238,10 @@ const { glass } = Astro.props;
       });
     });
 
-    root.querySelectorAll<HTMLButtonElement>('[data-density]').forEach((btn) => {
+    root.querySelectorAll<HTMLButtonElement>('[data-layout]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        state.density = btn.dataset.density as Density;
-        press('[data-density]', (el) => el === btn);
+        state.layout = btn.dataset.layout as Layout;
+        press('[data-layout]', (el) => el === btn);
         render();
       });
     });

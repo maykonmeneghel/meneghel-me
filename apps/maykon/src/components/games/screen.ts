@@ -8,24 +8,32 @@
  */
 
 export type Accent = 'brand' | 'ok' | 'info';
-export type Density = 'compact' | 'comfortable';
+/** Stacked runs down the screen; inline runs across it. */
+export type Layout = 'stacked' | 'inline';
 
 export interface ScreenState {
   accent: Accent;
-  density: Density;
+  layout: Layout;
   radius: number;
   chart: boolean;
 }
 
 export const DEFAULT_STATE: ScreenState = {
   accent: 'brand',
-  density: 'comfortable',
+  layout: 'stacked',
   radius: 18,
   chart: true,
 };
 
-/** Gap between stacked elements, in points. */
-export const spacingOf = (d: Density) => (d === 'compact' ? 6 : 14);
+/** Gap between elements, in points. Inline rows want a little more air. */
+export const spacingOf = (l: Layout) => (l === 'inline' ? 14 : 14);
+
+/**
+ * The reading's type size. An inline arrangement has to give the number back
+ * some room or it simply wraps, and a card that wraps is a stacked card with
+ * extra steps.
+ */
+export const fontOf = (l: Layout) => (l === 'inline' ? 26 : 44);
 
 export const ACCENTS: Record<Accent, { swift: string; dart: string; css: string }> = {
   brand: { swift: '.pink', dart: 'const Color(0xFFFF2D55)', css: '#ff2d55' },
@@ -34,20 +42,24 @@ export const ACCENTS: Record<Accent, { swift: string; dart: string; css: string 
 };
 
 export function swiftUI(s: ScreenState): string {
-  const gap = spacingOf(s.density);
+  const gap = spacingOf(s.layout);
   const accent = ACCENTS[s.accent].swift;
+  const inline = s.layout === 'inline';
+  const stack = inline
+    ? `HStack(alignment: .firstTextBaseline, spacing: ${gap})`
+    : `VStack(alignment: .leading, spacing: ${gap})`;
   const chart = s.chart ? `\n      MoistureChart(points: reading.history)\n        .frame(height: 44)\n` : '\n';
   return `struct ReadingCard: View {
   let reading: Reading
 
   var body: some View {
-    VStack(alignment: .leading, spacing: ${gap}) {
+    ${stack} {
       Text(reading.sensor)
         .font(.caption)
         .foregroundStyle(.secondary)
 
       Text("\\(reading.moisture)%")
-        .font(.system(size: 44, weight: .semibold))
+        .font(.system(size: ${fontOf(s.layout)}, weight: .semibold))
         .foregroundStyle(${accent})
 
       StatusPill(state: reading.state)
@@ -62,10 +74,18 @@ ${chart}    }
 }
 
 export function flutter(s: ScreenState): string {
-  const gap = spacingOf(s.density);
+  const gap = spacingOf(s.layout);
   const accent = ACCENTS[s.accent].dart;
+  const inline = s.layout === 'inline';
+  // In a Row the spacer changes axis: height becomes width. SwiftUI's spacing:
+  // parameter does not care which way the stack runs.
+  const spacer = inline ? `SizedBox(width: ${gap})` : `SizedBox(height: ${gap})`;
+  const widget = inline ? 'Row' : 'Column';
+  const align = inline
+    ? 'crossAxisAlignment: CrossAxisAlignment.baseline,\n        textBaseline: TextBaseline.alphabetic,'
+    : 'crossAxisAlignment: CrossAxisAlignment.start,';
   const chart = s.chart
-    ? `\n          SizedBox(height: ${gap}),\n          SizedBox(height: 44, child: MoistureChart(points: reading.history)),`
+    ? `\n          ${spacer},\n          SizedBox(height: 44, width: 90, child: MoistureChart(points: reading.history)),`
     : '';
   return `class ReadingCard extends StatelessWidget {
   const ReadingCard({super.key, required this.reading});
@@ -80,19 +100,19 @@ export function flutter(s: ScreenState): string {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(${s.radius}),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ${widget}(
+        ${align}
         children: [
           Text(reading.sensor,
               style: Theme.of(context).textTheme.labelSmall),
-          SizedBox(height: ${gap}),
+          ${spacer},
           Text('\${reading.moisture}%',
               style: TextStyle(
-                fontSize: 44,
+                fontSize: ${fontOf(s.layout)},
                 fontWeight: FontWeight.w600,
                 color: ${accent},
               )),
-          SizedBox(height: ${gap}),
+          ${spacer},
           StatusPill(state: reading.state),${chart}
         ],
       ),
@@ -105,6 +125,6 @@ export function flutter(s: ScreenState): string {
 export function spacerCount(s: ScreenState): { swift: number; dart: number } {
   return {
     swift: (swiftUI(s).match(/spacing:/g) ?? []).length,
-    dart: (flutter(s).match(/SizedBox\(height:/g) ?? []).length,
+    dart: (flutter(s).match(/SizedBox\((?:height|width): \d+\)/g) ?? []).length,
   };
 }
