@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 06, 07 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 05, 06, 07 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -60,7 +60,14 @@ TypeScript modules, tested separately from the DOM:
   over 400 random starts the separable set converged in at most 53 corrections,
   so warning at 90 cannot fire falsely.
 
-Node 24 strips types natively, so all three run with plain `node` — no runner,
+- `games/dbindex.ts` is the query planner's arithmetic over a stated table
+  distribution, so every number the panel prints is checkable. `dbindex.test.ts`
+  covers the three outcomes that matter: no index means a full scan, the right
+  index on a point lookup is ~900x faster, and an index the planner *declines*
+  because the query wants 60% of the table buys nothing while still taxing
+  every write.
+
+Node 24 strips types natively, so all four run with plain `node` — no runner,
 no build step, no dev dependency.
 
 ## The timeline

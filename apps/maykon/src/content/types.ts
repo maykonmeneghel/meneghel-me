@@ -112,6 +112,24 @@ export interface MindGame {
   hintStuck: string;
 }
 
+export interface ServiceGame {
+  lede: string;
+  table: string;
+  indexes: string;
+  query: string;
+  run: string;
+  running: string;
+  rows: string;
+  time: string;
+  speedup: string;
+  writes: string;
+  queryLabels: Record<string, string>;
+  /** Keyed by Plan['reason']. */
+  hints: Record<string, string>;
+  treeLabel: string;
+  heapLabel: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -130,5 +148,6 @@ export interface Content {
   signal: SignalGame;
   swarm: SwarmGame;
   mind: MindGame;
+  service: ServiceGame;
   ui: Record<string, string>;
 }

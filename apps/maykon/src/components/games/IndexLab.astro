@@ -1,0 +1,284 @@
+---
+import type { Content } from '../../content';
+import { QUERIES, INDEX_PROBES } from './dbindex';
+
+interface Props { service: Content['service'] }
+const { service } = Astro.props;
+const columns = ['reading_id', 'sensor_id', 'value'] as const;
+---
+<div class="ix" data-ix data-hints={JSON.stringify(service.hints)}
+  data-l-run={service.run} data-l-running={service.running}>
+  <p class="ix__lede">{service.lede}</p>
+
+  <div class="ix__row">
+    <span class="ix__rowlabel mono">{service.query}</span>
+    <div class="ix__chips">
+      {QUERIES.map((q, i) => (
+        <button type="button" class="btn ix__chip" data-query={q.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+          {service.queryLabels[q.id]}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <pre class="ix__sql mono" data-sql>{QUERIES[0].sql}</pre>
+
+  <div class="ix__row">
+    <span class="ix__rowlabel mono">{service.indexes}</span>
+    <div class="ix__chips">
+      {columns.map((c) => (
+        <button type="button" class="btn ix__chip" data-index={c} aria-pressed="false">{c}</button>
+      ))}
+    </div>
+    <button type="button" class="btn btn--primary ix__run" data-run>{service.run}</button>
+  </div>
+
+  <div class="ix__stage">
+    <div class="ix__tree">
+      <p class="ix__stagelabel mono">{service.treeLabel}</p>
+      <svg viewBox="0 0 180 130" class="ix__svg" aria-hidden="true">
+        <line class="ix__edge" data-edge="0" x1="90" y1="26" x2="45" y2="62" />
+        <line class="ix__edge" data-edge="1" x1="90" y1="26" x2="135" y2="62" />
+        <line class="ix__edge" data-edge="2" x1="45" y1="62" x2="24" y2="100" />
+        <line class="ix__edge" data-edge="3" x1="45" y1="62" x2="66" y2="100" />
+        <line class="ix__edge" data-edge="4" x1="135" y1="62" x2="114" y2="100" />
+        <line class="ix__edge" data-edge="5" x1="135" y1="62" x2="156" y2="100" />
+        <rect class="ix__node" data-node="0" x="70" y="14" width="40" height="18" rx="4" />
+        <rect class="ix__node" data-node="1" x="27" y="50" width="36" height="18" rx="4" />
+        <rect class="ix__node" data-node="2" x="117" y="50" width="36" height="18" rx="4" />
+        <rect class="ix__node" data-node="3" x="8" y="88" width="32" height="18" rx="4" />
+        <rect class="ix__node" data-node="4" x="50" y="88" width="32" height="18" rx="4" />
+        <rect class="ix__node" data-node="5" x="98" y="88" width="32" height="18" rx="4" />
+        <rect class="ix__node" data-node="6" x="140" y="88" width="32" height="18" rx="4" />
+      </svg>
+      <p class="ix__depth mono" data-depth>{INDEX_PROBES} pages</p>
+    </div>
+
+    <div class="ix__heap">
+      <p class="ix__stagelabel mono">{service.heapLabel} · <span data-table>{service.table}</span></p>
+      <canvas class="ix__strip" data-strip width="960" height="180"
+        role="img" aria-label="How much of the table the query had to read"></canvas>
+    </div>
+  </div>
+
+  <pre class="ix__explain mono" data-explain>—</pre>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{service.rows}</span>
+      <span class="readout__v" data-out="rows">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{service.time}</span>
+      <span class="readout__v" data-out="ms">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{service.speedup}</span>
+      <span class="readout__v" data-out="speed">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{service.writes}</span>
+      <span class="readout__v" data-out="writes">—</span>
+    </div>
+  </div>
+
+  <p class="ix__hint" data-hint></p>
+</div>
+
+<style>
+  .ix__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.25rem; max-width: 74ch; }
+
+  .ix__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: .9rem; }
+  .ix__rowlabel {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fg-700); min-width: 8.5rem;
+  }
+  .ix__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .ix__chip { font-size: 11px; padding: .32rem .6rem; }
+  .ix__run { margin-left: auto; }
+
+  .ix__sql {
+    margin: 0 0 1.1rem; padding: .7rem .85rem; overflow-x: auto;
+    background: var(--bg-900); border: 1px solid var(--line); border-radius: 8px;
+    font-size: var(--step--1); color: var(--fg-300);
+  }
+
+  .ix__stage {
+    display: grid; gap: 1rem; margin-top: 1.25rem;
+    grid-template-columns: 200px 1fr;
+  }
+  @media (max-width: 720px) { .ix__stage { grid-template-columns: 1fr; } }
+  .ix__stagelabel {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fg-700); margin: 0 0 .5rem;
+  }
+
+  .ix__tree {
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg-900); padding: .7rem;
+  }
+  .ix__svg { width: 100%; height: auto; }
+  .ix__node { fill: var(--bg-700); stroke: var(--line-2); stroke-width: 1; transition: fill .12s, stroke .12s; }
+  .ix__node.is-on { fill: color-mix(in oklab, var(--info) 55%, var(--bg-800)); stroke: var(--info); }
+  .ix__edge { stroke: var(--line); stroke-width: 1.5; transition: stroke .12s; }
+  .ix__edge.is-on { stroke: var(--info); }
+  .ix__tree.is-off { opacity: .3; }
+  .ix__depth { font-size: 10px; color: var(--fg-700); margin: .4rem 0 0; text-align: center; }
+
+  .ix__heap {
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg-900); padding: .7rem;
+  }
+  .ix__strip { width: 100%; height: auto; }
+
+  .ix__explain {
+    margin: 1.1rem 0 0; padding: .7rem .85rem; overflow-x: auto;
+    background: #06070a; border: 1px solid var(--line); border-radius: 8px;
+    font-size: var(--step--1); color: var(--fg-500);
+  }
+  .ix__explain[data-kind="index"] { color: var(--ok); border-color: color-mix(in oklab, var(--ok) 35%, transparent); }
+  .ix__explain[data-kind="seq"]   { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 30%, transparent); }
+
+  .ix__hint { margin-top: 1rem; font-size: var(--step--1); color: var(--fg-300); max-width: 74ch; min-height: 4.2em; }
+</style>
+
+<script>
+  import {
+    QUERIES, plan, speedup, writeMs, litBlocks, matchCount,
+    BLOCKS, TABLE_ROWS, INDEX_PROBES, type Column, type Plan, type Query,
+  } from './dbindex';
+
+  const root = document.querySelector<HTMLElement>('[data-ix]');
+  if (root) {
+    const strip = root.querySelector<HTMLCanvasElement>('[data-strip]')!;
+    const ctx = strip.getContext('2d')!;
+    const sqlOut = root.querySelector<HTMLElement>('[data-sql]')!;
+    const explainOut = root.querySelector<HTMLElement>('[data-explain]')!;
+    const hintOut = root.querySelector<HTMLElement>('[data-hint]')!;
+    const runBtn = root.querySelector<HTMLButtonElement>('[data-run]')!;
+    const tree = root.querySelector<HTMLElement>('.ix__tree')!;
+    const nodes = [...root.querySelectorAll<SVGElement>('[data-node]')];
+    const edges = [...root.querySelectorAll<SVGElement>('[data-edge]')];
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const hints: Record<string, string> = JSON.parse(root.dataset.hints!);
+
+    const COLS = 60;                       // strip layout
+    const ROWS = BLOCKS / COLS;
+    let query: Query = QUERIES[0];
+    let indexes = new Set<Column>();
+    let scanned = 0;                       // blocks lit so far
+    let running = false;
+
+    /** The path a lookup takes down the tree: root, one branch, one leaf. */
+    const PATH_NODES = [0, 1, 3];
+    const PATH_EDGES = [0, 2];
+
+    function drawStrip(lit: number, kind: 'seq' | 'index' | null) {
+      const w = strip.width, h = strip.height;
+      const cw = w / COLS, ch = h / ROWS;
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < BLOCKS; i++) {
+        const x = (i % COLS) * cw, y = Math.floor(i / COLS) * ch;
+        const on = i < lit;
+        ctx.fillStyle = !on
+          ? '#12151c'
+          : kind === 'index' ? 'rgba(52,211,153,.85)' : 'rgba(251,191,36,.75)';
+        ctx.fillRect(x + 1, y + 1, cw - 2, ch - 2);
+      }
+    }
+
+    function setTree(on: boolean, depth: number) {
+      tree.classList.toggle('is-off', !on);
+      nodes.forEach((n, i) => n.classList.toggle('is-on', on && PATH_NODES.slice(0, depth).includes(i)));
+      edges.forEach((e, i) => e.classList.toggle('is-on', on && PATH_EDGES.slice(0, Math.max(0, depth - 1)).includes(i)));
+    }
+
+    function paintResult(p: Plan) {
+      const label = p.kind === 'index'
+        ? `Index Scan using idx_${query.column} on readings  (rows=${matchCount(query).toLocaleString()})`
+        : `Seq Scan on readings  (rows=${TABLE_ROWS.toLocaleString()})`;
+      explainOut.textContent = label;
+      explainOut.dataset.kind = p.kind;
+
+      out('rows').textContent = p.rowsExamined.toLocaleString();
+      out('rows').dataset.state = p.kind === 'index' ? 'ok' : 'warn';
+      out('ms').textContent = `${p.ms.toFixed(p.ms < 1 ? 3 : 1)} ms`;
+      out('ms').dataset.state = p.kind === 'index' ? 'ok' : 'warn';
+      const s = speedup(p);
+      out('speed').textContent = s >= 2 ? `${Math.round(s)}×` : '1×';
+      out('speed').dataset.state = s >= 2 ? 'ok' : 'warn';
+      out('writes').textContent = `${writeMs(indexes.size).toFixed(3)} ms`;
+      out('writes').dataset.state = indexes.size > 1 ? 'warn' : 'ok';
+
+      hintOut.textContent = hints[p.reason];
+    }
+
+    function reset() {
+      scanned = 0;
+      running = false;
+      runBtn.textContent = root!.dataset.lRun!;
+      runBtn.disabled = false;
+      setTree(false, 0);
+      drawStrip(0, null);
+      explainOut.textContent = '—';
+      delete explainOut.dataset.kind;
+      hintOut.textContent = '';
+      ['rows', 'ms', 'speed'].forEach((k) => { out(k).textContent = '—'; delete out(k).dataset.state; });
+      out('writes').textContent = `${writeMs(indexes.size).toFixed(3)} ms`;
+    }
+
+    function run() {
+      if (running) return;
+      running = true;
+      runBtn.disabled = true;
+      runBtn.textContent = root!.dataset.lRunning!;
+
+      const p = plan(query, indexes);
+      const target = litBlocks(query, p);
+      scanned = 0;
+
+      // An index seek descends the tree first, then reads only what it found.
+      const descend = p.kind === 'index'
+        ? [0, 1, 2, 3].map((d, i) => new Promise<void>((res) => setTimeout(() => { setTree(true, d); res(); }, i * 130)))
+        : [Promise.resolve()];
+
+      Promise.all(descend).then(() => {
+        if (p.kind !== 'index') setTree(false, 0);
+        // A full scan crawls; an index read lands. The pacing is the argument.
+        const perBlock = p.kind === 'index' ? 260 / Math.max(target, 1) : 1500 / BLOCKS;
+        const t0 = performance.now();
+        const tick = (now: number) => {
+          scanned = Math.min(target, Math.floor((now - t0) / perBlock) + 1);
+          drawStrip(scanned, p.kind);
+          if (scanned < target) { requestAnimationFrame(tick); return; }
+          paintResult(p);
+          running = false;
+          runBtn.disabled = false;
+          runBtn.textContent = root!.dataset.lRun!;
+        };
+        requestAnimationFrame(tick);
+      });
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-query]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        query = QUERIES.find((q) => q.id === btn.dataset.query)!;
+        root.querySelectorAll('[data-query]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        sqlOut.textContent = query.sql;
+        reset();
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-index]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const col = btn.dataset.index as Column;
+        if (indexes.has(col)) indexes.delete(col); else indexes.add(col);
+        btn.setAttribute('aria-pressed', String(indexes.has(col)));
+        reset();
+      });
+    });
+
+    runBtn.addEventListener('click', run);
+    reset();
+  }
+</script>
