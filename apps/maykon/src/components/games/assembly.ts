@@ -1,210 +1,220 @@
 /**
- * The AGROM.IO products, rebuilt as geometry.
+ * The AGROM.IO assemblies, rebuilt as geometry.
  *
- * `Projeto Mecânico/Por Produto` says what the products are; the bills of
- * material say what each is made of, in what quantity; and the dimensioned
- * drawings say how big the turned parts are. The SolidWorks assemblies
- * themselves cannot be read — they are not OLE compound files, so there is no
- * geometry inside them to recover — which means the shapes here come from the
- * drawings and the arrangement is matched to the 2017 renders.
- *
- * Anything printed rather than turned is substituted at runtime by its real
- * STL, placed by `at` and scaled from millimetres.
+ * `Projeto Mecânico/Por Projeto` holds one folder per assembly, and the part
+ * files inside each are its parts list — so the pieces below carry the names
+ * SolidWorks gave them, not names I chose. The shapes come from the dimensioned
+ * drawings, the printed parts are their real STLs, and the arrangement is
+ * matched to the 2017 renders, because the .SLDASM files themselves cannot be
+ * read: they are not OLE compound files, so there is no geometry inside them.
  */
 import { box, cylinder, tube, place, merge, bounds, type Mesh } from './solid.ts';
 
 export interface Vec3 { x: number; y: number; z: number }
 
+/** How a part came to exist, which the panel shows beside its name. */
+export type Source = 'drawing' | 'printed' | 'laser' | 'bought' | 'board';
+
 export interface Piece {
+  /** The part file's own name. */
   id: string;
-  /** Geometry built here, from the drawings. */
+  source: Source;
   mesh?: Mesh;
   /** Or the id of a printed part, whose STL is dropped in at runtime. */
   stl?: string;
   at?: Vec3;
   colour: string;
-  /** Direction and distance this piece travels in an exploded view, in mm. */
+  /** Where this piece travels in an exploded view, in mm. */
   explode: Vec3;
-  fromDrawing: boolean;
 }
 
 /** Ø76.20 mm is 3 inches: the stock tube everything is cut from. (drawing) */
 export const TUBE_D = 76.2;
+export const BORE_D = 72;          // drawing: Espaçador, Conexão Tubos
 export const CONE_LEN = 130;       // drawing: Cone
-export const TUBE_LEN = 1000;      // drawing: Espaçador 1000, the mast tube
+export const TUBE_LEN = 1000;      // drawing: Espaçador 1000
 export const COUPLING_LEN = 60;    // drawing: Conexão Tubos
+export const HASTE_LEN = 775;      // drawing: Haste
 export const HEAD_LEN = 44;        // drawing: Suporte Cabeça
 export const PANEL_W = 145;        // drawing: Suporte Painel Solar
 export const PANEL_H = 85;         // drawing
-/** Ø72 inside the Ø76.20 tube: a 2.1 mm wall. (drawing: Espaçador, Conexão) */
-export const BORE_D = 72;
 export const SEGMENTS = 56;
-/** BOM Corpo: two of each, and they set the depths the soil sensors sit at. */
-export const SPACERS = [80, 80, 100, 100, 120, 120];
+
+const R = TUBE_D / 2;
+const BORE = BORE_D / 2;
 
 const BLUE = '#2323a8';
 const STEEL = '#b9bec7';
 const PANEL = '#2b4fd0';
 const DARK = '#2a2f38';
-const WHITE = '#e6e8ec';
+const PRINTED = '#e6e8ec';
 const ACRYLIC = '#8fa4b8';
 const BOARD = '#0f5132';
+const COPPER = '#c8892f';
 
-const R = TUBE_D / 2;
-const BORE = BORE_D / 2;
 const up = (d: number): Vec3 => ({ x: 0, y: 0, z: d });
 const out = (x: number, y: number, z = 0): Vec3 => ({ x, y, z });
 
-/**
- * The mast: a cone that drives it in, the tube, four couplings and six spacers.
- * Exactly the BOM, stacked, with nothing invented between the drawn lengths.
- */
+/** Corpo: the mast. Six part files, and the BOM says how many of each. */
 export function corpo(): Piece[] {
   const pieces: Piece[] = [];
   let z = 0;
-  const step = (mesh: Mesh, id: string, colour: string, height: number) => {
-    pieces.push({ id, mesh: place(mesh, 0, 0, z + height / 2), colour, explode: up(pieces.length * 95), fromDrawing: true });
+  let n = 0;
+  const step = (id: string, mesh: Mesh, colour: string, height: number, source: Source = 'drawing') => {
+    pieces.push({ id, source, mesh: place(mesh, 0, 0, z + height / 2), colour, explode: up(n++ * 95) });
     z += height;
   };
 
-  step(cylinder(0, R, CONE_LEN, SEGMENTS), 'cone', BLUE, CONE_LEN);
-  // Couplings and spacers alternate up the shaft; the spacers are what set the
-  // depths the buried sensors end up at.
-  for (let i = 0; i < SPACERS.length; i++) {
-    // Couplings slip over the tube, so their bore is the tube's outside.
-    if (i < 4) step(tube(R * 1.06, R, COUPLING_LEN, SEGMENTS), `coupling-${i}`, STEEL, COUPLING_LEN);
-    step(tube(R, BORE, SPACERS[i], SEGMENTS), `spacer-${SPACERS[i]}-${i}`, BLUE, SPACERS[i]);
+  step('Cone', cylinder(0, R, CONE_LEN, SEGMENTS), BLUE, CONE_LEN);
+  // BOM Corpo: four couplings, and two each of the 80, 100 and 120 spacers.
+  const spacers = [80, 80, 100, 100, 120, 120];
+  for (let i = 0; i < spacers.length; i++) {
+    if (i < 4) step(`Conexão Tubos ${i + 1}`, tube(R * 1.06, R, COUPLING_LEN, SEGMENTS), STEEL, COUPLING_LEN);
+    step(`Espaçador ${spacers[i]}`, tube(R, BORE, spacers[i], SEGMENTS), BLUE, spacers[i]);
   }
-  step(tube(R, BORE, TUBE_LEN, SEGMENTS), 'cano', BLUE, TUBE_LEN);
+  step('Espaçador 1000', tube(R, BORE, TUBE_LEN, SEGMENTS), BLUE, TUBE_LEN);
   return pieces;
 }
 
 export const corpoHeight = () => bounds(merge(corpo().map((p) => p.mesh!))).size[2];
 
-/** The head: the machined collar, the printed spine and cap, acrylic and the board. */
-function cabeca(variant: 'os' | 'ws'): Piece[] {
-  const collar = place(tube(R * 1.05, BORE, HEAD_LEN, SEGMENTS), 0, 0, 0);
-  const pieces: Piece[] = [
-    { id: 'suporte-cabeca', mesh: collar, colour: STEEL, explode: up(0), fromDrawing: true },
-    { id: 'pci', mesh: place(cylinder(35, 35, 1.6, SEGMENTS), 0, 0, 26), colour: BOARD, explode: up(58), fromDrawing: true },
-    { id: 'barra', stl: 'barra-central', at: { x: 0, y: 0, z: 40 }, colour: WHITE, explode: up(96), fromDrawing: false },
-    { id: 'acrilico', mesh: place(cylinder(34, 34, 3, SEGMENTS), 0, 0, 62), colour: ACRYLIC, explode: up(134), fromDrawing: true },
-    { id: 'tampa', stl: variant === 'os' ? 'tampa-os' : 'tampa-ws', at: { x: 0, y: 0, z: 86 }, colour: WHITE, explode: up(176), fromDrawing: false },
+/** Cabeça 1 — Only Soil. Six files, one of them the assembly itself. */
+export function cabecaOS(): Piece[] {
+  return [
+    { id: 'Suporte Cabeça OS', source: 'drawing', mesh: place(tube(R * 1.05, BORE, HEAD_LEN, SEGMENTS), 0, 0, 0), colour: STEEL, explode: up(0) },
+    { id: 'Barra Central_ABS', source: 'printed', stl: 'barra-central', at: { x: 0, y: 0, z: 40 }, colour: PRINTED, explode: up(96) },
+    { id: 'Acrílico', source: 'laser', mesh: place(cylinder(34, 34, 3, SEGMENTS), 0, 0, 62), colour: ACRYLIC, explode: up(150) },
+    { id: 'Tampa_ABS', source: 'printed', stl: 'tampa-os', at: { x: 0, y: 0, z: 86 }, colour: PRINTED, explode: up(210) },
+    { id: 'Célula Fotovoltáica 1', source: 'bought', mesh: place(box(30, 3, 22), -16, 0, 96), colour: PANEL, explode: out(-90, 0, 260) },
+    { id: 'Célula Fotovoltáica 2', source: 'bought', mesh: place(box(30, 3, 22), 16, 0, 96), colour: PANEL, explode: out(90, 0, 260) },
   ];
-  if (variant === 'os') {
-    // BOM OS: two photovoltaic cells on the cap.
-    pieces.push(
-      { id: 'celula-1', mesh: place(box(30, 3, 22), -16, 0, 96), colour: PANEL, explode: out(-70, 0, 200), fromDrawing: false },
-      { id: 'celula-2', mesh: place(box(30, 3, 22), 16, 0, 96), colour: PANEL, explode: out(70, 0, 200), fromDrawing: false },
-    );
-  } else {
-    // BOM WS: a UV sensor and a TIL-78 phototransistor instead.
-    pieces.push(
-      { id: 'sensor-uv', mesh: place(cylinder(7, 7, 9, 24), -14, 0, 96), colour: DARK, explode: out(-70, 0, 200), fromDrawing: false },
-      { id: 'til-78', mesh: place(cylinder(3, 3, 7, 20), 14, 0, 96), colour: DARK, explode: out(70, 0, 200), fromDrawing: false },
-    );
-  }
-  return pieces;
 }
 
-export const cabecaOS = () => cabeca('os');
-export const cabecaWS = () => cabeca('ws');
+/** Cabeça 2 — Weather Station. The same head, with the UV sensor and TIL-78. */
+export function cabecaWS(): Piece[] {
+  return [
+    { id: 'Suporte Cabeça WS', source: 'drawing', mesh: place(tube(R * 1.05, BORE, HEAD_LEN, SEGMENTS), 0, 0, 0), colour: STEEL, explode: up(0) },
+    { id: 'Barra Central_ABS_WS', source: 'printed', stl: 'barra-central', at: { x: 0, y: 0, z: 40 }, colour: PRINTED, explode: up(96) },
+    { id: 'Acrílico_WS', source: 'laser', mesh: place(cylinder(34, 34, 3, SEGMENTS), 0, 0, 62), colour: ACRYLIC, explode: up(150) },
+    { id: 'Tampa_ABS_WS', source: 'printed', stl: 'tampa-ws', at: { x: 0, y: 0, z: 86 }, colour: PRINTED, explode: up(210) },
+    { id: 'Sensor UV', source: 'bought', mesh: place(cylinder(7, 7, 9, 24), -14, 0, 98), colour: DARK, explode: out(-90, 0, 260) },
+    { id: 'TIL-78', source: 'bought', mesh: place(cylinder(3, 3, 7, 20), 14, 0, 98), colour: DARK, explode: out(90, 0, 260) },
+  ];
+}
 
-/** The buried soil sensor: a ribbed machined body between two acrylic caps. */
+/** Painel Solar: two files, two of each. */
+export function painel(): Piece[] {
+  return [
+    { id: 'Suporte Painel Solar 1', source: 'drawing', mesh: place(box(26, 10, 46), -70, 0, -26), colour: STEEL, explode: out(-110, 0, -60) },
+    { id: 'Painel Solar 1', source: 'bought', mesh: place(box(PANEL_W, 6, PANEL_H), -70, 0, 6), colour: PANEL, explode: out(-110, 0, 80) },
+    { id: 'Suporte Painel Solar 2', source: 'drawing', mesh: place(box(26, 10, 46), 70, 0, -26), colour: STEEL, explode: out(110, 0, -60) },
+    { id: 'Painel Solar 2', source: 'bought', mesh: place(box(PANEL_W, 6, PANEL_H), 70, 0, 6), colour: PANEL, explode: out(110, 0, 80) },
+  ];
+}
+
+/**
+ * PCB. This folder holds the IDF pair EAGLE exported to the mechanical CAD —
+ * the same files chapter 02 builds its assembled board from — so the laminate
+ * and the two populated faces are the parts worth pulling apart here.
+ */
+export function pcb(): Piece[] {
+  const laminate = cylinder(35, 35, 1.6, SEGMENTS);
+  const side = (z: number) => merge([
+    place(box(18, 12, 3), -14, 8, z), place(box(10, 8, 3), 10, -6, z),
+    place(box(14, 14, 3), 4, 14, z), place(cylinder(4, 4, 6, 20), -20, -12, z),
+    place(box(24, 10, 3), 16, 12, z),
+  ]);
+  return [
+    { id: 'PCB', source: 'board', mesh: laminate, colour: BOARD, explode: up(0) },
+    { id: 'Componentes · face superior', source: 'board', mesh: side(3.5), colour: COPPER, explode: up(70) },
+    { id: 'Componentes · face inferior', source: 'board', mesh: side(-3.5), colour: STEEL, explode: up(-70) },
+  ];
+}
+
+/** Sensor 0 — AIR: the surface unit, on its own rod. */
+export function air(): Piece[] {
+  return [
+    { id: 'Haste', source: 'drawing', mesh: place(tube(12, 9, HASTE_LEN, 32), 0, 0, -HASTE_LEN / 2), colour: BLUE, explode: up(-260) },
+    { id: 'Suporte Sperficie', source: 'drawing', mesh: place(tube(26, 12, 30, SEGMENTS), 0, 0, 20), colour: STEEL, explode: up(0) },
+    { id: 'Suporte Bateria_ABS', source: 'printed', stl: 'suporte-bateria', at: { x: 0, y: 0, z: 70 }, colour: PRINTED, explode: up(150) },
+    { id: 'Tampa Suporte Bateria_ABS', source: 'printed', stl: 'tampa-suporte-bateria', at: { x: 0, y: 0, z: 132 }, colour: PRINTED, explode: up(320) },
+  ];
+}
+
+/** Sensor 1 — THD: the buried soil sensor, potted in epoxy. */
 export function thd(): Piece[] {
-  const RIBS = 7;
   const pieces: Piece[] = [];
-  for (let i = 0; i < RIBS; i++) {
-    const z = -30 + i * 9;
+  for (let i = 0; i < 5; i++) {
+    const z = -18 + i * 9;
     pieces.push({
-      id: `rib-${i}`,
-      mesh: place(tube(i === 3 ? 31 : 30, 11, 7, SEGMENTS), 0, 0, z),
-      colour: i === 3 ? BLUE : DARK,   // the blue band in the middle
-      explode: up((i - 3) * 26),
-      fromDrawing: true,
+      id: i === 2 ? 'Suporte Sensor_1' : `Suporte Sensor_1 · anel ${i + 1}`,
+      source: 'drawing',
+      mesh: place(tube(i === 2 ? 31 : 30, 11, 7, SEGMENTS), 0, 0, z),
+      colour: i === 2 ? BLUE : DARK,
+      explode: up((i - 2) * 30),
     });
   }
   pieces.push(
-    { id: 'tampa-acrilico-topo', mesh: place(cylinder(30, 30, 3, SEGMENTS), 0, 0, 36), colour: ACRYLIC, explode: up(130), fromDrawing: true },
-    { id: 'tampa-acrilico-base', mesh: place(cylinder(30, 30, 3, SEGMENTS), 0, 0, -38), colour: ACRYLIC, explode: up(-130), fromDrawing: true },
-    { id: 'conector-m12', mesh: place(tube(6, 3.2, 18, 28), 14, 0, 48), colour: STEEL, explode: up(190), fromDrawing: false },
+    { id: 'Tampa Acrílico_1', source: 'laser', mesh: place(cylinder(30, 30, 3, SEGMENTS), 0, 0, 26), colour: ACRYLIC, explode: up(170) },
+    { id: 'Sensor SHT_1', source: 'bought', mesh: place(box(14, 10, 4), 0, 0, -30), colour: BOARD, explode: up(-170) },
+    { id: 'Conector M12_1', source: 'bought', mesh: place(tube(6, 3.2, 18, 28), 14, 0, 40), colour: STEEL, explode: out(60, 0, 240) },
+    { id: 'Cabo 4 vias', source: 'bought', mesh: place(tube(3, 1.6, 90, 20), 14, 0, 92, 'z'), colour: DARK, explode: out(60, 0, 340) },
   );
   return pieces;
 }
 
-/** The gas bank: printed mount and cap, three MQ sensors and a barometer. */
+/** Sensor 5 — GAS STATION: three MQ sensors and a barometer under a cap. */
 export function gas(): Piece[] {
-  const mq = (x: number, id: string) => ({
-    id, mesh: place(tube(9, 6.5, 14, 28), x, 0, 6), colour: STEEL,
-    explode: up(-70), fromDrawing: false,
+  const mq = (x: number, id: string): Piece => ({
+    id, source: 'bought',
+    mesh: place(tube(9, 6.5, 14, 28), x, 0, 6), colour: STEEL, explode: up(-90),
   });
   return [
-    { id: 'suporte-gas', stl: 'suporte-gas', at: { x: 0, y: 0, z: 0 }, colour: WHITE, explode: up(0), fromDrawing: false },
-    mq(-26, 'mq-2'), mq(0, 'mq-7'), mq(26, 'mq-8'),
-    { id: 'bmp180', mesh: place(box(14, 10, 3), 0, 26, 6), colour: BOARD, explode: out(0, 60, -70), fromDrawing: false },
-    { id: 'tampa-gas', stl: 'tampa-gas', at: { x: 0, y: 0, z: 34 }, colour: WHITE, explode: up(110), fromDrawing: false },
+    { id: 'Suporte_ABS_5', source: 'printed', stl: 'suporte-gas', at: { x: 0, y: 0, z: 0 }, colour: PRINTED, explode: up(0) },
+    mq(-26, 'MQ-2 Gas Sensor'), mq(0, 'MQ-7 Gas Sensor'), mq(26, 'MQ-8 Gas Sensor'),
+    { id: 'BMP180', source: 'bought', mesh: place(box(14, 10, 3), 0, 26, 6), colour: BOARD, explode: out(0, 80, -90) },
+    { id: 'Tampa_ABS_5', source: 'printed', stl: 'tampa-gas', at: { x: 0, y: 0, z: 34 }, colour: PRINTED, explode: up(150) },
   ];
 }
 
-/** The battery cradle, printed, with its lid. */
-export function bateria(): Piece[] {
-  return [
-    { id: 'suporte-bateria', stl: 'suporte-bateria', at: { x: 0, y: 0, z: 0 }, colour: WHITE, explode: up(0), fromDrawing: false },
-    { id: 'bateria', mesh: place(box(96, 52, 68), 0, 0, 6), colour: DARK, explode: up(80), fromDrawing: false },
-    { id: 'tampa-suporte', stl: 'tampa-suporte-bateria', at: { x: 0, y: 0, z: 62 }, colour: WHITE, explode: up(170), fromDrawing: false },
-  ];
-}
-
-/** BOM Painel Solar: two panels on two machined brackets. */
-export function painel(): Piece[] {
-  return [
-    { id: 'suporte-1', mesh: place(box(26, 10, 46), -70, 0, -26), colour: STEEL, explode: out(-90, 0, -40), fromDrawing: true },
-    { id: 'painel-1', mesh: place(box(PANEL_W, 6, PANEL_H), -70, 0, 6), colour: PANEL, explode: out(-90, 0, 60), fromDrawing: true },
-    { id: 'suporte-2', mesh: place(box(26, 10, 46), 70, 0, -26), colour: STEEL, explode: out(90, 0, -40), fromDrawing: true },
-    { id: 'painel-2', mesh: place(box(PANEL_W, 6, PANEL_H), 70, 0, 6), colour: PANEL, explode: out(90, 0, 60), fromDrawing: true },
-  ];
-}
-
-/** The whole station: the products above, put where the render puts them. */
+/** Estação Meteorológica Full: the assemblies above, where the render puts them. */
 export function station(): Piece[] {
-  const shift = (pieces: Piece[], x: number, y: number, z: number, spread = 1, away: Vec3 = up(0)): Piece[] =>
+  const shift = (pieces: Piece[], x: number, y: number, z: number, away: Vec3 = up(0)): Piece[] =>
     pieces.map((p) => ({
       ...p,
       mesh: p.mesh ? place(p.mesh, x, y, z) : undefined,
       at: p.at ? { x: p.at.x + x, y: p.at.y + y, z: p.at.z + z } : undefined,
-      explode: {
-        x: p.explode.x * spread + away.x,
-        y: p.explode.y * spread + away.y,
-        z: p.explode.z * spread + away.z,
-      },
+      explode: { x: p.explode.x + away.x, y: p.explode.y + away.y, z: p.explode.z + away.z },
     }));
 
   const mastTop = corpoHeight() - CONE_LEN;
   const armZ = mastTop - 130;
 
   return [
-    // Sub-assemblies keep their own explosion and travel outward as a group,
-    // so the station comes apart into products rather than into a haze.
-    ...shift(corpo(), 0, 0, -CONE_LEN, 1),
-    ...shift(cabecaWS(), 0, 0, mastTop, 1, up(900)),
-    { id: 'arm', mesh: place(tube(8, 6, 700, 28), 0, 0, armZ, 'x'), colour: STEEL, explode: up(560), fromDrawing: false },
-    ...shift(painel(), -235, 0, armZ + 10, 1, out(-500, 0, 320)),
-    ...shift(gas(), 215, 0, armZ + 6, 1, out(500, 0, 320)),
-    ...shift(bateria(), 0, 66, armZ - 200, 1, out(0, 460, 0)),
+    ...shift(corpo(), 0, 0, -CONE_LEN),
+    ...shift(cabecaWS(), 0, 0, mastTop, up(900)),
+    { id: 'Braço', source: 'drawing', mesh: place(tube(8, 6, 700, 28), 0, 0, armZ, 'x'), colour: STEEL, explode: up(560) },
+    ...shift(painel(), -235, 0, armZ + 10, out(-520, 0, 340)),
+    ...shift(gas(), 215, 0, armZ + 6, out(520, 0, 340)),
+    ...shift(pcb(), 0, 0, mastTop + 26, up(1320)),
   ];
 }
 
-export type ProductId = 'station' | 'corpo' | 'cabeca-os' | 'cabeca-ws' | 'thd' | 'gas' | 'bateria' | 'painel';
+export type AssemblyId =
+  | 'station' | 'cabeca-os' | 'cabeca-ws' | 'corpo'
+  | 'painel' | 'pcb' | 'air' | 'thd' | 'gas';
 
-export const PRODUCTS: { id: ProductId; build: () => Piece[]; bom?: string }[] = [
+/** In the order the folders sit in Por Projeto, with the full station first. */
+export const ASSEMBLIES: { id: AssemblyId; build: () => Piece[]; bom?: string }[] = [
   { id: 'station', build: station },
-  { id: 'corpo', build: corpo, bom: 'corpo' },
   { id: 'cabeca-os', build: cabecaOS, bom: 'cabeca-os' },
   { id: 'cabeca-ws', build: cabecaWS, bom: 'cabeca-ws' },
+  { id: 'corpo', build: corpo, bom: 'corpo' },
+  { id: 'painel', build: painel, bom: 'painel' },
+  { id: 'pcb', build: pcb },
+  { id: 'air', build: air, bom: 'air' },
   { id: 'thd', build: thd, bom: 'thd' },
   { id: 'gas', build: gas, bom: 'gas' },
-  { id: 'bateria', build: bateria, bom: 'air' },
-  { id: 'painel', build: painel, bom: 'painel' },
 ];
 
-export const buildProduct = (id: ProductId) => PRODUCTS.find((p) => p.id === id)!.build();
+export const buildAssembly = (id: AssemblyId) => ASSEMBLIES.find((a) => a.id === id)!.build();

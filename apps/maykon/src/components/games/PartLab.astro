@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Content } from '../../content';
-import { PRODUCTS } from './assembly';
+import { ASSEMBLIES } from './assembly';
 import boms from '../../data/agrom-boms.json';
 
 interface Props { steel: Content['steel'] }
@@ -16,14 +16,14 @@ const modelPath = join(process.cwd(), 'public/models/agrom-parts.json');
 const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest('hex').slice(0, 8);
 
 const bomOf = (id: string) => {
-  const key = PRODUCTS.find((p) => p.id === id)?.bom;
+  const key = ASSEMBLIES.find((a) => a.id === id)?.bom;
   return key ? (boms as Record<string, { qty: number; unit: string; part: string; supplier?: string }[]>)[key] ?? [] : [];
 };
 ---
 <div class="st" data-st
   data-model-version={modelVersion}
   data-products={JSON.stringify(steel.products)}
-  data-boms={JSON.stringify(Object.fromEntries(PRODUCTS.map((p) => [p.id, bomOf(p.id)])))}
+  data-boms={JSON.stringify(Object.fromEntries(ASSEMBLIES.map((a) => [a.id, bomOf(a.id)])))}
   data-l-none={steel.bomNone}
 >
   <p class="st__lede">{steel.lede}</p>
@@ -31,9 +31,9 @@ const bomOf = (id: string) => {
   <div class="st__row">
     <span class="st__rowlabel mono">{steel.productLabel}</span>
     <div class="st__chips">
-      {PRODUCTS.map((p, i) => (
-        <button type="button" class="btn mono" data-product={p.id} aria-pressed={i === 0 ? 'true' : 'false'}>
-          {steel.products[p.id]?.name ?? p.id}
+      {ASSEMBLIES.map((a, i) => (
+        <button type="button" class="btn mono" data-product={a.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+          {steel.products[a.id]?.name ?? a.id}
         </button>
       ))}
     </div>
@@ -77,14 +77,11 @@ const bomOf = (id: string) => {
           <span class="readout__k">{steel.span}</span>
           <span class="readout__v" data-out="mm">—</span>
         </div>
-        <div class="readout__cell">
-          <span class="readout__k">{steel.fromDrawings}</span>
-          <span class="readout__v" data-out="drawn">—</span>
-        </div>
+
       </div>
     </div>
 
-    <div class="st__bom">
+    <div class="st__side">
       <p class="st__bomtitle mono">{steel.bomTitle}</p>
       <table class="st__table">
         <thead>
@@ -139,18 +136,13 @@ const bomOf = (id: string) => {
   .st__caption b { color: var(--fg-100); font-weight: 600; display: block; }
   .st__blurb { display: block; margin-top: .15rem; }
 
-  .st__bom { border: 1px solid var(--line); border-radius: 8px; padding: .9rem; background: var(--bg-900); }
-  .st__bomtitle { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); margin: 0 0 .7rem; }
-  .st__table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  .st__table th {
-    text-align: left; font-family: var(--font-mono); font-weight: 400;
-    font-size: 9px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--fg-700); padding-bottom: .4rem; border-bottom: 1px solid var(--line);
-  }
-  .st__table td { padding: .3rem 0; vertical-align: top; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
-  .st__table td:first-child { font-family: var(--font-mono); color: var(--brand-500); white-space: nowrap; padding-right: .6rem; }
-  .st__table td:nth-child(2) { color: var(--fg-300); }
-  .st__table td:last-child { color: var(--fg-700); padding-left: .6rem; }
+  .st__side { border: 1px solid var(--line); border-radius: 8px; padding: .9rem; background: var(--bg-900); }
+  /* BOM rows are built by the script, so they never carry Astro's scoping
+     attribute and the component's own CSS would not reach them. */
+  .st__table :global(td) { padding: .3rem 0; vertical-align: top; border-bottom: 1px solid color-mix(in oklab, var(--line) 55%, transparent); }
+  .st__table :global(td:first-child) { font-family: var(--font-mono); color: var(--brand-500); white-space: nowrap; padding-right: .6rem; }
+  .st__table :global(td:nth-child(2)) { color: var(--fg-300); }
+  .st__table :global(td:last-child) { color: var(--fg-700); padding-left: .6rem; }
   .st__bomempty { font-size: var(--step--1); color: var(--fg-700); margin: 0; }
 
   .st__prov { margin: 1.25rem 0 0; font-size: var(--step--1); color: var(--warn); opacity: .85; max-width: 74ch; }
@@ -170,7 +162,7 @@ const bomOf = (id: string) => {
 <script>
   import { project, faceNormal, facesCamera, shade, headlight, mix, type Camera, type Vec3 } from './board3d';
   import { place, bounds, type Mesh } from './solid';
-  import { PRODUCTS, buildProduct, type Piece, type ProductId } from './assembly';
+  import { ASSEMBLIES, buildAssembly, type Piece, type AssemblyId } from './assembly';
 
   const root = document.querySelector<HTMLElement>('[data-st]');
   if (root) {
@@ -181,6 +173,7 @@ const bomOf = (id: string) => {
     const zoomIn = root.querySelector<HTMLInputElement>('[data-zoom]')!;
     const spinBtn = root.querySelector<HTMLButtonElement>('[data-spin]')!;
     const bomBody = root.querySelector<HTMLElement>('[data-bombody]')!;
+
     const bomEmpty = root.querySelector<HTMLElement>('[data-bomempty]')!;
     const nameOut = root.querySelector<HTMLElement>('[data-part-name]')!;
     const kindOut = root.querySelector<HTMLElement>('[data-part-kind]')!;
@@ -195,7 +188,7 @@ const bomOf = (id: string) => {
     const cam: Camera = { azimuth: -34, elevation: 18, scale: 1, cx: 0, cy: 0 };
     /** Printed parts, once their STLs have arrived. */
     let stls: Record<string, { mesh: Mesh; mm: number }> = {};
-    let current: ProductId = 'station';
+    let current: AssemblyId = 'station';
     let pieces: Piece[] = [];
     let spinning = true;
     let visible = false;
@@ -220,9 +213,9 @@ const bomOf = (id: string) => {
       };
     }
 
-    function load(id: ProductId) {
+    function load(id: AssemblyId) {
       current = id;
-      pieces = buildProduct(id);
+      pieces = buildAssembly(id);
       drawables = [];
       for (const p of pieces) {
         const mesh = meshOf(p);
@@ -251,15 +244,12 @@ const bomOf = (id: string) => {
       const assembled = bounds({ v: drawables.flatMap((d) => d.verts.flatMap((v) => [v.x, v.y, v.z])), f: [] });
       out('pieces').textContent = String(pieces.length);
       out('mm').textContent = `${Math.round(Math.max(...assembled.size))} mm`;
-      const drawn = pieces.filter((p) => p.fromDrawing).length;
-      out('drawn').textContent = `${drawn} / ${pieces.length}`;
-      out('drawn').dataset.state = drawn === pieces.length ? 'ok' : '';
 
       renderBom(id);
       draw();
     }
 
-    function renderBom(id: ProductId) {
+    function renderBom(id: AssemblyId) {
       const lines = boms[id] ?? [];
       bomBody.replaceChildren();
       bomEmpty.hidden = lines.length > 0;
@@ -373,7 +363,7 @@ const bomOf = (id: string) => {
     root.querySelectorAll<HTMLButtonElement>('[data-product]').forEach((btn) => {
       btn.addEventListener('click', () => {
         root.querySelectorAll('[data-product]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-        load(btn.dataset.product as ProductId);
+        load(btn.dataset.product as AssemblyId);
       });
     });
 

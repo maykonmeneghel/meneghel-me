@@ -15,7 +15,7 @@ bottom-up through the stack — `SILICON → COPPER → STEEL → SIGNAL → SER
 SWARM → MIND → GLASS → SYSTEM` — and every one of them ends with a single
 sentence stating what the visitor just learned by playing with it. `FLOW` and `FIELD` then turn the
 corner into the present: the 2019 pivot out of the Apple Developer Academy,
-Tradx, and the Gaussian Splatting work in Projeto Mirage. The nine chapters
+Tradx, and the Gaussian Splatting work. The nine chapters
 prove range; the last two are what he does on a Tuesday.
 
 Three chapters run on artefacts rather than inventions: `COPPER` renders the

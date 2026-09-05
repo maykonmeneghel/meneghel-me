@@ -1,7 +1,7 @@
 import { box, cylinder, tube, place, merge, bounds } from './solid.ts';
 import {
-  station, corpo, corpoHeight, cabecaOS, cabecaWS, thd, gas, bateria, painel,
-  PRODUCTS, buildProduct, TUBE_D, CONE_LEN, TUBE_LEN, COUPLING_LEN, SPACERS,
+  station, corpo, corpoHeight, cabecaOS, cabecaWS, thd, gas, air, painel, pcb,
+  ASSEMBLIES, buildAssembly, TUBE_D, CONE_LEN, TUBE_LEN, COUPLING_LEN,
 } from './assembly.ts';
 import boms from '../../data/agrom-boms.json' with { type: 'json' };
 import { faceNormal } from './board3d.ts';
@@ -94,33 +94,62 @@ eq(both.f.length / 3, 24, 'and every face');
 check(Math.max(...both.f) === 15, 'indices of the second mesh were shifted', `${Math.max(...both.f)}`);
 
 // --- the products ---
-eq(PRODUCTS.map((p) => p.id),
-  ['station', 'corpo', 'cabeca-os', 'cabeca-ws', 'thd', 'gas', 'bateria', 'painel'],
-  'the viewer offers the products the CAD folder is organised by');
-for (const { id, build } of PRODUCTS) {
+eq(ASSEMBLIES.map((a) => a.id),
+  ['station', 'cabeca-os', 'cabeca-ws', 'corpo', 'painel', 'pcb', 'air', 'thd', 'gas'],
+  'the viewer offers the assemblies Por Projeto is organised by');
+for (const { id, build } of ASSEMBLIES) {
   const pieces = build();
   check(pieces.length > 0, `${id}: has pieces`);
   check(pieces.every((p) => p.mesh || p.stl), `${id}: every piece is either geometry or a printed part`);
   check(pieces.every((p) => !p.mesh || p.mesh.f.length > 0), `${id}: no empty geometry`);
   check(pieces.every((p) => p.stl ? !!p.at : true), `${id}: every printed part is placed`);
-  eq(new Set(pieces.map((p) => p.id)).size, pieces.length, `${id}: piece ids are unique`);
+  check(pieces.every((p) => p.id.trim().length > 0), `${id}: every piece is named`);
+  // Ids repeat on purpose: two Espaçador 80 are two instances of one part file,
+  // which is exactly what a quantity of two in a bill of material means.
 }
-eq(buildProduct('corpo').length, corpo().length, 'buildProduct returns the product it is asked for');
+eq(buildAssembly('corpo').length, corpo().length, 'buildAssembly returns what it is asked for');
+
+// Pieces carry the names SolidWorks gave the part files, not names I chose.
+const named = (pieces: { id: string }[]) => pieces.map((p) => p.id);
+check(named(corpo()).includes('Cone'), 'Corpo has Cone.SLDPRT');
+check(named(corpo()).includes('Espaçador 1000'), 'and Espaçador 1000.SLDPRT');
+check(named(cabecaOS()).includes('Tampa_ABS'), 'Cabeça 1 has Tampa_ABS.SLDPRT');
+check(named(cabecaOS()).includes('Célula Fotovoltáica 1'), 'and the photovoltaic cells');
+check(named(cabecaWS()).includes('TIL-78'), 'Cabeça 2 has TIL-78.SLDPRT');
+check(named(cabecaWS()).includes('Sensor UV'), 'and Sensor UV.SLDPRT');
+check(named(thd()).includes('Conector M12_1'), 'Sensor 1 has Conector M12_1.SLDPRT');
+check(named(thd()).includes('Cabo 4 vias'), 'and Cabo 4 vias.SLDPRT');
+check(named(gas()).includes('MQ-7 Gas Sensor'), 'Sensor 5 has MQ-7 Gas Sensor.SLDPRT');
+check(named(gas()).includes('BMP180'), 'and BMP180.SLDPRT');
+check(named(air()).includes('Haste'), 'Sensor 0 has Haste.SLDPRT');
+check(named(air()).includes('Suporte Sperficie'), 'and Suporte Sperficie.SLDPRT, typo included');
+check(named(painel()).some((n) => n.startsWith('Suporte Painel Solar')), 'Painel Solar has its bracket');
+check(named(pcb()).includes('PCB'), 'the PCB folder yields the laminate');
+
+// Every piece says where it came from, and the mix differs by assembly.
+for (const { id, build } of ASSEMBLIES) {
+  const sources = new Set(build().map((p) => p.source));
+  check(sources.size >= 1, `${id}: every piece is attributed`);
+  check([...sources].every((sc) => ['drawing', 'printed', 'laser', 'bought', 'board'].includes(sc)),
+    `${id}: and only to a source the panel knows how to label`);
+}
+check(new Set(cabecaOS().map((p) => p.source)).size >= 3,
+  'a head mixes machined, printed, laser-cut and bought parts');
+check(corpo().every((p) => p.source === 'drawing'), 'while the mast is turned, every piece of it');
 
 // Ø76.2 mm is 3 inches, which is why the tube is that size at all.
 near(TUBE_D / 25.4, 3, 1e-9, 'the mast tube is 3 inches on the nose');
 
-// --- the body is exactly its bill of material ---
+// --- the mast is exactly its bill of material ---
 const body = corpo();
-eq(body.filter((p) => p.id.startsWith('coupling')).length, 4, 'BOM Corpo lists four couplings, and there are four');
-eq(body.filter((p) => p.id.startsWith('spacer')).length, 6, 'and six spacers');
-eq(SPACERS.slice().sort((a, b) => a - b), [80, 80, 100, 100, 120, 120], 'two each of 80, 100 and 120 mm');
-check(body.some((p) => p.id === 'cone') && body.some((p) => p.id === 'cano'), 'plus the cone and the tube');
+eq(body.filter((p) => p.id.startsWith('Conexão Tubos')).length, 4, 'BOM Corpo lists four couplings, and there are four');
+eq(body.filter((p) => p.id.startsWith('Espaçador ') && p.id !== 'Espaçador 1000').length, 6, 'and six spacers');
+eq(body.filter((p) => p.id === 'Espaçador 80').length, 2, 'two of the 80');
+eq(body.filter((p) => p.id === 'Espaçador 100').length, 2, 'two of the 100');
+eq(body.filter((p) => p.id === 'Espaçador 120').length, 2, 'two of the 120');
 eq(body.length, 12, 'twelve pieces, which is what the BOM adds up to');
-near(corpoHeight(),
-  CONE_LEN + TUBE_LEN + 4 * COUPLING_LEN + SPACERS.reduce((a, b) => a + b, 0), 1e-6,
-  'the body is the drawn lengths stacked, nothing invented in between');
-check(body.every((p) => p.fromDrawing), 'and every one of them comes from a drawing');
+near(corpoHeight(), CONE_LEN + TUBE_LEN + 4 * COUPLING_LEN + 80 * 2 + 100 * 2 + 120 * 2, 1e-6,
+  'the mast is the drawn lengths stacked, nothing invented in between');
 
 // --- exploded views actually explode ---
 // Counting how many pieces move is the wrong test: a three-piece product with
@@ -140,7 +169,7 @@ const diagonalOf = (pieces: any[], apart: boolean) => {
   const size = bounds(merge(parts)).size;
   return Math.hypot(size[0], size[1], size[2]);
 };
-for (const { id, build } of PRODUCTS) {
+for (const { id, build } of ASSEMBLIES) {
   const pieces = build();
   const together = diagonalOf(pieces, false);
   const apart = diagonalOf(pieces, true);
@@ -156,15 +185,16 @@ const h = bounds(merge(pieces.filter((p) => p.mesh).map((p) => p.mesh!))).size[2
 check(h > 1800 && h < 2400, 'and stands about two metres', `${h.toFixed(0)} mm`);
 check(pieces.some((p) => p.stl), 'with printed parts dropped into it');
 
-// --- every product that claims a bill of material has one ---
-for (const { id, bom } of PRODUCTS) {
+// --- every assembly that claims a bill of material has one ---
+for (const { id, bom } of ASSEMBLIES) {
   if (!bom) continue;
   const list = (boms as Record<string, unknown[]>)[bom];
   check(Array.isArray(list) && list.length > 0, `${id}: its bill of material was extracted`, bom);
 }
-const named = Object.values(boms as Record<string, { supplier?: string }[]>)
+const withSupplier = Object.values(boms as Record<string, { supplier?: string }[]>)
   .flat().filter((i) => i.supplier).length;
-check(named > 5, 'and the BOMs carry real suppliers, not just part names', `${named} lines name one`);
+check(withSupplier > 5, 'and the BOMs carry real suppliers, not just part names',
+  `${withSupplier} lines name one`);
 
 console.log(fail === 0 ? '\nAll assertions passed.' : `\n${fail} failing assertion(s).`);
 process.exit(fail === 0 ? 0 : 1);
