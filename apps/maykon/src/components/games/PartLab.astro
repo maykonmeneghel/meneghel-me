@@ -92,7 +92,7 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 </div>
 
 <style>
-  .st__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; max-width: 74ch; }
+  .st__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; }
   .st__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: baseline; margin-bottom: 1.25rem; }
   .st__rowlabel { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); min-width: 4.5rem; }
   .st__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
@@ -108,15 +108,15 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
   .st__actions { display: flex; align-items: center; gap: .8rem; }
   .st__spin { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
 
-  .st__caption { margin: 1rem 0 0; font-size: var(--step-body); color: var(--fg-500); max-width: 56ch; }
+  .st__caption { margin: 1rem 0 0; font-size: var(--step-body); color: var(--fg-500); }
   .st__caption b { color: var(--fg-100); font-weight: 600; display: block; }
   .st__blurb { display: block; margin-top: .15rem; }
 
-  .st__prov { margin: 1.25rem 0 0; font-size: var(--step-body); color: var(--warn); opacity: .85; max-width: 74ch; }
+  .st__prov { margin: 1.25rem 0 0; font-size: var(--step-body); color: var(--warn); opacity: .85; }
 
   .st__process { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
   .st__ptitle { font-size: var(--step-1); margin-bottom: .4rem; }
-  .st__plede { color: var(--fg-300); font-size: var(--step-body); margin: 0 0 1.25rem; max-width: 74ch; }
+  .st__plede { color: var(--fg-300); font-size: var(--step-body); margin: 0 0 1.25rem; }
   .st__plist { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
   .st__pitem { display: flex; align-items: baseline; gap: .9rem; }
   .st__pcount { min-width: 2.4rem; text-align: right; font-size: var(--step-1); color: var(--brand-500); font-variant-numeric: tabular-nums; }
