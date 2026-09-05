@@ -8,6 +8,7 @@ import MqttBench from './games/MqttBench.astro';
 import ClusterLab from './games/ClusterLab.astro';
 import PerceptronLab from './games/PerceptronLab.astro';
 import IndexLab from './games/IndexLab.astro';
+import BoardLab from './games/BoardLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
 import { content } from '../content';
@@ -35,6 +36,8 @@ const recordCodename = c.record.eyebrow.split('·').pop()!.trim();
           <PerceptronLab mind={c.mind} />
         ) : chapter.slug === 'service' ? (
           <IndexLab service={c.service} />
+        ) : chapter.slug === 'copper' ? (
+          <BoardLab copper={c.copper} />
         ) : (
           <div class="wip">
             <span>{c.ui.wip}</span>

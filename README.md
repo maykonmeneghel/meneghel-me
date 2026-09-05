@@ -5,7 +5,7 @@ A family home and a playable CV, as three independently deployed static sites.
 | Site | What it is | Status |
 |---|---|---|
 | `meneghel.me` | The family: where the surname comes from, the people who built it, what got passed down | copy is placeholder |
-| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 04, 05, 06, 07 + timeline playable |
+| `maykon.meneghel.me` | The CV you can play — nine chapters, each a working mini-game, then the record | chapters 01, 02, 04, 05, 06, 07 + timeline playable |
 | `manu.meneghel.me` | Emanuelle's page | not started |
 
 ## The idea
@@ -36,6 +36,7 @@ apps/manu      manu.meneghel.me
 packages/ui    design tokens and base stylesheet, shared by all three
 infra          Terraform: S3 + CloudFront + Route 53 + GitHub OIDC
 assets/raw     source material extracted from Portfolio-2024.pdf (git-ignored)
+tools          one-off asset pipelines (EAGLE board -> JSON)
 docs           what is still needed from Maykon
 ```
 
@@ -67,7 +68,14 @@ TypeScript modules, tested separately from the DOM:
   because the query wants 60% of the table buys nothing while still taxing
   every write.
 
-Node 24 strips types natively, so all four run with plain `node` — no runner,
+- `data/agrom-board.json` is not written by hand: `tools/extract-board.py`
+  generates it from the 2017 EAGLE file for the AGROM.IO soil probe, which
+  lives outside this repository. `board.test.ts` guards the extraction — that
+  no trace escapes the 70 mm outline, that the totals still come to 754
+  segments and 1321 mm of copper, and that the two nets the chapter narrates
+  (`+5V` crossing layers seven times, `IN` never crossing) still behave that way.
+
+Node 24 strips types natively, so all five run with plain `node` — no runner,
 no build step, no dev dependency.
 
 ## The timeline

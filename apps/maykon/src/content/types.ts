@@ -130,6 +130,27 @@ export interface ServiceGame {
   heapLabel: string;
 }
 
+export interface CopperGame {
+  lede: string;
+  layersLabel: string;
+  both: string;
+  topOnly: string;
+  bottomOnly: string;
+  netsLabel: string;
+  allNets: string;
+  segments: string;
+  crossings: string;
+  length: string;
+  legendTop: string;
+  legendBottom: string;
+  legendVia: string;
+  hintIdle: string;
+  /** Uses {net} and {n}. */
+  hintCrossings: string;
+  hintFlat: string;
+  hintOneLayer: string;
+}
+
 export interface Content {
   meta: { title: string; description: string };
   nav: { chapters: string; family: string; contact: string; resume: string };
@@ -149,5 +170,6 @@ export interface Content {
   swarm: SwarmGame;
   mind: MindGame;
   service: ServiceGame;
+  copper: CopperGame;
   ui: Record<string, string>;
 }
