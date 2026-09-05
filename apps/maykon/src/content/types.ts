@@ -164,12 +164,7 @@ export interface CopperGame {
 
 export interface SteelGame {
   lede: string;
-  assemblyCaption: string;
-  assemblyAlt: string;
-  detailHeadCaption: string;
-  detailHeadAlt: string;
-  detailSensorCaption: string;
-  detailSensorAlt: string;
+  assembly: { name: string; kind: string; blurb: string; provenance: string; sourceLabel: string };
   partsTitle: string;
   partsLede: string;
   partsLabel: string;

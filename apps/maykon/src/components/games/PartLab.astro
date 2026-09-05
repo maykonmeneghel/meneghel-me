@@ -16,30 +16,9 @@ const { steel } = Astro.props;
 const modelPath = join(process.cwd(), 'public/models/agrom-parts.json');
 const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest('hex').slice(0, 8);
 ---
-<div class="st" data-st data-loading={steel.loading} data-parts-copy={JSON.stringify(steel.parts)} data-model-version={modelVersion}>
+<div class="st" data-st data-loading={steel.loading} data-parts-copy={JSON.stringify(steel.parts)}
+  data-assembly-copy={JSON.stringify(steel.assembly)} data-model-version={modelVersion}>
   <p class="st__lede">{steel.lede}</p>
-
-  <figure class="st__assembly">
-    <img class="st__hero" src="/img/agrom-station.jpg" alt={steel.assemblyAlt}
-      width="546" height="1120" loading="lazy" decoding="async" />
-    <figcaption class="mono">{steel.assemblyCaption}</figcaption>
-  </figure>
-
-  <div class="st__details">
-    <figure>
-      <img src="/img/agrom-head.jpg" alt={steel.detailHeadAlt}
-        width="546" height="1120" loading="lazy" decoding="async" />
-      <figcaption class="mono">{steel.detailHeadCaption}</figcaption>
-    </figure>
-    <figure>
-      <img src="/img/agrom-sensor.jpg" alt={steel.detailSensorAlt}
-        width="959" height="682" loading="lazy" decoding="async" />
-      <figcaption class="mono">{steel.detailSensorCaption}</figcaption>
-    </figure>
-  </div>
-
-  <h3 class="st__ptitle st__ptitle--parts">{steel.partsTitle}</h3>
-  <p class="st__plede">{steel.partsLede}</p>
 
   <div class="st__row">
     <span class="st__rowlabel mono">{steel.partsLabel}</span>
@@ -49,7 +28,7 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
   </div>
 
   <div class="st__stage" data-stage>
-    <canvas class="st__canvas" data-canvas width="1000" height="640"
+    <canvas class="st__canvas" data-canvas width="900" height="900"
       role="img" aria-label="A 3D-printed part from the AGROM.IO probe"></canvas>
       <p class="st__caption">
       <b data-part-name></b><span data-part-kind></span>
@@ -77,6 +56,7 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
     </div>
   </div>
 
+  <p class="st__prov" data-provenance></p>
   <p class="st__hint">{steel.hint}</p>
 
   <div class="st__process">
@@ -100,38 +80,24 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 <style>
   .st__lede { color: var(--fg-500); font-size: var(--step--1); margin: 0 0 1.5rem; max-width: 74ch; }
 
-  .st__assembly { margin: 0 0 1rem; display: grid; justify-items: center; gap: .8rem; }
-  /* The station render is a tall portrait: bound it by height, not by width. */
-  .st__hero {
-    max-height: min(62vh, 560px); width: auto; max-width: 100%;
-    border-radius: 10px; border: 1px solid var(--line);
+  .st__ptitle--parts { margin-top: 0; }
+  .st__prov {
+    margin: .9rem 0 0; font-size: var(--step--1); color: var(--warn);
+    max-width: 74ch; opacity: .85;
   }
-  .st__details {
-    display: grid; gap: 1rem; margin-bottom: 2.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    align-items: end;
-  }
-  .st__details figure { margin: 0; display: grid; justify-items: center; gap: .6rem; }
-  .st__details img {
-    max-height: 260px; width: auto; max-width: 100%;
-    border-radius: 8px; border: 1px solid var(--line);
-    /* The sensor render was flattened against this colour; the seam disappears. */
-    background: #08090c;
-  }
-  .st__assembly figcaption, .st__details figcaption {
-    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--fg-700); text-align: center; max-width: 46ch;
-  }
-  .st__ptitle--parts { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); }
+  .st__prov:empty { display: none; }
 
   .st__row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
   .st__rowlabel { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); min-width: 4rem; }
   .st__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
   .st__chips .btn { font-size: 11px; padding: .3rem .6rem; }
+  /* The whole station leads; the parts it is made of follow. */
+  .st__asmchip { margin-right: .5rem; border-color: var(--line-2); }
+  .st__asmchip[aria-pressed="true"] { background: var(--brand-500); border-color: var(--brand-500); color: #fff; }
   .st__loading { font-size: 11px; color: var(--fg-700); }
 
   .st__stage { position: relative; background: #06070a; border: 1px solid var(--line); border-radius: 8px; display: grid; place-items: center; }
-  .st__canvas { width: min(100%, 560px); height: auto; display: block; cursor: grab; touch-action: pan-y; }
+  .st__canvas { width: min(100%, 480px); height: auto; display: block; cursor: grab; touch-action: pan-y; }
   .st__canvas:active { cursor: grabbing; }
   .st__caption {
     margin: 0; padding: 0 1rem 1rem; text-align: center;
@@ -164,6 +130,8 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
 
 <script>
   import { project, faceNormal, shade, headlight, mix, facesCamera, type Camera, type Vec3 } from './board3d';
+  import { station } from './assembly';
+  import { merge, bounds, type Mesh } from './solid';
 
   interface PackedPart {
     id: string; name: string;
@@ -181,22 +149,78 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
     const kindOut = root.querySelector<HTMLElement>('[data-part-kind]')!;
     const blurbOut = root.querySelector<HTMLElement>('[data-part-blurb]')!;
     const copy: Record<string, { kind: string; blurb: string }> = JSON.parse(root.dataset.partsCopy!);
+    const assemblyCopy: { name: string; kind: string; blurb: string; provenance: string; sourceLabel: string } =
+      JSON.parse(root.dataset.assemblyCopy!);
+    const provenance = root.querySelector<HTMLElement>('[data-provenance]')!;
     const spinBtn = root.querySelector<HTMLButtonElement>('[data-spin]')!;
     const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
 
     const cam: Camera = { azimuth: -30, elevation: 24, scale: 1, cx: 0, cy: 0 };
-    let part: PackedPart | null = null;
-    let verts: Vec3[] = [];
+
+    /** What the canvas is currently drawing: one or more coloured meshes. */
+    interface Piece { verts: Vec3[]; faces: number[]; colour: string }
+    let pieces: Piece[] = [];
+    /** Half the model's largest dimension, used to fit it in the frame. */
+    let radius = 1;
     let spinning = true;
     let visible = false;
     let raf = 0;
 
-    function loadPart(p: PackedPart, quant: number) {
-      part = p;
-      verts = [];
-      for (let i = 0; i < p.v.length; i += 3) {
-        verts.push({ x: p.v[i] / quant, y: p.v[i + 1] / quant, z: p.v[i + 2] / quant });
+    function fit(all: Piece[]) {
+      let lo = [Infinity, Infinity, Infinity];
+      let hi = [-Infinity, -Infinity, -Infinity];
+      for (const piece of all) {
+        for (const v of piece.verts) {
+          const c = [v.x, v.y, v.z];
+          for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], c[k]); hi[k] = Math.max(hi[k], c[k]); }
+        }
       }
+      const centre = hi.map((h, k) => (h + lo[k]) / 2);
+      // Centre the model on the origin so rotation spins about the object, not
+      // about wherever it happened to be modelled.
+      for (const piece of all) {
+        for (const v of piece.verts) { v.x -= centre[0]; v.y -= centre[1]; v.z -= centre[2]; }
+      }
+      radius = Math.max(...hi.map((h, k) => (h - lo[k]) / 2));
+      return { size: hi.map((h, k) => h - lo[k]) };
+    }
+
+    function loadAssembly() {
+      const built = station();
+      pieces = built.map((b) => ({
+        verts: Array.from({ length: b.mesh.v.length / 3 }, (_, i) => ({
+          x: b.mesh.v[i * 3], y: b.mesh.v[i * 3 + 1], z: b.mesh.v[i * 3 + 2],
+        })),
+        faces: b.mesh.f,
+        colour: b.colour,
+      }));
+      const { size } = fit(pieces);
+      cam.elevation = 6;
+      nameOut.textContent = assemblyCopy.name;
+      kindOut.textContent = assemblyCopy.kind;
+      blurbOut.textContent = assemblyCopy.blurb;
+      provenance.textContent = assemblyCopy.provenance;
+      out('mm').textContent = `${Math.round(Math.max(...size))} mm`;
+      out('tris').textContent = pieces.reduce((n, p) => n + p.faces.length / 3, 0).toLocaleString();
+      out('src').textContent = assemblyCopy.sourceLabel;
+      draw();
+    }
+
+    function loadPart(p: PackedPart, quant: number) {
+      // Each part was normalised to span 2 on its longest axis; mm restores it.
+      const scale = p.mm / 2;
+      const verts: Vec3[] = [];
+      for (let i = 0; i < p.v.length; i += 3) {
+        verts.push({
+          x: (p.v[i] / quant) * scale,
+          y: (p.v[i + 1] / quant) * scale,
+          z: (p.v[i + 2] / quant) * scale,
+        });
+      }
+      pieces = [{ verts, faces: p.f, colour: '#c9ccd4' }];
+      fit(pieces);
+      cam.elevation = 24;
+      provenance.textContent = '';
       // Names come from Maykon's own files and stay as they are; what the part
       // is gets described in the reader's language.
       const said = copy[p.id] ?? { kind: '', blurb: '' };
@@ -212,24 +236,28 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
     function draw() {
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      if (!part) return;
+      if (!pieces.length) return;
 
       cam.cx = w / 2;
       cam.cy = h / 2;
-      cam.scale = Math.min(w, h) * 0.46;   // parts are packed into [-1, 1]
+      cam.scale = (Math.min(w, h) * 0.44) / radius;
       const lamp = headlight(cam);
 
       const faces: { depth: number; pts: { sx: number; sy: number }[]; colour: string }[] = [];
-      for (let i = 0; i < part.f.length; i += 3) {
-        const a = verts[part.f[i]], b = verts[part.f[i + 1]], c = verts[part.f[i + 2]];
-        const n = faceNormal(a, b, c);
-        if (!n || !facesCamera(n, cam)) continue;
-        const pa = project(a, cam), pb = project(b, cam), pc = project(c, cam);
-        faces.push({
-          depth: (pa.depth + pb.depth + pc.depth) / 3,
-          pts: [pa, pb, pc],
-          colour: mix('#c9ccd4', shade(n, 0.28, lamp)),
-        });
+      for (const piece of pieces) {
+        for (let i = 0; i < piece.faces.length; i += 3) {
+          const a = piece.verts[piece.faces[i]];
+          const b = piece.verts[piece.faces[i + 1]];
+          const c = piece.verts[piece.faces[i + 2]];
+          const n = faceNormal(a, b, c);
+          if (!n || !facesCamera(n, cam)) continue;
+          const pa = project(a, cam), pb = project(b, cam), pc = project(c, cam);
+          faces.push({
+            depth: (pa.depth + pb.depth + pc.depth) / 3,
+            pts: [pa, pb, pc],
+            colour: mix(piece.colour, shade(n, 0.28, lamp)),
+          });
+        }
       }
 
       faces.sort((x, y) => x.depth - y.depth);
@@ -294,19 +322,31 @@ const modelVersion = createHash('sha256').update(readFileSync(modelPath)).digest
         const res = await fetch(`/models/agrom-parts.json?v=${root!.dataset.modelVersion}`);
         const data: { quant: number; parts: PackedPart[] } = await res.json();
         loadNote.remove();
-        data.parts.forEach((p, i) => {
+
+        const asmBtn = document.createElement('button');
+        asmBtn.type = 'button';
+        asmBtn.className = 'btn mono st__asmchip';
+        asmBtn.textContent = assemblyCopy.name;
+        asmBtn.setAttribute('aria-pressed', 'true');
+        asmBtn.addEventListener('click', () => {
+          chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === asmBtn)));
+          loadAssembly();
+        });
+        chips.append(asmBtn);
+
+        data.parts.forEach((p) => {
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'btn mono';
           btn.textContent = p.name;
-          btn.setAttribute('aria-pressed', String(i === 0));
+          btn.setAttribute('aria-pressed', 'false');
           btn.addEventListener('click', () => {
             chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
             loadPart(p, data.quant);
           });
           chips.append(btn);
         });
-        loadPart(data.parts[0], data.quant);
+        loadAssembly();
         start();
       } catch {
         loadNote.textContent = '—';
