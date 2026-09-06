@@ -262,7 +262,13 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
   }
   .tl__drag { font-size: 11px; letter-spacing: .18em; color: var(--fg-700); text-transform: uppercase; }
 
-  .tl__chart { position: relative; padding-top: 28px; touch-action: pan-y; cursor: ew-resize; }
+  /* The chart is a control you drag, so the browser must not treat the drag as
+     a text selection — it was painting the labels under the pointer in the
+     brand colour, which reads as the page having gone wrong. */
+  .tl__chart {
+    position: relative; padding-top: 28px; touch-action: pan-y; cursor: ew-resize;
+    user-select: none; -webkit-user-select: none;
+  }
 
   .tl__overlay { position: absolute; left: var(--tl-label); right: 0; top: 0; bottom: 0; pointer-events: none; }
   .tl__axis { position: absolute; top: 0; left: 0; right: 0; height: 24px; }
@@ -406,6 +412,8 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
     };
     let dragging = false;
     chart.addEventListener('pointerdown', (e) => {
+      // Stops the browser starting a text selection under the drag.
+      e.preventDefault();
       dragging = true;
       chart.setPointerCapture(e.pointerId);
       commit(e.clientX);
