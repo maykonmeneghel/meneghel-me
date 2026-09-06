@@ -1,6 +1,6 @@
 .skip {
   position: absolute; left: -9999px; top: 0; z-index: 100;
-  background: var(--brand-500); color: #fff; padding: .7rem 1rem;
+  background: var(--brand-500); color: var(--bg-900); padding: .7rem 1rem; font-weight: 500;
 }
 .skip:focus { left: 0; }
 

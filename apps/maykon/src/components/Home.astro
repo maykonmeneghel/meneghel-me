@@ -11,7 +11,6 @@ import LedgerLab from './games/LedgerLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
-import SystemTrace from './games/SystemTrace.astro';
 import GlassLab from './games/GlassLab.astro';
 import FlowLab from './games/FlowLab.astro';
 import SplatLab from './games/SplatLab.astro';
@@ -65,8 +64,6 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
           <FlowLab flow={c.flow} />
         ) : chapter.slug === 'field' ? (
           <SplatLab field={c.field} />
-        ) : chapter.slug === 'system' ? (
-          <SystemTrace system={c.system} chapters={c.chapters} />
         ) : (
           <div class="wip">
             <span>{c.ui.wip}</span>

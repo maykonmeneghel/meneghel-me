@@ -129,7 +129,49 @@ button { font: inherit; color: inherit; }
 }
 .btn:hover { border-color: var(--brand-500); background: var(--bg-700); }
 .btn:active { transform: translateY(1px); }
+/* Near-black on the pink, not white. White on #ff2d55 measures 3.65 against a
+   required 4.5, and darkening the pink to fix it would change the one colour
+   the whole site is built from. The label moves instead: 5.46. */
 .btn[aria-pressed="true"], .btn--primary {
-  background: var(--brand-500); border-color: var(--brand-500); color: #fff;
+  background: var(--brand-500); border-color: var(--brand-500);
+  color: var(--bg-900, #08090c); font-weight: 500;
 }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* On a finger, every control clears the platform minimum — 44pt on iOS, 48dp on
+   Android. The chips are 30px, which is comfortable with a mouse and a miss with
+   a thumb, and a portfolio aimed at mobile teams cannot ship a 30px tap target.
+   Pointer-coarse only, so the desktop layout keeps its density. */
+@media (pointer: coarse) {
+  .btn, .langbar__link { min-height: 44px; }
+  .rail__item { min-height: 32px; display: flex; align-items: center; }
+}
+
+/* Somebody who has asked the operating system to stop moving things means it.
+   The boot cursor blinks forever, and an infinite animation is exactly the kind
+   this setting exists for; transitions are cut to almost nothing rather than to
+   zero so state changes still read as changes. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The page is a set of instruments and prints as a dark mess. Anyone reaching
+   for print wants the CV, so say where it is and make the text legible. */
+@media print {
+  :root { --bg-900: #fff; --bg-800: #fff; --bg-600: #eee; --line: #ccc;
+          --fg-100: #000; --fg-300: #222; --fg-500: #444; --fg-700: #555; }
+  body { background: #fff; color: #000; }
+  .rail, .langbar, .skip, .panel, .boot, .hero__proof, .act { display: none !important; }
+  .chapter { padding-block: 1rem; border-top: 1px solid #ccc; break-inside: avoid; }
+  .chapter__lede, .takeaway { color: #222; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+  main::before {
+    content: "The interactive version and a two-page CV are at maykon.meneghel.me";
+    display: block; padding: 8pt 0; font-weight: 600;
+  }
+}

@@ -17,8 +17,14 @@
 
   --fg-100: #f2f4f8;
   --fg-300: #b8bfcc;
-  --fg-500: #7c8598;
-  --fg-700: #4a5262;
+  /* These two were #7c8598 and #4a5262. Measured against the three backgrounds
+     they actually sit on, --fg-700 came out at 2.08–2.54 against a required
+     4.5 — and it is the colour of every small label on the site: the readout
+     keys, the era chips, the rail, the provenance notes. Raised until all three
+     levels clear 4.5 on the page, the panel and the chip, with enough gap left
+     between them to still read as three levels. */
+  --fg-500: #9aa3b5;
+  --fg-700: #818a9c;
 
   /* Signal colours for the instrumentation widgets */
   --ok:    #34d399;

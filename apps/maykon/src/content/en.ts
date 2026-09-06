@@ -39,7 +39,7 @@ export const en: Content = {
       before: 'silicon',
       label: 'Act one',
       title: 'One machine, taken apart',
-      lede: 'The next eight chapters are a single product: a soil probe I designed, built and put in the ground between 2016 and 2019. It is here because it is the one thing I own end to end — the board, the enclosure, the protocol, the database, the cluster and the app are all mine — so the whole stack can be walked from a pin to a screen without ever changing the subject.',
+      lede: 'The next seven chapters are a single product: a soil probe I designed, built and put in the ground between 2016 and 2019. It is here because it is the one thing I own end to end — the board, the enclosure, the protocol, the database, the cluster and the app are all mine — so the whole stack can be walked from a pin to a screen without ever changing the subject. The part worth hiring is not any one of those layers — it is the seams between them.',
     },
     {
       before: 'mind',
@@ -114,16 +114,7 @@ export const en: Content = {
       stack: ['Swift', 'SwiftUI', 'Flutter', 'Dart', 'Kotlin', 'App Store'],
     },
     {
-      id: '08', codename: 'SYSTEM', slug: 'system',
-      era: 'AGROM.IO · 2016 – 2019',
-      title: 'Now watch all of it run at once',
-      lede: 'Seven chapters, one packet. Press play and follow a single soil reading from the sensor in the ground all the way to the chart in someone’s hand.',
-      panel: 'trace · end-to-end',
-      takeaway: 'This is the actual answer to "what do you do?". Not one layer — <b>the seams between them</b>, which is where products are really won or lost.',
-      stack: ['System design', 'Observability', 'Distributed systems'],
-    },
-    {
-      id: '09', codename: 'MIND', slug: 'mind',
+      id: '08', codename: 'MIND', slug: 'mind',
       era: 'StockGAN · 2021',
       title: 'Teach the machine to guess what happens next',
       lede: 'In 2021 I built a generative adversarial network for time series from scratch — the work where my postgraduate specialization in AI and my Master in Bioengineering stop being lines on a diploma — two networks, one trying to invent the next reading and one trying to catch it lying. I trained it on financial data. It runs here on the soil probe from the chapters above, unchanged, because a time series does not know what it measures.',
@@ -132,7 +123,7 @@ export const en: Content = {
       stack: ['TensorFlow / Keras', 'GANs', 'LSTM', 'Time series', 'PCA & XGBoost feature selection'],
     },
     {
-      id: '10', codename: 'FLOW', slug: 'flow',
+      id: '09', codename: 'FLOW', slug: 'flow',
       era: 'Tradx · 2022 → today',
       title: 'And then I built the tool',
       lede: 'A forecast has to live somewhere. Tradx is where mine does — the company I co-founded in 2022 and run as COO, a desk where a trading strategy is a graph you wire rather than code you write.',
@@ -141,7 +132,7 @@ export const en: Content = {
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Backtesting engine', 'Paper trading'],
     },
     {
-      id: '11', codename: 'LEDGER', slug: 'ledger',
+      id: '10', codename: 'LEDGER', slug: 'ledger',
       era: 'Tradx · 2022 → today',
       title: 'An order is not a trade',
       lede: 'The chapter before this one produced a signal. This one is what happens to it. A strategy emits orders; an engine decides which of them become trades, and the distance between those two numbers is where a trading desk is actually built or lost.',
@@ -150,7 +141,7 @@ export const en: Content = {
       stack: ['NestJS', 'Order lifecycle', 'Position netting', 'Idempotency', 'Redis + BullMQ', 'Paper trading'],
     },
     {
-      id: '12', codename: 'FIELD', slug: 'field',
+      id: '11', codename: 'FIELD', slug: 'field',
       era: 'Gaussian splatting · today',
       title: 'And now the object is made of light',
       lede: 'What I spend my days on now: Gaussian Splatting. A scene stops being a surface someone modelled and becomes a cloud of oriented gaussians, fitted by gradient descent until renders of them match the photographs. Real reconstructions start from a camera walking around a room. The demo below deliberately does not — it uses a part you already met in chapter 03, because the only way to see what the method changes is to watch the same object built both ways.',
@@ -160,7 +151,7 @@ export const en: Content = {
     },
   ],
   record: {
-    eyebrow: '13 · RECORD',
+    eyebrow: '12 · RECORD',
     title: 'The receipts',
     lede: 'Nine chapters of demonstration. This one is just evidence. Drag through the years and watch what was running at the same time — because the honest headline of this timeline is not any single job, it is how rarely there was only one.',
     lanes: {
@@ -437,29 +428,6 @@ export const en: Content = {
       'air': { name: 'Sensor 0 · AIR', kind: 'surface unit', blurb: 'The rod, its machined seat, and the printed battery cradle with its lid.' },
       'thd': { name: 'Sensor 1 · THD', kind: 'buried soil sensor', blurb: 'A ribbed machined body under a laser-cut acrylic cap, potted in epoxy, with an M12 lead.' },
       'gas': { name: 'Sensor 5 · GAS STATION', kind: 'gas sensor bank', blurb: 'MQ-2, MQ-7 and MQ-8 with a barometer, on a printed mount under a vented cap.' },
-    },
-  },
-  system: {
-    lede: 'One moisture reading, from the pin in the ground to the number on a phone. Press play. Then break something — click any stage — and run it again, because the interesting part is not that it works.',
-    play: 'Send a reading',
-    running: 'in flight…',
-    again: 'Send another',
-    repair: 'Repair all',
-    total: 'End to end',
-    verdictArrived: 'Arrived. Eight layers, one number, and nobody had to think about any of it.',
-    verdictFailed: 'Stopped at {stage}.',
-    breakHint: 'Click a stage to break it.',
-    silentBadge: 'still returns a number',
-    goto: 'chapter',
-    stages: {
-      silicon: { name: 'Silicon', does: 'The ADC samples the probe', payload: 'ADC 2871 / 4095', broken: 'The pin reads nothing. Every number above this is now a guess about a wire.' },
-      copper:  { name: 'Copper',  does: 'Across the board to the radio', payload: '1.63 V', broken: 'A hairline crack in a trace. Intermittent — the worst kind, because it passes on the bench.' },
-      steel:   { name: 'Steel',   does: 'Out through the sealed head', payload: 'M12 · IP67', broken: 'Water past the seal. The reading still arrives, on time, and it is wrong. Nothing alerts.' },
-      signal:  { name: 'Signal',  does: 'Published to the broker', payload: 'farm/greenhouse/soil-1/moisture', broken: 'The broker is unreachable. The device keeps measuring perfectly and nobody is listening.' },
-      service: { name: 'Service', does: 'Written to the database', payload: 'INSERT → reading_id 128374', broken: 'The API answers and the write fails. The dashboard confidently shows yesterday.' },
-      swarm:   { name: 'Swarm',   does: 'Handled by a replica', payload: 'pod 7/12', broken: 'No replica free. 503 — and the retries make the queue worse than the outage.' },
-      model:   { name: 'Model',   does: 'Classified by the model', payload: 'healthy · 0.94', broken: 'The model answers, confidently, about soil it has never seen. A number, and no way to know it is wrong.' },
-      glass:   { name: 'Glass',   does: 'Rendered on the phone', payload: '43 % moisture', broken: 'Everything upstream worked. The screen shows nothing, because nobody built the empty state.' },
     },
   },
   glass: {

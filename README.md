@@ -132,11 +132,6 @@ TypeScript modules, tested separately from the DOM:
   average to the centroid — which is what square-rooting the first barycentric
   coordinate buys — and that a face nine times larger receives nine times the
   gaussians.
-- `games/system.ts` is the finale's chain: the eight chapters in order, what
-  each costs in milliseconds, and which of them fail while still returning a
-  number. `system.test.ts` checks every stage stops the trace when broken and
-  only when broken, that with two broken the earlier one wins, and that the
-  clock only counts stages actually cleared.
 
 Node 24 strips types natively, so all seven run with plain `node` — no runner,
 no build step, no dev dependency.

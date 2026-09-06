@@ -239,23 +239,6 @@ export interface SteelGame {
   products: Record<string, { name: string; kind: string; blurb: string }>;
 }
 
-export interface SystemGame {
-  lede: string;
-  play: string;
-  running: string;
-  again: string;
-  repair: string;
-  total: string;
-  verdictArrived: string;
-  /** Uses {stage}. */
-  verdictFailed: string;
-  breakHint: string;
-  silentBadge: string;
-  goto: string;
-  /** Keyed by StageId. */
-  stages: Record<string, { name: string; does: string; payload: string; broken: string }>;
-}
-
 export interface GlassGame {
   lede: string;
   accent: string;
@@ -339,7 +322,6 @@ export interface Content {
   service: ServiceGame;
   copper: CopperGame;
   steel: SteelGame;
-  system: SystemGame;
   glass: GlassGame;
   flow: FlowGame;
   field: FieldGame;

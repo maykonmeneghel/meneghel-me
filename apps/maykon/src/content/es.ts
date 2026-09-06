@@ -39,7 +39,7 @@ export const es: Content = {
       before: 'silicon',
       label: 'Acto uno',
       title: 'Una máquina, desmontada',
-      lede: 'Los siguientes ocho capítulos son un único producto: una sonda de suelo que diseñé, construí y clavé en la tierra entre 2016 y 2019. Está aquí porque es lo único que tengo de punta a punta — la placa, la carcasa, el protocolo, la base de datos, el clúster y la app son todos míos — así que se puede subir la pila entera, de un pin a una pantalla, sin cambiar nunca de tema.',
+      lede: 'Los siguientes siete capítulos son un único producto: una sonda de suelo que diseñé, construí y clavé en la tierra entre 2016 y 2019. Está aquí porque es lo único que tengo de punta a punta — la placa, la carcasa, el protocolo, la base de datos, el clúster y la app son todos míos — así que se puede subir la pila entera, de un pin a una pantalla, sin cambiar nunca de tema. Lo que vale contratar no es ninguna de esas capas — son las costuras entre ellas.',
     },
     {
       before: 'mind',
@@ -114,16 +114,7 @@ export const es: Content = {
       stack: ['Swift', 'SwiftUI', 'Flutter', 'Dart', 'Kotlin', 'App Store'],
     },
     {
-      id: '08', codename: 'SISTEMA', slug: 'system',
-      era: 'AGROM.IO · 2016 – 2019',
-      title: 'Ahora míralo todo funcionando a la vez',
-      lede: 'Siete capítulos, un paquete. Dale a play y sigue una sola lectura de suelo, desde el sensor enterrado hasta el gráfico en la mano de alguien.',
-      panel: 'trace · extremo a extremo',
-      takeaway: 'Esta es la respuesta real a "¿a qué te dedicas?". No a una capa — a <b>las costuras entre ellas</b>, que es donde los productos se ganan o se pierden de verdad.',
-      stack: ['Diseño de sistemas', 'Observabilidad', 'Sistemas distribuidos'],
-    },
-    {
-      id: '09', codename: 'MENTE', slug: 'mind',
+      id: '08', codename: 'MENTE', slug: 'mind',
       era: 'StockGAN · 2021',
       title: 'Enseña a la máquina a adivinar qué viene después',
       lede: 'En 2021 construí desde cero una red generativa adversaria para series temporales — el trabajo en el que mi posgrado en IA y mi máster en Bioingeniería dejan de ser líneas en un diploma — dos redes, una intentando inventar la siguiente lectura y otra intentando pillarla mintiendo. La entrené con datos financieros. Aquí corre sobre la sonda de suelo de los capítulos de arriba, sin cambiar nada, porque una serie temporal no sabe qué mide.',
@@ -132,7 +123,7 @@ export const es: Content = {
       stack: ['TensorFlow / Keras', 'GANs', 'LSTM', 'Series temporales', 'Selección de features con PCA y XGBoost'],
     },
     {
-      id: '10', codename: 'FLUJO', slug: 'flow',
+      id: '09', codename: 'FLUJO', slug: 'flow',
       era: 'Tradx · 2022 → hoy',
       title: 'Y entonces construí la herramienta',
       lede: 'Un pronóstico tiene que vivir en algún sitio. El mío vive en Tradx — la empresa que cofundé en 2022 y dirijo como COO, una mesa donde una estrategia es un grafo que cableas, no un código que escribes.',
@@ -141,7 +132,7 @@ export const es: Content = {
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
     },
     {
-      id: '11', codename: 'LIBRO', slug: 'ledger',
+      id: '10', codename: 'LIBRO', slug: 'ledger',
       era: 'Tradx · 2022 → hoy',
       title: 'Una orden no es una operación',
       lede: 'El capítulo anterior produjo una señal. Este es lo que le pasa. Una estrategia emite órdenes; un motor decide cuáles se convierten en operaciones, y la distancia entre esos dos números es donde una mesa de trading se construye o se pierde.',
@@ -150,7 +141,7 @@ export const es: Content = {
       stack: ['NestJS', 'Ciclo de vida de la orden', 'Netting de posición', 'Idempotencia', 'Redis + BullMQ', 'Paper trading'],
     },
     {
-      id: '12', codename: 'CAMPO', slug: 'field',
+      id: '11', codename: 'CAMPO', slug: 'field',
       era: 'Gaussian splatting · hoy',
       title: 'Y ahora el objeto está hecho de luz',
       lede: 'En esto paso los días ahora: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Las reconstrucciones de verdad empiezan con una cámara recorriendo una sala. La demo de abajo a propósito no lo hace — usa una pieza que ya conociste en el capítulo 03, porque la única forma de ver qué cambia el método es ver el mismo objeto construido de las dos formas.',
@@ -160,7 +151,7 @@ export const es: Content = {
     },
   ],
   record: {
-    eyebrow: '13 · TRAYECTORIA',
+    eyebrow: '12 · TRAYECTORIA',
     title: 'Las pruebas',
     lede: 'Nueve capítulos de demostración. Este es solo evidencia. Arrastra por los años y mira qué estaba corriendo a la vez — porque el titular honesto de esta línea de tiempo no es ningún empleo concreto, es lo poco que hubo uno solo.',
     lanes: {
@@ -437,29 +428,6 @@ export const es: Content = {
       'air': { name: 'Sensor 0 · AIR', kind: 'unidad de superficie', blurb: 'La varilla, su asiento mecanizado, y la cuna de batería impresa con su tapa.' },
       'thd': { name: 'Sensor 1 · THD', kind: 'sensor de suelo enterrado', blurb: 'Cuerpo mecanizado estriado bajo tapa de acrílico cortada por láser, encapsulado en epoxi, con latiguillo M12.' },
       'gas': { name: 'Sensor 5 · GAS STATION', kind: 'banco de sensores de gas', blurb: 'MQ-2, MQ-7 y MQ-8 con un barómetro, en un soporte impreso bajo tapa ventilada.' },
-    },
-  },
-  system: {
-    lede: 'Una lectura de humedad, desde el pin enterrado hasta el número en la mano de alguien. Dale a play. Después rompe algo — haz clic en una etapa — y vuelve a lanzarla, porque lo interesante no es cuando funciona.',
-    play: 'Enviar una lectura',
-    running: 'en tránsito…',
-    again: 'Enviar otra',
-    repair: 'Reparar todo',
-    total: 'Extremo a extremo',
-    verdictArrived: 'Llegó. Ocho capas, un número, y nadie tuvo que pensar en ninguna.',
-    verdictFailed: 'Se detuvo en {stage}.',
-    breakHint: 'Haz clic en una etapa para romperla.',
-    silentBadge: 'sigue devolviendo un número',
-    goto: 'capítulo',
-    stages: {
-      silicon: { name: 'Silicio', does: 'El ADC muestrea la sonda', payload: 'ADC 2871 / 4095', broken: 'El pin no lee nada. Todo número por encima de esto es ya una conjetura sobre un cable.' },
-      copper:  { name: 'Cobre',   does: 'Cruza la placa hasta la radio', payload: '1,63 V', broken: 'Una grieta capilar en una pista. Intermitente — la peor clase, porque pasa en el banco.' },
-      steel:   { name: 'Acero',   does: 'Sale por el cabezal sellado', payload: 'M12 · IP67', broken: 'Agua más allá del sello. La lectura sigue llegando, puntual, y está mal. Nada avisa.' },
-      signal:  { name: 'Señal',   does: 'Publicada en el broker', payload: 'farm/greenhouse/soil-1/moisture', broken: 'El broker es inalcanzable. El dispositivo sigue midiendo perfectamente y nadie escucha.' },
-      service: { name: 'Servicio', does: 'Escrita en la base de datos', payload: 'INSERT → reading_id 128374', broken: 'La API responde y la escritura falla. El panel muestra ayer, con total confianza.' },
-      swarm:   { name: 'Enjambre', does: 'Atendida por una réplica', payload: 'pod 7/12', broken: 'Ninguna réplica libre. 503 — y los reintentos dejan la cola peor que la caída.' },
-      model:   { name: 'Modelo',  does: 'Clasificada por el modelo', payload: 'sano · 0,94', broken: 'El modelo responde, con confianza, sobre un suelo que nunca ha visto. Un número, y ninguna forma de saber que está mal.' },
-      glass:   { name: 'Cristal', does: 'Renderizada en el móvil', payload: '43 % de humedad', broken: 'Todo lo anterior funcionó. La pantalla no muestra nada, porque nadie hizo el estado vacío.' },
     },
   },
   glass: {
