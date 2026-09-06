@@ -31,6 +31,16 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
 
   <main id="chapters">
     {c.chapters.map((chapter) => (
+      <>
+      {c.acts.filter((a) => a.before === chapter.slug).map((act) => (
+        <div class="act">
+          <div class="act__inner">
+            <p class="act__label mono">{act.label}</p>
+            <h2 class="act__title">{act.title}</h2>
+            <p class="act__lede">{act.lede}</p>
+          </div>
+        </div>
+      ))}
       <Chapter chapter={chapter} learned={c.ui.learned}>
         {chapter.slug === 'silicon' ? (
           <PwmLab ui={c.ui} />
@@ -61,6 +71,7 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
           </div>
         )}
       </Chapter>
+      </>
     ))}
 
     <Record record={c.record} />

@@ -1,5 +1,14 @@
 export type Locale = 'en' | 'pt' | 'es';
 
+/** A divider that tells the reader which era the chapters under it belong to. */
+export interface Act {
+  /** The slug of the chapter this act opens on. */
+  before: string;
+  label: string;
+  title: string;
+  lede: string;
+}
+
 export interface Chapter {
   /** Two-digit index shown in the rail, e.g. "01". */
   id: string;
@@ -284,6 +293,7 @@ export interface Content {
     boot: string[];
   };
   chapters: Chapter[];
+  acts: Act[];
   record: RecordSection;
   signal: SignalGame;
   swarm: SwarmGame;

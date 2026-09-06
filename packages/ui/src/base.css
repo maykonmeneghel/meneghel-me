@@ -39,6 +39,26 @@ button { font: inherit; color: inherit; }
 .mono { font-family: var(--font-mono); font-variant-ligatures: none; }
 
 /* A chapter is one full "lesson" in the playable CV. */
+/* The act divider. Chapters 01-08 are one 2016-2019 product taken apart, and
+   09-11 are the work since; without saying so the page reads as a career
+   timeline that keeps going backwards. */
+.act {
+  padding-block: clamp(3.5rem, 10vh, 7rem);
+  padding-inline: var(--gutter);
+  border-top: 1px solid var(--brand-500);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--brand-500) 7%, transparent), transparent 70%);
+}
+.act__inner { max-width: 1080px; margin-inline: auto; }
+.act__label {
+  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--brand-500); margin: 0 0 .9rem;
+}
+.act__title {
+  font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em;
+  color: var(--fg-100); margin: 0 0 1rem; text-wrap: balance;
+}
+.act__lede { color: var(--fg-500); font-size: var(--step-0); margin: 0; }
+
 .chapter {
   padding-block: clamp(4rem, 12vh, 9rem);
   padding-inline: var(--gutter);

@@ -13,9 +13,14 @@ const none = new Set<StageId>();
 
 // --- the chain is the eight chapters, in order ---
 eq(STAGES.map((s) => s.id),
-  ['silicon', 'copper', 'steel', 'signal', 'service', 'swarm', 'mind', 'glass'],
-  'the stages follow the chapters bottom-up');
-check(STAGES.every((s) => s.href === `#${s.id}`), 'every stage links back to its chapter');
+  ['silicon', 'copper', 'steel', 'signal', 'service', 'swarm', 'model', 'glass'],
+  'the stages follow the chapters bottom-up, with the model between them');
+// Every stage but one is a chapter and links back to it. The model is the
+// exception on purpose: the probe this trace follows never had one.
+check(STAGES.filter((s) => s.href !== null).every((s) => s.href === `#${s.id}`),
+  'every stage that is a chapter links back to it');
+eq(STAGES.filter((s) => s.href === null).map((s) => s.id), ['model'],
+  'and the model is the only stage that is not a chapter');
 check(STAGES.every((s) => s.ms >= 0), 'no stage takes negative time');
 
 // --- a clean run ---
@@ -54,9 +59,9 @@ eq(run(new Set(STAGES.map((s) => s.id))).reached, -1, 'with the first stage brok
 eq(totalMs(new Set(STAGES.map((s) => s.id))), 0, 'and no time is spent');
 
 // --- the failures that still hand you a number ---
-eq(SILENT_FAILURES, ['steel', 'mind'], 'the silent failures are the seal and the model');
+eq(SILENT_FAILURES, ['steel', 'model'], 'the silent failures are the seal and the model');
 check(isSilent('steel'), 'water in the connector still reports a reading');
-check(isSilent('mind'), 'a model outside its training still answers');
+check(isSilent('model'), 'a model outside its training still answers');
 check(!isSilent('signal'), 'an unreachable broker is loud');
 check(SILENT_FAILURES.every((id) => indexOf(id) >= 0), 'every silent failure names a real stage');
 
