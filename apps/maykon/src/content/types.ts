@@ -12,6 +12,9 @@ export interface Act {
 export interface Chapter {
   /** Two-digit index shown in the rail, e.g. "01". */
   id: string;
+  /** What this chapter is about and when it happened, e.g. "Tradx · 2022 → today".
+   *  The page reads as a timeline whether or not it is one, so every chapter says. */
+  era: string;
   /** Single-word material name: SILICON, COPPER, STEEL... the stack read bottom-up. */
   codename: string;
   slug: string;
@@ -100,6 +103,30 @@ export interface SwarmGame {
   strained: string;
   failing: string;
   wasteful: string;
+}
+
+export interface LedgerGame {
+  lede: string;
+  modeLabel: string;
+  modeGross: string;
+  modeNet: string;
+  price: string;
+  position: string;
+  equityLabel: string;
+  lockedLabel: string;
+  availableLabel: string;
+  flat: string;
+  buy: string;
+  sell: string;
+  reset: string;
+  replay: string;
+  replayTitle: string;
+  grossLabel: string;
+  netLabel: string;
+  hintStart: string;
+  hintAccepted: string;
+  hintFunds: string;
+  hintReplay: string;
 }
 
 export interface MindGame {
@@ -287,6 +314,10 @@ export interface Content {
     name: string;
     headline: string;
     sub: string;
+    /** Hard credentials, shown as chips under the sub. */
+    proof: string[];
+    /** Where a recruiter clicks next. */
+    links: { label: string; href: string }[];
     cta: string;
     scrollHint: string;
     /** Terminal boot lines rendered one by one. */
@@ -298,6 +329,7 @@ export interface Content {
   signal: SignalGame;
   swarm: SwarmGame;
   mind: MindGame;
+  ledger: LedgerGame;
   service: ServiceGame;
   copper: CopperGame;
   steel: SteelGame;

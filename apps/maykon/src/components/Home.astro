@@ -7,6 +7,7 @@ import PwmLab from './games/PwmLab.astro';
 import MqttBench from './games/MqttBench.astro';
 import ClusterLab from './games/ClusterLab.astro';
 import GanLab from './games/GanLab.astro';
+import LedgerLab from './games/LedgerLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
@@ -58,6 +59,8 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
           <PartLab steel={c.steel} />
         ) : chapter.slug === 'glass' ? (
           <GlassLab glass={c.glass} />
+        ) : chapter.slug === 'ledger' ? (
+          <LedgerLab ledger={c.ledger} />
         ) : chapter.slug === 'flow' ? (
           <FlowLab flow={c.flow} />
         ) : chapter.slug === 'field' ? (

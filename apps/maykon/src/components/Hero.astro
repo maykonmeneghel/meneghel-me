@@ -10,9 +10,17 @@ const [first, ...rest] = hero.name.split(' ');
     <h1 class="hero__name">{first} <em>{rest.join(' ')}</em></h1>
     <p class="hero__headline">{hero.headline}</p>
     <p class="hero__sub">{hero.sub}</p>
+
+    <ul class="hero__proof">
+      {hero.proof.map((item) => <li class="hero__chip mono">{item}</li>)}
+    </ul>
+
     <div class="hero__actions">
       <a class="btn btn--primary" href="#chapters">{hero.cta} ↓</a>
       <a class="btn" href="https://meneghel.me">meneghel.me</a>
+      {hero.links.map((l) => (
+        <a class="btn" href={l.href} rel="noopener" target="_blank">{l.label} ↗</a>
+      ))}
     </div>
     <div class="boot mono" data-boot aria-hidden="true">
       {hero.boot.map((line) => <div class="boot__line">{line}</div>)}

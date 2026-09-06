@@ -1,0 +1,222 @@
+---
+import type { Content } from '../../content';
+interface Props { ledger: Content['ledger'] }
+const { ledger } = Astro.props;
+---
+<div class="lg" data-lg
+  data-l-accepted={ledger.hintAccepted}
+  data-l-funds={ledger.hintFunds}
+  data-l-replay={ledger.hintReplay}
+  data-l-start={ledger.hintStart}
+  data-l-flat={ledger.flat}
+>
+  <p class="lg__lede">{ledger.lede}</p>
+
+  <div class="lg__mode">
+    <span class="lg__modek mono">{ledger.modeLabel}</span>
+    <button type="button" class="btn lg__m" data-mode="gross" aria-pressed="true">{ledger.modeGross}</button>
+    <button type="button" class="btn lg__m" data-mode="net" aria-pressed="false">{ledger.modeNet}</button>
+  </div>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{ledger.price}</span>
+      <span class="readout__v" data-out="price">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{ledger.position}</span>
+      <span class="readout__v" data-out="pos">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{ledger.equityLabel}</span>
+      <span class="readout__v" data-out="equity">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{ledger.lockedLabel}</span>
+      <span class="readout__v" data-out="locked">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{ledger.availableLabel}</span>
+      <span class="readout__v" data-out="free">—</span>
+    </div>
+  </div>
+
+  <div class="lg__bar">
+    <button type="button" class="btn btn--primary" data-buy>{ledger.buy}</button>
+    <button type="button" class="btn" data-sell>{ledger.sell}</button>
+    <button type="button" class="btn" data-reset>{ledger.reset}</button>
+  </div>
+
+  <p class="lg__hint" data-hint>{ledger.hintStart}</p>
+
+  <div class="lg__replay">
+    <div class="lg__replayhead">
+      <h4 class="lg__replayt">{ledger.replayTitle}</h4>
+      <button type="button" class="btn" data-replay>{ledger.replay}</button>
+    </div>
+
+    <div class="lg__cols">
+      <div class="lg__col" data-col="gross">
+        <span class="lg__colk mono">{ledger.grossLabel}</span>
+        <div class="lg__ticks" data-ticks="gross"></div>
+        <p class="lg__colv mono" data-sum="gross">—</p>
+      </div>
+      <div class="lg__col" data-col="net">
+        <span class="lg__colk mono">{ledger.netLabel}</span>
+        <div class="lg__ticks" data-ticks="net"></div>
+        <p class="lg__colv mono" data-sum="net">—</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .lg__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; }
+
+  .lg__mode { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: 1.25rem; }
+  .lg__modek { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .lg__m[aria-pressed="true"] { background: var(--bg-600); border-color: var(--brand-500); color: var(--fg-100); }
+
+  .lg__bar { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+  .lg__hint { margin-top: 1rem; font-size: var(--step-body); color: var(--fg-300); min-height: 3.2em; }
+  .lg__hint[data-tone="reject"] { color: var(--fail); }
+  .lg__hint[data-tone="ok"] { color: var(--ok); }
+
+  .lg__replay {
+    margin-top: 1.75rem; padding: 1.25rem;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--bg-800);
+  }
+  .lg__replayhead {
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    align-items: center; justify-content: space-between; margin-bottom: 1.1rem;
+  }
+  .lg__replayt { margin: 0; font-size: var(--step-0); font-weight: 500; color: var(--fg-100); }
+
+  .lg__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 620px) { .lg__cols { grid-template-columns: 1fr; } }
+  .lg__colk { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .lg__ticks {
+    display: flex; flex-wrap: wrap; gap: 3px; margin: .6rem 0 .7rem; min-height: 34px;
+  }
+  /* Built by script, so the scoped attribute never lands on them. */
+  .lg__ticks :global(i) {
+    width: 12px; height: 14px; border-radius: 2px; background: var(--bg-600);
+    display: block; transition: background .12s;
+  }
+  .lg__ticks :global(i.is-fill) { background: var(--ok); }
+  .lg__ticks :global(i.is-reject) { background: color-mix(in oklab, var(--fail) 55%, transparent); }
+  .lg__colv { margin: 0; font-size: 11px; color: var(--fg-500); line-height: 1.7; white-space: pre-line; }
+  .lg__col[data-col="gross"] .lg__colv { color: var(--fail); }
+  .lg__col[data-col="net"] .lg__colv { color: var(--ok); }
+</style>
+
+<script>
+  import {
+    START, LOT, submit, run, session, prices, equity, locked, lockedAfter,
+    type Mode, type State,
+  } from './execution';
+
+  const root = document.querySelector<HTMLElement>('[data-lg]');
+  if (root) {
+    const L = {
+      accepted: root.dataset.lAccepted!,
+      funds: root.dataset.lFunds!,
+      replay: root.dataset.lReplay!,
+      start: root.dataset.lStart!,
+      flat: root.dataset.lFlat!,
+    };
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const modeBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-mode]')];
+
+    const PATH = prices(40);
+    const ORDERS = session(40);
+    // The page's language, not the browser's — an English reader was getting
+    // "5.000" for five thousand because the visitor's locale won by default.
+    const lang = document.documentElement.lang || 'en';
+    const money = (n: number) => n.toLocaleString(lang, { maximumFractionDigits: 0 });
+
+    let mode: Mode = 'gross';
+    let state: State = START;
+    let tick = 0;
+    let nextId = 1000;
+
+    function price() { return PATH[tick % PATH.length]; }
+
+    function paint() {
+      const p = price();
+      const eq = equity(state, p);
+      const lk = locked(state, p);
+      out('price').textContent = p.toFixed(2);
+      out('pos').textContent = state.qty === 0 ? L.flat
+        : `${state.qty > 0 ? '+' : ''}${state.qty} @ ${state.avg.toFixed(2)}`;
+      out('equity').textContent = money(eq);
+      out('locked').textContent = money(lk);
+      out('free').textContent = money(eq - lk);
+    }
+
+    function order(side: 'buy' | 'sell') {
+      const p = price();
+      const o = { id: nextId++, side, qty: LOT };
+      const need = lockedAfter(state, o, p, mode);
+      const attempt = submit(state, o, p, mode);
+      state = attempt.state;
+      tick++;
+      paint();
+      if (attempt.accepted) {
+        hint.textContent = L.accepted
+          .replace('{side}', side).replace('{qty}', String(LOT)).replace('{price}', p.toFixed(2));
+        hint.dataset.tone = 'ok';
+      } else {
+        hint.textContent = L.funds
+          .replace('{need}', money(need)).replace('{have}', money(attempt.equity));
+        hint.dataset.tone = 'reject';
+      }
+    }
+
+    function replay() {
+      for (const m of ['gross', 'net'] as Mode[]) {
+        const r = run(ORDERS, PATH, m);
+        const box = root.querySelector<HTMLElement>(`[data-ticks="${m}"]`)!;
+        box.textContent = '';
+        const filled = new Set(r.fills);
+        for (const o of ORDERS) {
+          const i = document.createElement('i');
+          i.className = filled.has(o.id) ? 'is-fill' : 'is-reject';
+          box.appendChild(i);
+        }
+        root.querySelector<HTMLElement>(`[data-sum="${m}"]`)!.textContent =
+          L.replay
+            .replace('{filled}', String(r.filled))
+            .replace('{orders}', String(ORDERS.length))
+            .replace('{trips}', String(r.state.roundTrips))
+            .replace('{pnl}', r.state.realised.toFixed(2));
+      }
+    }
+
+    for (const b of modeBtns) {
+      b.addEventListener('click', () => {
+        mode = b.dataset.mode as Mode;
+        for (const o of modeBtns) o.setAttribute('aria-pressed', String(o === b));
+        state = START; tick = 0;
+        hint.textContent = L.start;
+        delete hint.dataset.tone;
+        paint();
+      });
+    }
+    root.querySelector('[data-buy]')!.addEventListener('click', () => order('buy'));
+    root.querySelector('[data-sell]')!.addEventListener('click', () => order('sell'));
+    root.querySelector('[data-reset]')!.addEventListener('click', () => {
+      state = START; tick = 0;
+      hint.textContent = L.start;
+      delete hint.dataset.tone;
+      paint();
+    });
+    root.querySelector('[data-replay]')!.addEventListener('click', replay);
+
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); paint(); replay(); }
+    }, { rootMargin: '200px' });
+    io.observe(root);
+  }
+</script>

@@ -8,10 +8,19 @@ export const es: Content = {
   },
   nav: { chapters: 'Capítulos', family: 'La familia', contact: 'Contacto', resume: 'Currículum' },
   hero: {
-    kicker: 'Ingeniero Full-Stack Sénior · Máster en Bioingeniería · Especialista en IA',
+    kicker: 'Ingeniero Full-Stack Sénior · Agro y mercados financieros',
     name: 'Maykon Meneghel',
     headline: 'Construyo la pila entera — de la pista de cobre a la red neuronal.',
     sub: 'La mayoría de los currículums cuentan lo que alguien sabe hacer. Este te deja probarlo. Cada capítulo de abajo es un minijuego que funciona: vas a enrutar una PCB, suscribirte a un tópico MQTT, escalar un clúster bajo carga y entrenar un modelo — sin salir de esta página.',
+    proof: [
+      'Doce apps iOS nativas · una destacada por Apple',
+      'COO y cofundador · Tradx',
+      'Máster en Bioingeniería · posgrado en IA aplicada',
+      'Seis publicaciones revisadas por pares',
+    ],
+    links: [
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/maykonmeneghel/' },
+    ],
     cta: 'Empezar el recorrido',
     scrollHint: 'desliza',
     boot: [
@@ -41,6 +50,7 @@ export const es: Content = {
 
     {
       id: '01', codename: 'SILICIO', slug: 'silicon',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Todo empieza en un solo pin',
       lede: 'Mucho antes de que exista una app, hay un microcontrolador decidiendo —millones de veces por segundo— si un cable está en alto o en bajo. Catorce firmwares me enseñaron que todo lo de arriba depende de acertar aquí.',
       panel: 'pwm_playground.c',
@@ -49,6 +59,7 @@ export const es: Content = {
     },
     {
       id: '02', codename: 'COBRE', slug: 'copper',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Luego necesita una placa',
       lede: 'Un esquemático es una promesa. La PCB es donde se cumple. Cada placa que he fabricado empezó exactamente con este rompecabezas: llevar cada señal a su sitio, en una superficie donde nada puede cruzarse.',
       panel: 'router.pcb',
@@ -57,6 +68,7 @@ export const es: Content = {
     },
     {
       id: '03', codename: 'ACERO', slug: 'steel',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Y un cuerpo que sobreviva al campo',
       lede: 'Un sensor enterrado en tierra empapada durante dos años no se preocupa por lo elegante que sea tu firmware. Se preocupa por la carcasa. Por eso la modelo yo mismo: cada pieza, cada tolerancia, cada sello.',
       panel: 'soil_probe.sldasm',
@@ -65,6 +77,7 @@ export const es: Content = {
     },
     {
       id: '04', codename: 'SEÑAL', slug: 'signal',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Ahora haz que mil de ellos hablen',
       lede: 'Un dispositivo es un proyecto. Mil dispositivos son una arquitectura. MQTT es cómo se hablan sin conocerse nunca — y los comodines de tópico son todo el truco.',
       panel: 'broker · mqtt://meneghel.me:8883',
@@ -73,6 +86,7 @@ export const es: Content = {
     },
     {
       id: '05', codename: 'SERVICIO', slug: 'service',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Alguien tiene que recordarlo todo',
       lede: 'Los mensajes son efímeros; el negocio no. Detrás de cada dispositivo hay una API y una base de datos, y la diferencia entre un producto rápido y uno lento suele ser una decisión tomada aquí.',
       panel: 'psql · meneghel_db',
@@ -81,6 +95,7 @@ export const es: Content = {
     },
     {
       id: '06', codename: 'ENJAMBRE', slug: 'swarm',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Una sola máquina nunca alcanza',
       lede: 'El tráfico no llega con educación. Llega de golpe, a las 3 de la mañana, el día del lanzamiento. Los contenedores y Kubernetes son cómo respondes a eso sin despertarte.',
       panel: 'kubectl · production',
@@ -89,6 +104,7 @@ export const es: Content = {
     },
     {
       id: '07', codename: 'CRISTAL', slug: 'glass',
+      era: 'Swift y Flutter · 2019 → hoy',
       title: 'Por fin, algo que puedes tocar',
       lede: 'Doce apps iOS nativas, una destacada por Apple. El usuario nunca ve el broker, el clúster ni el modelo — ve una pantalla. Así que la pantalla tiene que valer todo eso.',
       panel: 'ContentView.swift / main.dart',
@@ -97,6 +113,7 @@ export const es: Content = {
     },
     {
       id: '08', codename: 'SISTEMA', slug: 'system',
+      era: 'AGROM.IO · 2016 – 2019',
       title: 'Ahora míralo todo funcionando a la vez',
       lede: 'Siete capítulos, un paquete. Dale a play y sigue una sola lectura de suelo, desde el sensor enterrado hasta el gráfico en la mano de alguien.',
       panel: 'trace · extremo a extremo',
@@ -105,6 +122,7 @@ export const es: Content = {
     },
     {
       id: '09', codename: 'MENTE', slug: 'mind',
+      era: 'StockGAN · 2021',
       title: 'Enseña a la máquina a adivinar qué viene después',
       lede: 'En 2021 construí desde cero una red generativa adversaria para series temporales — el trabajo en el que mi posgrado en IA y mi máster en Bioingeniería dejan de ser líneas en un diploma — dos redes, una intentando inventar la siguiente lectura y otra intentando pillarla mintiendo. La entrené con datos financieros. Aquí corre sobre la sonda de suelo de los capítulos de arriba, sin cambiar nada, porque una serie temporal no sabe qué mide.',
       panel: 'gan_model.py — train_step()',
@@ -113,6 +131,7 @@ export const es: Content = {
     },
     {
       id: '10', codename: 'FLUJO', slug: 'flow',
+      era: 'Tradx · 2022 → hoy',
       title: 'Y entonces construí la herramienta',
       lede: 'Un pronóstico tiene que vivir en algún sitio. El mío vive en Tradx — la empresa que cofundé en 2022 y dirijo como COO, una mesa donde una estrategia es un grafo que cableas, no un código que escribes.',
       panel: 'tradx · grafo de estrategia',
@@ -120,16 +139,26 @@ export const es: Content = {
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
     },
     {
-      id: '11', codename: 'CAMPO', slug: 'field',
+      id: '11', codename: 'LIBRO', slug: 'ledger',
+      era: 'Tradx · 2022 → hoy',
+      title: 'Una orden no es una operación',
+      lede: 'El capítulo anterior produjo una señal. Este es lo que le pasa. Una estrategia emite órdenes; un motor decide cuáles se convierten en operaciones, y la distancia entre esos dos números es donde una mesa de trading se construye o se pierde.',
+      panel: 'tradx · motor de ejecución',
+      takeaway: 'El motor rechazó treinta y ocho órdenes y reportó un problema de fondos. No lo tenía. <b>Vender contra una posición larga libera poder de compra</b> — un motor que revisa la orden en vez de la exposición resultante bloqueará justo las operaciones que reducen riesgo y lo llamará prudencia.',
+      stack: ['NestJS', 'Ciclo de vida de la orden', 'Netting de posición', 'Idempotencia', 'Redis + BullMQ', 'Paper trading'],
+    },
+    {
+      id: '12', codename: 'CAMPO', slug: 'field',
+      era: 'Gaussian splatting · hoy',
       title: 'Y ahora el objeto está hecho de luz',
-      lede: 'En esto paso los días ahora: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Es el mismo cerebro de ingeniería apuntado a otra pregunta — y es donde el trabajo de IA y el de 3D por fin se encuentran.',
+      lede: 'En esto paso los días ahora: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Las reconstrucciones de verdad empiezan con una cámara recorriendo una sala. La demo de abajo a propósito no lo hace — usa una pieza que ya conociste en el capítulo 03, porque la única forma de ver qué cambia el método es ver el mismo objeto construido de las dos formas.',
       panel: 'gaussian splatting · viewer',
       takeaway: 'Una malla dice dónde están las <b>superficies</b>, y un ingeniero dibujó cada una. Un campo de splats dice dónde está la <b>luz</b>, y nadie dibujó nada — se ajustó hasta que el render dejó de contradecir a la fotografía.',
       stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Fotogrametría', 'Campos de radiancia'],
     },
   ],
   record: {
-    eyebrow: '12 · TRAYECTORIA',
+    eyebrow: '13 · TRAYECTORIA',
     title: 'Las pruebas',
     lede: 'Nueve capítulos de demostración. Este es solo evidencia. Arrastra por los años y mira qué estaba corriendo a la vez — porque el titular honesto de esta línea de tiempo no es ningún empleo concreto, es lo poco que hubo uno solo.',
     lanes: {
@@ -272,6 +301,29 @@ export const es: Content = {
     hintHigh: 'Aquí arriba se califica solo por engañar al crítico. Las lecturas por fin se mueven como se mueve el sensor, y los números están más lejos de la próxima hora que nunca. Parece correcto. No lo es.',
     hintHis: '0.6 es lo que publiqué: inclinándose hacia el crítico, y pagando unas dos décimas de punto de error por ello. Ningún ajuste gana en los dos medidores — que es exactamente por qué ese número es una decisión y no un valor por defecto.',
     verdict: 'Estás en {you} en estas rondas. La red está en {net} sobre las mismas ventanas.',
+  },
+  ledger: {
+    lede: 'Una cuenta, un instrumento, veinte lotes por clic. Compra y vende a mano y mira qué le hace cada orden a los fondos disponibles — luego cambia la comprobación de fondos y hazlo otra vez.',
+    modeLabel: 'Comprobación de fondos',
+    modeGross: 'Nocional de la orden',
+    modeNet: 'Exposición neta',
+    price: 'Precio',
+    position: 'Posición',
+    equityLabel: 'Patrimonio',
+    lockedLabel: 'Bloqueado',
+    availableLabel: 'Disponible',
+    flat: 'plana',
+    buy: 'Comprar 20',
+    sell: 'Vender 20',
+    reset: 'Reiniciar',
+    replay: 'Repetir la sesión',
+    replayTitle: 'Las mismas cuarenta órdenes, de las dos formas',
+    grossLabel: 'Comprobado contra la orden',
+    netLabel: 'Comprobado contra la exposición',
+    hintStart: 'Empieza con dos compras y luego intenta vender para salir. Mira qué le hace la venta a los fondos disponibles en cada comprobación.',
+    hintAccepted: 'Ejecutada — {side} {qty} a {price}.',
+    hintFunds: 'Rechazada. El motor quiere {need} bloqueados y la cuenta vale {have} — incluso cuando la orden dejaría la posición más pequeña.',
+    hintReplay: '{filled} de {orders} órdenes ejecutadas\n{trips} idas y vueltas\n{pnl} realizado',
   },
   service: {
     lede: 'Una tabla de lecturas de sensor, 240.000 filas. Elige una consulta, decide qué columnas llevan índice, y ejecútala. La franja de abajo es la tabla; fíjate en cuánta tiene que tocar la base de datos.',
@@ -422,7 +474,7 @@ export const es: Content = {
     reveal: 'Entre las 75.429 combinaciones de parámetros, el conjunto que más rindió en la mitad donde ajustaste quedó en el puesto 22.949 en la mitad que no viste. Del primer puesto al vigésimo segundo milésimo. Por eso un backtest es una hipótesis y no un resultado, y por eso el número bonito es la parte fácil.',
   },
   field: {
-    lede: 'La misma pieza del capítulo 03, mostrada de las dos formas. A un lado del interruptor es la malla con la que se imprimió. Al otro es un campo de gaussianas repartidas sobre esa malla — un sustituto de uno ajustado, para poder ponerlos lado a lado.',
+    lede: 'Un objeto, construido dos veces. A un lado del interruptor es la malla del capítulo 03, con la que se imprimió la pieza. Al otro es un campo de gaussianas sobre esa misma malla — repartidas aquí en vez de ajustadas, para que los dos queden lado a lado y la diferencia sea el método y nada más.',
     mesh: 'Malla', splats: 'Gaussianas',
     count: 'Gaussianas', size: 'Dispersión', spin: 'arrastra para girar',
     primitives: 'Primitivas', authored: 'Hechas a mano',

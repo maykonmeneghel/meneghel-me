@@ -6,7 +6,10 @@ const { chapter, learned } = Astro.props;
 <section class="chapter" id={chapter.slug} data-chapter={chapter.id}>
   <div class="chapter__inner">
     <div class="chapter__head">
-      <p class="chapter__eyebrow">{chapter.id} · {chapter.codename}</p>
+      <p class="chapter__eyebrow">
+        <span>{chapter.id} · {chapter.codename}</span>
+        <span class="chapter__era">{chapter.era}</span>
+      </p>
       <h2 class="chapter__title">{chapter.title}</h2>
       <p class="chapter__lede">{chapter.lede}</p>
     </div>
