@@ -4,7 +4,7 @@ export const en: Content = {
   meta: {
     title: 'Maykon Meneghel — the playable CV',
     description:
-      'Senior full-stack engineer with a Master in AI. Firmware, PCBs, CAD, MQTT, Kubernetes, Swift and Flutter — explained through mini-games you can play right on the page.',
+      'Senior mobile engineer. Native iOS in Swift and SwiftUI, cross-platform in Flutter, and the Node, Java and Kubernetes APIs behind them — explained through mini-games you can play right on the page.',
   },
   nav: { chapters: 'Chapters', family: 'The family', contact: 'Contact', resume: 'Résumé' },
   hero: {
@@ -124,7 +124,7 @@ export const en: Content = {
       track: 'ai', codename: 'MIND', slug: 'mind',
       era: 'StockGAN · 2021',
       title: 'Teach the machine to guess what happens next',
-      lede: 'In 2021 I built a generative adversarial network for time series from scratch — the work where my postgraduate specialization in AI and my Master in Bioengineering stop being lines on a diploma — two networks, one trying to invent the next reading and one trying to catch it lying. I trained it on financial data. It runs here on the soil probe from the chapters above, unchanged, because a time series does not know what it measures.',
+      lede: 'In 2021 I built a generative adversarial network for time series from scratch — the work where my postgraduate specialization in AI and my Master in Bioengineering stop being lines on a diploma — two networks, one trying to invent the next reading and one trying to catch it lying. I trained it on financial data. It runs here on a soil probe I designed and buried years earlier, unchanged, because a time series does not know what it measures.',
       panel: 'gan_model.py — train_step()',
       takeaway: 'Two models, one loss function, and a knob between them. Grade the forecaster on being close and it answers with the average of everything, which is safe and useless. Grade it on being believable and it answers with something that moves like the sensor and knows nothing. <b>Every model I ship is that trade made on purpose</b>, written down, and measured.',
       stack: ['TensorFlow / Keras', 'GANs', 'LSTM', 'Time series', 'PCA & XGBoost feature selection'],
@@ -133,7 +133,7 @@ export const en: Content = {
       track: 'ai', codename: 'FIELD', slug: 'field',
       era: 'Gaussian splatting · today',
       title: 'And now the object is made of light',
-      lede: 'What I spend my days on now: Gaussian Splatting. A scene stops being a surface someone modelled and becomes a cloud of oriented gaussians, fitted by gradient descent until renders of them match the photographs. Real reconstructions start from a camera walking around a room. The demo below deliberately does not — it uses a part you already met in chapter 03, because the only way to see what the method changes is to watch the same object built both ways.',
+      lede: 'What I spend my days on now: Gaussian Splatting. A scene stops being a surface someone modelled and becomes a cloud of oriented gaussians, fitted by gradient descent until renders of them match the photographs. Real reconstructions start from a camera walking around a room. The demo below deliberately does not — it uses a part I designed and printed myself, because the only way to see what the method changes is to watch the same object built both ways.',
       panel: 'gaussian splatting · viewer',
       takeaway: 'A mesh says where the <b>surfaces</b> are, and an engineer drew every one. A splat field says where the <b>light</b> is, and nobody drew any of it — it was fitted until the render stopped disagreeing with the photograph.',
       stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Photogrammetry', 'Radiance fields'],
@@ -240,8 +240,8 @@ export const en: Content = {
       },
     },
     closing: {
-      line: 'Senior full-stack, from the solder joint to the model in production — in agribusiness and in financial markets.',
-      note: 'The board, the firmware, the broker, the database, the cluster, the model and the screen on the phone. I have yet to meet the other person who does both ends of both.',
+      line: 'I build the app, and I build what it talks to.',
+      note: 'The screen, the state on it, the API that fills it, the database under that, and the model that reads it. Most people own one of those. I have shipped all of them, and I still know which one is the hard part.',
     },
     contact: {
       title: 'Talk to me',
@@ -317,7 +317,7 @@ export const en: Content = {
     wasteful: 'over-provisioned',
   },
   mind: {
-    lede: 'In 2021 I wrote a GAN that forecasts the next value of a time series — generator, discriminator and training loop from scratch. I trained it on thirty years of daily bars, because that is where clean history was free, but the network reads log returns and has no idea what the numbers measure. So here it is running on the soil probe from the chapters above. The part worth showing is this: the discriminator never judges a predicted reading on its own. The reading is glued onto the nine real ones before it, and the network has to say whether the whole window came off the sensor. That is the game. You are the discriminator.',
+    lede: 'In 2021 I wrote a GAN that forecasts the next value of a time series — generator, discriminator and training loop from scratch. I trained it on thirty years of daily bars, because that is where clean history was free, but the network reads log returns and has no idea what the numbers measure. So here it is running on a soil probe I built years before any of this. The part worth showing is this: the discriminator never judges a predicted reading on its own. The reading is glued onto the nine real ones before it, and the network has to say whether the whole window came off the sensor. That is the game. You are the discriminator.',
     paper: 'StockGAN · LSTM(128) · window of 10 · trained on 30 years of daily bars, running here on soil-1',
     reading: 'soil-1 · greenhouse · % moisture',
     question: 'One of these two windows ends with a reading the probe actually took. The other ends with one the generator invented. Which is which?',
@@ -558,7 +558,7 @@ export const en: Content = {
     reveal: 'Across all 75,429 parameter combinations, the set that returned most on the half you tuned on came 22,949th on the half you had not seen. First place to twenty-two thousandth. That is why a backtest is a hypothesis and not a result, and why the beautiful number is the easy part.',
   },
   field: {
-    lede: 'One object, built twice. On the left of the switch it is the mesh from chapter 03, the one the part was printed from. On the right it is a field of gaussians over that same mesh — scattered here rather than fitted, so the two can sit side by side and the difference is the method and nothing else.',
+    lede: 'One object, built twice. On the left of the switch it is the mesh the part was printed from. On the right it is a field of gaussians over that same mesh — scattered here rather than fitted, so the two can sit side by side and the difference is the method and nothing else.',
     mesh: 'Mesh', splats: 'Gaussians',
     count: 'Gaussians', size: 'Spread', spin: 'drag to turn',
     primitives: 'Primitives', authored: 'Authored by hand',

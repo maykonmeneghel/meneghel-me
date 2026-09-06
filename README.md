@@ -188,6 +188,24 @@ Primary `#FF2D55`, sampled directly out of `Portfolio-2024.pdf` — which happen
 to be Apple's system pink, fitting for someone who came up through the Apple
 Developer Academy. Deep accent `#FF0635`.
 
+## The share card
+
+`apps/maykon/src/pages/og.astro` is the Open Graph card as a route with no
+scripts on it, and `tools/build-og.sh` shoots it with headless Chrome. Run it
+whenever the hero changes:
+
+```sh
+npm run build && ./tools/build-og.sh && npm run build
+```
+
+It exists because the first version was composed by stripping the real hero and
+screenshotting that, which meant capturing a page whose chapters never stop
+animating — the capture would not settle. Worse, nothing tied the card to the
+copy, so it went on advertising twelve App Store apps for a week after that
+claim came off every other surface. The card is the first thing anyone sees when
+the link is pasted; it is the easiest thing here to leave saying something that
+is no longer true.
+
 ## The CV
 
 `apps/maykon/src/pages/cv.astro` is the CV as a page: one column, real text,

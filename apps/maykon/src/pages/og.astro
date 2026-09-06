@@ -1,0 +1,57 @@
+---
+/**
+ * The share card, as a page with no scripts on it.
+ *
+ * Composing it by stripping the real hero meant screenshotting a page whose
+ * chapters keep animating, and the capture never settled. This route renders
+ * the same type and palette and nothing else, so tools/build-og.sh can shoot it
+ * every time the positioning changes — which is what went wrong last time: the
+ * card still advertised twelve App Store apps a week after they came off the
+ * rest of the site.
+ */
+import { content } from '../content';
+const c = content.en;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Maykon Meneghel — share card</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <style>
+      * { box-sizing: border-box; margin: 0; }
+      body {
+        width: 1200px; height: 630px; overflow: hidden;
+        background: #08090c; color: #f2f4f8;
+        font-family: "Inter", -apple-system, system-ui, sans-serif;
+        display: flex; align-items: center; padding: 0 72px;
+        background-image:
+          linear-gradient(#262b36 1px, transparent 1px),
+          linear-gradient(90deg, #262b36 1px, transparent 1px);
+        background-size: 48px 48px;
+      }
+      .veil {
+        position: fixed; inset: 0;
+        background: radial-gradient(ellipse 90% 70% at 50% 35%, transparent 20%, #08090c 78%);
+      }
+      .in { position: relative; max-width: 1060px; }
+      .kicker { font-family: "JetBrains Mono", monospace; font-size: 16px; letter-spacing: .04em; color: #9aa3b5; }
+      h1 { font-size: 92px; font-weight: 700; letter-spacing: -0.045em; margin: 14px 0 18px; }
+      h1 em { font-style: normal; color: #ff2d55; }
+      .line { font-size: 38px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.25; max-width: 20ch; }
+      .foot { font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: .06em; color: #818a9c; margin-top: 30px; }
+    </style>
+  </head>
+  <body>
+    <div class="veil"></div>
+    <div class="in">
+      <p class="kicker">{c.hero.kicker}</p>
+      <h1>Maykon <em>Meneghel</em></h1>
+      <p class="line">{c.hero.headline}</p>
+      <p class="foot">maykon.meneghel.me · iOS · SwiftUI · Flutter · COO &amp; co-founder, Tradx</p>
+    </div>
+  </body>
+</html>

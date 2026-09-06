@@ -4,7 +4,7 @@ export const es: Content = {
   meta: {
     title: 'Maykon Meneghel — el currículum jugable',
     description:
-      'Ingeniero full-stack sénior con máster y posgrado en IA. Firmware, PCBs, CAD, MQTT, Kubernetes, Swift y Flutter — explicados con minijuegos que puedes jugar en la propia página.',
+      'Ingeniero móvil sénior. iOS nativo en Swift y SwiftUI, multiplataforma en Flutter, y las APIs en Node, Java y Kubernetes detrás — explicados con mini-juegos que puedes jugar en la propia página.',
   },
   nav: { chapters: 'Capítulos', family: 'La familia', contact: 'Contacto', resume: 'Currículum' },
   hero: {
@@ -124,7 +124,7 @@ export const es: Content = {
       track: 'ai', codename: 'MENTE', slug: 'mind',
       era: 'StockGAN · 2021',
       title: 'Enseña a la máquina a adivinar qué viene después',
-      lede: 'En 2021 construí desde cero una red generativa adversaria para series temporales — el trabajo en el que mi posgrado en IA y mi máster en Bioingeniería dejan de ser líneas en un diploma — dos redes, una intentando inventar la siguiente lectura y otra intentando pillarla mintiendo. La entrené con datos financieros. Aquí corre sobre la sonda de suelo de los capítulos de arriba, sin cambiar nada, porque una serie temporal no sabe qué mide.',
+      lede: 'En 2021 construí desde cero una red generativa adversaria para series temporales — el trabajo en el que mi posgrado en IA y mi máster en Bioingeniería dejan de ser líneas en un diploma — dos redes, una intentando inventar la siguiente lectura y otra intentando pillarla mintiendo. La entrené con datos financieros. Aquí corre sobre una sonda de suelo que diseñé y enterré años antes, sin cambiar nada, porque una serie temporal no sabe qué mide.',
       panel: 'gan_model.py — train_step()',
       takeaway: 'Dos modelos, una función de pérdida y una perilla entre ellos. Exígele al pronosticador que quede cerca y responde con el promedio de todo, que es seguro e inútil. Exígele que sea creíble y responde con algo que se mueve como el sensor y no sabe nada. <b>Cada modelo que entrego es ese intercambio hecho a propósito</b>, escrito y medido.',
       stack: ['TensorFlow / Keras', 'GANs', 'LSTM', 'Series temporales', 'Selección de features con PCA y XGBoost'],
@@ -133,7 +133,7 @@ export const es: Content = {
       track: 'ai', codename: 'CAMPO', slug: 'field',
       era: 'Gaussian splatting · hoy',
       title: 'Y ahora el objeto está hecho de luz',
-      lede: 'En esto paso los días ahora: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Las reconstrucciones de verdad empiezan con una cámara recorriendo una sala. La demo de abajo a propósito no lo hace — usa una pieza que ya conociste en el capítulo 03, porque la única forma de ver qué cambia el método es ver el mismo objeto construido de las dos formas.',
+      lede: 'En esto paso los días ahora: Gaussian Splatting. Una escena deja de ser una superficie que alguien modeló y pasa a ser una nube de gaussianas orientadas, ajustadas por descenso de gradiente hasta que sus renders coinciden con las fotografías. Las reconstrucciones de verdad empiezan con una cámara recorriendo una sala. La demo de abajo a propósito no lo hace — usa una pieza que yo mismo diseñé e imprimí, porque la única forma de ver qué cambia el método es ver el mismo objeto construido de las dos formas.',
       panel: 'gaussian splatting · viewer',
       takeaway: 'Una malla dice dónde están las <b>superficies</b>, y un ingeniero dibujó cada una. Un campo de splats dice dónde está la <b>luz</b>, y nadie dibujó nada — se ajustó hasta que el render dejó de contradecir a la fotografía.',
       stack: ['Gaussian Splatting', '3DGS', 'PyTorch', 'CUDA', 'Fotogrametría', 'Campos de radiancia'],
@@ -240,8 +240,8 @@ export const es: Content = {
       },
     },
     closing: {
-      line: 'Full stack sénior, desde el punto de soldadura hasta el modelo en producción — en el agro y en los mercados financieros.',
-      note: 'La placa, el firmware, el broker, la base de datos, el clúster, el modelo y la pantalla del móvil. Todavía no he conocido a la otra persona que hace los dos extremos de los dos.',
+      line: 'Construyo la app, y construyo aquello con lo que habla.',
+      note: 'La pantalla, el estado en ella, la API que la llena, la base de datos debajo, y el modelo que lo lee. La mayoría domina una de esas. Yo he entregado todas, y sigo sabiendo cuál es la parte difícil.',
     },
     contact: {
       title: 'Hablemos',
@@ -317,7 +317,7 @@ export const es: Content = {
     wasteful: 'sobredimensionado',
   },
   mind: {
-    lede: 'En 2021 escribí una GAN que pronostica el siguiente valor de una serie temporal — generador, discriminador y bucle de entrenamiento desde cero. La entrené con treinta años de barras diarias, porque ahí era donde había histórico limpio y gratis, pero la red lee log-retornos y no tiene ni idea de qué miden los números. Así que aquí está corriendo sobre la sonda de suelo de los capítulos de arriba. Lo que vale la pena mostrar es esto: el discriminador nunca juzga una lectura prevista por sí sola. La lectura se pega a las nueve reales que vinieron antes, y la red tiene que decir si la ventana entera salió del sensor. Ese es el juego. Tú eres el discriminador.',
+    lede: 'En 2021 escribí una GAN que pronostica el siguiente valor de una serie temporal — generador, discriminador y bucle de entrenamiento desde cero. La entrené con treinta años de barras diarias, porque ahí era donde había histórico limpio y gratis, pero la red lee log-retornos y no tiene ni idea de qué miden los números. Así que aquí está corriendo sobre una sonda de suelo que construí años antes de todo esto. Lo que vale la pena mostrar es esto: el discriminador nunca juzga una lectura prevista por sí sola. La lectura se pega a las nueve reales que vinieron antes, y la red tiene que decir si la ventana entera salió del sensor. Ese es el juego. Tú eres el discriminador.',
     paper: 'StockGAN · LSTM(128) · ventana de 10 · entrenada con 30 años de barras diarias, corriendo aquí sobre soil-1',
     reading: 'soil-1 · invernadero · % de humedad',
     question: 'Una de estas dos ventanas termina con una lectura que la sonda tomó de verdad. La otra termina con una que inventó el generador. ¿Cuál es cuál?',
@@ -558,7 +558,7 @@ export const es: Content = {
     reveal: 'Entre las 75.429 combinaciones de parámetros, el conjunto que más rindió en la mitad donde ajustaste quedó en el puesto 22.949 en la mitad que no viste. Del primer puesto al vigésimo segundo milésimo. Por eso un backtest es una hipótesis y no un resultado, y por eso el número bonito es la parte fácil.',
   },
   field: {
-    lede: 'Un objeto, construido dos veces. A un lado del interruptor es la malla del capítulo 03, con la que se imprimió la pieza. Al otro es un campo de gaussianas sobre esa misma malla — repartidas aquí en vez de ajustadas, para que los dos queden lado a lado y la diferencia sea el método y nada más.',
+    lede: 'Un objeto, construido dos veces. A un lado del interruptor es la malla con la que se imprimió la pieza. Al otro es un campo de gaussianas sobre esa misma malla — repartidas aquí en vez de ajustadas, para que los dos queden lado a lado y la diferencia sea el método y nada más.',
     mesh: 'Malla', splats: 'Gaussianas',
     count: 'Gaussianas', size: 'Dispersión', spin: 'arrastra para girar',
     primitives: 'Primitivas', authored: 'Hechas a mano',
