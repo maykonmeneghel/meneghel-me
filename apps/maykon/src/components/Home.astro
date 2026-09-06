@@ -13,6 +13,7 @@ import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
 import SurfaceLab from './games/SurfaceLab.astro';
 import ThreadLab from './games/ThreadLab.astro';
+import LinkLab from './games/LinkLab.astro';
 import FlowLab from './games/FlowLab.astro';
 import SplatLab from './games/SplatLab.astro';
 import Record from './Record.astro';
@@ -46,7 +47,9 @@ const recordNumber = String(chapters.length + 1).padStart(2, '0');
         </div>
       ))}
       <Chapter chapter={chapter} learned={c.ui.learned}>
-        {chapter.slug === 'thread' ? (
+        {chapter.slug === 'gate' ? (
+          <LinkLab link={c.link} />
+        ) : chapter.slug === 'thread' ? (
           <ThreadLab thread={c.thread} />
         ) : chapter.slug === 'silicon' ? (
           <PwmLab ui={c.ui} />

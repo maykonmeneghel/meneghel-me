@@ -1,0 +1,194 @@
+---
+import type { Content } from '../../content';
+interface Props { link: Content['link'] }
+const { link } = Astro.props;
+const STEPS = ['open', 'authorise', 'redirect', 'receive', 'exchange', 'reuse', 'session'] as const;
+const ATTACKS = ['scheme-hijack', 'token-in-logs', 'code-replay', 'code-interception', 'csrf'] as const;
+---
+<div class="lk" data-lk data-copy={JSON.stringify({ steps: link.steps, attacks: link.attacks, hints: link.hints })}>
+  <p class="lk__lede">{link.lede}</p>
+
+  <div class="lk__switches">
+    <div class="lk__sw">
+      <span class="lk__swk mono">{link.channel}</span>
+      <div class="lk__row">
+        <button type="button" class="btn lk__o" data-set="link" data-value="customScheme" aria-pressed="true">{link.customScheme}</button>
+        <button type="button" class="btn lk__o" data-set="link" data-value="universalLink" aria-pressed="false">{link.universalLink}</button>
+      </div>
+    </div>
+    <div class="lk__sw">
+      <span class="lk__swk mono">{link.carries}</span>
+      <div class="lk__row">
+        <button type="button" class="btn lk__o" data-set="payload" data-value="token" aria-pressed="true">{link.token}</button>
+        <button type="button" class="btn lk__o" data-set="payload" data-value="code" aria-pressed="false">{link.code}</button>
+      </div>
+    </div>
+    <div class="lk__sw lk__sw--wide">
+      <span class="lk__swk mono">{link.guards}</span>
+      <div class="lk__row">
+        <button type="button" class="btn lk__f" data-flag="pkce" aria-pressed="false">PKCE</button>
+        <button type="button" class="btn lk__f" data-flag="singleUse" aria-pressed="false">{link.singleUse}</button>
+        <button type="button" class="btn lk__f" data-flag="stateParam" aria-pressed="false">state</button>
+        <button type="button" class="btn btn--primary" data-ship>{link.shipIt}</button>
+        <button type="button" class="btn" data-naive>{link.naive}</button>
+      </div>
+    </div>
+  </div>
+
+  <ol class="lk__flow" data-flow>
+    {STEPS.map((id, i) => (
+      <li class="lk__step" data-step={id} data-index={i}>
+        <span class="lk__pip" aria-hidden="true"></span>
+        <span class="lk__body">
+          <b class="lk__name">{link.steps[id].name}</b>
+          <span class="lk__does">{link.steps[id].does}</span>
+          <span class="lk__breach" data-breach></span>
+        </span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{link.reachedLabel}</span>
+      <span class="readout__v" data-out="reached">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{link.openLabel}</span>
+      <span class="readout__v" data-out="open">—</span>
+    </div>
+  </div>
+
+  <ul class="lk__list" data-attacks>
+    {ATTACKS.map((id) => (
+      <li class="lk__attack" data-attack={id}>
+        <b class="lk__attackname">{link.attacks[id].name}</b>
+        <span class="lk__attacktext">{link.attacks[id].text}</span>
+      </li>
+    ))}
+  </ul>
+
+  <p class="lk__hint" data-hint>{link.hintStart}</p>
+</div>
+
+<style>
+  .lk__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.4rem; }
+  .lk__switches { display: grid; gap: 1rem; margin-bottom: 1.6rem; }
+  .lk__swk { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
+  .lk__sw { display: grid; gap: .45rem; }
+  .lk__row { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+  .lk__flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .lk__step { display: grid; grid-template-columns: 22px 1fr; gap: .75rem; padding: .55rem 0; position: relative; }
+  .lk__step::before {
+    content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 1px; background: var(--line);
+  }
+  .lk__step:first-child::before { top: 50%; }
+  .lk__step:last-child::before { bottom: 50%; }
+  .lk__pip {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--bg-600);
+    border: 1px solid var(--line-2); margin: .35rem auto 0; position: relative; z-index: 1;
+  }
+  .lk__step[data-state="ok"] .lk__pip { background: var(--ok); border-color: var(--ok); }
+  .lk__step[data-state="breached"] .lk__pip { background: var(--fail); border-color: var(--fail); }
+  .lk__step[data-state="unreached"] { opacity: .38; }
+  .lk__body { display: grid; gap: .1rem; }
+  .lk__name { font-size: var(--step-0); color: var(--fg-100); }
+  .lk__does { font-size: var(--step--1); color: var(--fg-500); }
+  .lk__breach { font-size: var(--step--1); color: var(--fail); }
+  .lk__breach:empty { display: none; }
+
+  .lk__list { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: .5rem; }
+  .lk__attack {
+    display: grid; gap: .15rem; padding: .6rem .8rem; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg-800); opacity: .4;
+  }
+  .lk__attack[data-lands="true"] {
+    opacity: 1; border-color: color-mix(in oklab, var(--fail) 55%, var(--line));
+    background: color-mix(in oklab, var(--fail) 8%, var(--bg-800));
+  }
+  .lk__attackname { font-size: var(--step--1); color: var(--fg-300); }
+  .lk__attack[data-lands="true"] .lk__attackname { color: var(--fail); }
+  .lk__attacktext { font-size: 11px; color: var(--fg-700); }
+  .lk__attack[data-lands="true"] .lk__attacktext { color: var(--fg-500); }
+
+  .lk__hint { margin-top: 1.2rem; font-size: var(--step-body); color: var(--fg-300); min-height: 4.2em; }
+  .lk__hint[data-tone="safe"] { color: var(--ok); }
+</style>
+
+<script>
+  import { NAIVE, SHIPPED, attack, landed, flow, reached, type Config } from './deeplink';
+
+  const root = document.querySelector<HTMLElement>('[data-lk]');
+  if (root) {
+    const COPY = JSON.parse(root.dataset.copy || '{}');
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    let cfg: Config = { ...NAIVE };
+
+    function render() {
+      const open = landed(cfg);
+      const steps = flow(cfg);
+      const stop = reached(cfg);
+
+      steps.forEach((s, i) => {
+        const el = root.querySelector<HTMLElement>(`[data-step="${s.id}"]`)!;
+        const breached = s.attack !== null && open.includes(s.attack);
+        el.dataset.state = breached ? 'breached' : i < stop ? 'ok' : i === stop ? 'unreached' : 'unreached';
+        el.querySelector<HTMLElement>('[data-breach]')!.textContent =
+          breached ? COPY.attacks[s.attack!].name : '';
+      });
+
+      for (const a of attack(cfg)) {
+        root.querySelector<HTMLElement>(`[data-attack="${a.id}"]`)!.dataset.lands = String(a.lands);
+      }
+
+      out('reached').textContent = `${stop}/${steps.length}`;
+      out('open').textContent = String(open.length);
+
+      // The three states worth naming: safe, the trap, and everything else.
+      const key = open.length === 0 ? 'safe'
+        : (cfg.payload === 'code' && (!cfg.pkce || !cfg.singleUse)) ? 'halfway'
+        : 'open';
+      hint.textContent = COPY.hints?.[key] ?? '';
+      if (key === 'safe') hint.dataset.tone = 'safe'; else delete hint.dataset.tone;
+    }
+
+    for (const b of root.querySelectorAll<HTMLButtonElement>('[data-set]')) {
+      b.addEventListener('click', () => {
+        const k = b.dataset.set as 'link' | 'payload';
+        cfg = { ...cfg, [k]: b.dataset.value } as Config;
+        for (const o of root.querySelectorAll<HTMLButtonElement>(`[data-set="${k}"]`)) {
+          o.setAttribute('aria-pressed', String(o === b));
+        }
+        render();
+      });
+    }
+    for (const b of root.querySelectorAll<HTMLButtonElement>('[data-flag]')) {
+      b.addEventListener('click', () => {
+        const k = b.dataset.flag as 'pkce' | 'singleUse' | 'stateParam';
+        const on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(on));
+        cfg = { ...cfg, [k]: on };
+        render();
+      });
+    }
+    const sync = () => {
+      for (const b of root.querySelectorAll<HTMLButtonElement>('[data-set]')) {
+        const k = b.dataset.set as 'link' | 'payload';
+        b.setAttribute('aria-pressed', String((cfg as any)[k] === b.dataset.value));
+      }
+      for (const b of root.querySelectorAll<HTMLButtonElement>('[data-flag]')) {
+        b.setAttribute('aria-pressed', String((cfg as any)[b.dataset.flag!]));
+      }
+      render();
+    };
+    root.querySelector('[data-ship]')!.addEventListener('click', () => { cfg = { ...SHIPPED }; sync(); });
+    root.querySelector('[data-naive]')!.addEventListener('click', () => { cfg = { ...NAIVE }; sync(); });
+
+    const io = new IntersectionObserver((e) => {
+      if (e.some((x) => x.isIntersecting)) { io.disconnect(); render(); }
+    }, { rootMargin: '200px' });
+    io.observe(root);
+  }
+</script>

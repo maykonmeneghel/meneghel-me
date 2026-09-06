@@ -125,6 +125,11 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
       </div>
     </div>
 
+    <section class="climb" aria-labelledby="climb-title">
+      <h3 class="climb__title" id="climb-title">{record.climbTitle}</h3>
+      <p class="climb__body">{record.climbBody}</p>
+    </section>
+
     <div class="proof">
       <div class="proof__col">
         <h3 class="proof__title">{record.ventures.title}</h3>
@@ -236,6 +241,15 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
   .contact__title { margin: 0 0 .6rem; font-size: var(--step-1); font-weight: 500; color: var(--fg-100); }
   .contact__lede { margin: 0 0 1.4rem; font-size: var(--step-0); color: var(--fg-500); }
   .contact__links { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+  /* The four Eldorado bands in the industry lane are the best thing in this
+     timeline and they were left as data. Say it once, in words. */
+  .climb {
+    margin: 2.5rem 0 0; padding: 1.6rem 0 0;
+    border-top: 1px solid var(--line);
+  }
+  .climb__title { margin: 0 0 .7rem; font-size: var(--step-1); font-weight: 500; color: var(--fg-100); }
+  .climb__body { margin: 0; font-size: var(--step-0); color: var(--fg-500); }
 
   .sr-only {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;

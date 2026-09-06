@@ -33,11 +33,11 @@ const rows = (lane: string) =>
     <meta name="description" content="Senior Full-Stack Engineer. Agribusiness and financial markets. Firmware to production models." />
     <meta name="robots" content="noindex" />
     <style>
-      @page { size: A4; margin: 12mm 14mm; }
+      @page { size: A4; margin: 11mm 13mm; }
       * { box-sizing: border-box; }
       body {
         margin: 0; background: #fff; color: #14161a;
-        font: 9.6pt/1.38 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font: 9.3pt/1.34 "Helvetica Neue", Helvetica, Arial, sans-serif;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       .cv { max-width: 190mm; margin: 0 auto; }
@@ -49,12 +49,12 @@ const rows = (lane: string) =>
          "E D U C AT I O N", and an applicant tracking system finds its sections
          by matching the word. The heading has to survive copy and paste. */
       h2 {
-        font-size: 9.5pt; font-weight: 700; text-transform: uppercase;
-        color: #6a7180; margin: 11pt 0 5pt; padding-bottom: 2.5pt;
+        font-size: 9pt; font-weight: 700; text-transform: uppercase;
+        color: #6a7180; margin: 9pt 0 4pt; padding-bottom: 2pt;
         border-bottom: 0.6pt solid #ccd0d8;
       }
       .summary { margin: 0 0 2pt; text-align: justify; }
-      .item { margin: 0 0 5.5pt; break-inside: avoid; }
+      .item { margin: 0 0 4.5pt; break-inside: avoid; }
       .item__head { display: flex; justify-content: space-between; gap: 10pt; align-items: baseline; }
       .item__title { font-weight: 600; }
       .item__when { font-size: 8.5pt; color: #6a7180; white-space: nowrap; }
@@ -63,8 +63,8 @@ const rows = (lane: string) =>
       .skill b { display: inline; font-weight: 600; }
       .pub { margin: 0 0 5pt; }
       .pub__meta { font-size: 8.5pt; color: #6a7180; }
-      ul { margin: 3pt 0 0; padding-left: 14pt; }
-      li { margin-bottom: 2pt; }
+      ul { margin: 2pt 0 0; padding-left: 13pt; }
+      li { margin-bottom: 3pt; }
       a { color: #14161a; }
     </style>
   </head>
@@ -87,12 +87,28 @@ const rows = (lane: string) =>
         cross-platform in Flutter — Swift Concurrency, MVVM and Clean Architecture, XCTest and
         XCUITest, Dynamic Type, VoiceOver and localisation, fastlane and TestFlight. Two years
         at the Apple Developer Academy and four on a production Apple engagement, promoted from
-        trainee to senior. I build the APIs the apps talk to as well: Node.js, NestJS and Java,
-        MongoDB and PostgreSQL, Docker and Kubernetes on AWS. COO and co-founder of Tradx, a
-        trading platform built from the strategy graph down to the execution engine and published
-        on the Mac App Store. M.Sc. in Bioengineering, postgraduate specialization in applied AI,
-        six peer-reviewed publications, and current work in Gaussian Splatting.
+        trainee to senior on the same product. I build the APIs the apps talk to as well: Node.js,
+        NestJS and Java, MongoDB and PostgreSQL, Docker and Kubernetes on AWS. Tradx is my own
+        product and my sandbox — a desktop trading client on the Mac App Store with around fifteen
+        thousand downloads, built with one other engineer on pull requests and reviews. M.Sc. in
+        Bioengineering, postgraduate specialization in applied AI, six peer-reviewed publications,
+        and current work in Gaussian Splatting.
       </p>
+
+      <h2>Selected Highlights</h2>
+      <ul>
+        <li><b>Trainee to Senior in four years</b> on the same production Apple engagement
+          (2022–2026), each step taken by owning the work nobody wanted: the release process,
+          the flaky suite, the screen rewritten twice.</li>
+        <li><b>Tradx</b> — my own product and sandbox. A desktop trading client on the Mac App
+          Store, ~15,000 downloads, from the strategy graph to the execution engine. Built with one
+          other engineer, on pull requests, with reviews neither of us skips.</li>
+        <li><b>Rebuilt the OAuth deep-link flow</b> for Tradx: Universal Links instead of a custom
+          scheme, one-time codes with PKCE, and single-use exchange.</li>
+        <li><b>Six peer-reviewed publications</b>, none of them about mobile — where I learned to
+          state a method precisely enough for somebody else to attack it, and to change the claim
+          when they did.</li>
+      </ul>
 
       {lanes.map((lane) => (
         <>

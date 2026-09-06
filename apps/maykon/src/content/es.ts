@@ -13,7 +13,7 @@ export const es: Content = {
     headline: 'Entrego la app y la API con la que habla.',
     sub: 'La mayoría de los CV te cuentan lo que alguien sabe hacer. Este te deja probarlo. Cada capítulo es un mini-juego que funciona: escribe la misma pantalla dos veces, en SwiftUI y en Flutter, planifica una consulta, escala un servicio bajo carga y mira cómo una orden se convierte en una operación — sin salir de esta página.',
     proof: [
-      'Tradx · publicado en la Mac App Store',
+      'Tradx · producto propio, ~15 mil descargas en la Mac App Store',
       'De trainee a sénior en cuatro años en un proyecto Apple en producción',
       'Clean Architecture para SwiftUI · 30★ en GitHub',
       'Apple Developer Academy · posgrado en desarrollo iOS',
@@ -85,6 +85,15 @@ export const es: Content = {
       stack: ['SwiftUI', 'UIKit', 'Flutter', 'Dynamic Type', 'VoiceOver', 'Localización', 'RTL', 'Layout adaptativo', 'Accesibilidad', 'Design systems'],
     },
     {
+      track: 'mobile', codename: 'PUERTA', slug: 'gate',
+      era: 'Tradx · 2022 → hoy',
+      title: 'El login es por donde entran a una app',
+      lede: 'Todo lo demás en una app móvil falla de forma visible. Esto falla en silencio: el login funciona, la persona entra, y el flujo estuvo abierto todo el tiempo. Rehice esta parte en Tradx después de leer nuestra propia implementación con atención — son las cincuenta líneas que preguntaría en cualquier entrevista sénior.',
+      panel: 'oauth · manejo del redirect',
+      takeaway: 'Cambiar el token por un código de un solo uso es la primera corrección que todos intentan, y por sí sola <b>abre dos agujeros para cerrar uno</b>. Un código necesita PKCE para que solo la app que inició el flujo pueda gastarlo, y un solo uso para que no se gaste dos veces. Media migración de seguridad es peor que ninguna, porque parece terminada.',
+      stack: ['OAuth 2.0', 'PKCE', 'Universal Links', 'ASWebAuthenticationSession', 'Keychain', 'App Links', 'Deep linking', 'Modelado de amenazas'],
+    },
+    {
       track: 'platform', codename: 'SERVICIO', slug: 'service',
       era: 'Backend · 2018 → hoy',
       title: 'Alguien tiene que recordarlo todo',
@@ -106,7 +115,7 @@ export const es: Content = {
       track: 'platform', codename: 'FLUJO', slug: 'flow',
       era: 'Tradx · 2022 → hoy',
       title: 'Y entonces construí la herramienta',
-      lede: 'Un pronóstico tiene que vivir en algún sitio. El mío vive en Tradx — la empresa que cofundé en 2022 y dirijo como COO, una mesa donde una estrategia es un grafo que cableas, no un código que escribes.',
+      lede: 'Tradx es mi sandbox — el lugar donde tomo todas las decisiones y convivo con todas ellas. Un cliente de trading de escritorio donde una estrategia es un grafo que conectas en vez de código que escribes, publicado en la Mac App Store, con unas quince mil descargas. Lo construimos dos: Luiz Veloso y yo, por pull request, con revisiones que ninguno se salta.',
       panel: 'tradx · grafo de estrategia',
       takeaway: 'Un backtest es una <b>hipótesis</b>, no un resultado. Cualquiera ajusta una curva hasta que queda bonita con los datos que ya tiene; todo el oficio está en saber cuánto vale ese número con los datos que no tiene.',
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
@@ -181,6 +190,8 @@ export const es: Content = {
     eyebrow: '12 · TRAYECTORIA',
     title: 'Las pruebas',
     lede: 'Nueve capítulos de demostración. Este es solo evidencia. Arrastra por los años y mira qué estaba corriendo a la vez — porque el titular honesto de esta línea de tiempo no es ningún empleo concreto, es lo poco que hubo uno solo.',
+    climbTitle: 'De trainee a sénior en cuatro años',
+    climbBody: 'Entré en el proyecto Apple en 2022 como trainee y llegué a 2026 como sénior en el mismo producto. Nadie asciende por calendario: cada escalón vino de coger algo que nadie quería — el proceso de release, la suite inestable, la pantalla que todos reescribieron dos veces — y convertirlo en un problema fácil para los demás. Arrastra el año y mira la franja de industria: las cuatro barras seguidas son el mismo producto y el mismo equipo, vistos desde cuatro niveles de responsabilidad distintos.',
     lanes: {
       education: 'Formación',
       research: 'Investigación',
@@ -220,7 +231,7 @@ export const es: Content = {
     },
     publications: {
       title: 'Publicado y premiado',
-      lede: 'Trabajo revisado por pares, casi todo en la costura entre ingeniería y salud.',
+      lede: 'Seis artículos, y ninguno sobre móvil — y ese es justamente el punto. Ahí aprendí a equivocarme en público: a describir un método con precisión suficiente para que otro lo ataque, aceptar la revisión y cambiar la afirmación. Ese hábito vale más en un code review que cualquiera de los resultados.',
       read: 'leer el artículo',
       code: 'código',
       items: {
@@ -386,6 +397,79 @@ export const es: Content = {
       },
     },
   },
+  link: {
+    lede: 'Autenticar a alguien por el navegador y devolver el resultado a la app son las cincuenta líneas más sensibles de un código móvil. Empieza por la versión que muestra todo tutorial y ciérrala interruptor a interruptor. El orden importa más de lo que te gustaría.',
+    hintStart: 'Empieza por la versión del tutorial y ciérrala interruptor a interruptor. Mira hasta dónde llega el redirect.',
+    channel: 'El redirect',
+    customScheme: 'esquema tradx://',
+    universalLink: 'Universal Link',
+    carries: 'Qué vuelve',
+    token: 'el access token',
+    code: 'un código de un solo uso',
+    guards: 'Protecciones',
+    singleUse: 'un solo uso',
+    shipIt: 'Lo que publiqué',
+    naive: 'Volver al tutorial',
+    reachedLabel: 'El redirect llega a',
+    openLabel: 'Ataques que pasan',
+    steps: {
+      open: {
+        name: 'The app opens the browser',
+        does: 'ASWebAuthenticationSession, not a web view — the session cookie has to be the real one',
+      },
+      authorise: {
+        name: 'The user signs in',
+        does: 'and the authorisation server redirects back',
+      },
+      redirect: {
+        name: 'The device routes the redirect',
+        does: 'to whichever app claims that address',
+      },
+      receive: {
+        name: 'The app reads the callback',
+        does: 'off the URL, which is written to logs and history',
+      },
+      exchange: {
+        name: 'The app exchanges it',
+        does: 'for a session, over TLS, from the app itself',
+      },
+      reuse: {
+        name: 'Somebody presents it again',
+        does: 'the same value, a second time',
+      },
+      session: {
+        name: 'The session lands in the keychain',
+        does: 'and the user is in',
+      },
+    },
+    attacks: {
+      'scheme-hijack': {
+        name: 'Scheme hijack',
+        text: 'any other app on the device can register tradx:// and receive the redirect instead',
+      },
+      'token-in-logs': {
+        name: 'Token in the logs',
+        text: 'an access token on a query string is written to system logs, browser history and the referrer',
+      },
+      'code-replay': {
+        name: 'Code replay',
+        text: 'a code that is accepted twice is an access token with extra steps',
+      },
+      'code-interception': {
+        name: 'Code interception',
+        text: 'without PKCE the exchange proves nothing about who started the flow, so whoever holds the code can spend it',
+      },
+      csrf: {
+        name: 'Forged callback',
+        text: 'without an unguessable state value the app accepts a sign-in the user never started',
+      },
+    },
+    hints: {
+      open: 'This is the version in the tutorials, and it loses on the channel before it loses on the payload: the redirect goes to whichever app claimed the scheme, and the token is in a log by the time you read it.',
+      halfway: 'This is the trap. Swapping the token for a code is the fix everybody reaches for first, and on its own it makes things worse — it closes the logging hole and opens two new ones. A code needs PKCE so only the app that started the flow can spend it, and single use so it cannot be spent twice. Half the migration is worse than none of it.',
+      safe: 'A Universal Link the domain vouches for, a one-time code instead of a token, PKCE so only the app that started the flow can exchange it, single use so it cannot be replayed, and a state value so a callback nobody started is refused. Five switches, and every one of them is closing a different door.',
+    },
+  },
   ledger: {
     lede: 'Una cuenta, un instrumento, veinte lotes por clic. Compra y vende a mano y mira qué le hace cada orden a los fondos disponibles — luego cambia la comprobación de fondos y hazlo otra vez.',
     modeLabel: 'Comprobación de fondos',
@@ -539,6 +623,9 @@ export const es: Content = {
     dart: '// Same three decisions, same order.\nRow(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: [\n    if (image != null) Thumbnail(image!),\n    const SizedBox(width: 12),\n    Expanded(                              // min-width: 0, in Flutter\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text(p.symbol, style: t.titleMedium, softWrap: true),\n          error != null\n            ? Text(error!, style: t.bodySmall!.copyWith(color: cs.error))\n            : Text(p.summary, style: t.bodySmall),\n        ],\n      ),\n    ),\n    const SizedBox(width: 12),\n    Text(p.pnl, style: t.titleMedium),\n  ],\n)\n// Directionality mirrors the row; Semantics gives it one spoken label.',
   },
   flow: {
+    shotAlt: 'El editor de estrategias de Tradx: un gráfico de velas de PETR4 sobre un grafo de nodos que conecta una media móvil y un RSI a dos entradas a mercado.',
+    shotCap: 'Tradx · el editor de estrategias. Siete nodos, siete conexiones, y un backtest corriendo sobre PETR4 en el gráfico de quince minutos.',
+    teamLine: 'Dos personas, pull requests, y revisiones que ninguno se salta.',
     lede: 'Esto es lo que hace Tradx, en miniatura. No escribes el bucle — cableas la lógica, y el motor la ejecuta sobre las velas. Mueve los parámetros y mira cómo cambian a la vez el grafo y las operaciones.',
     period: 'Periodo del RSI',
     buyLevel: 'Entrar por encima de',

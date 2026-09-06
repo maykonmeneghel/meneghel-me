@@ -30,6 +30,14 @@ const path = (a: string, b: string) => {
 <div class="fl" data-fl data-reveal={flow.reveal} data-hint-in={flow.hintIn} data-hint-out={flow.hintOut}>
   <p class="fl__lede">{flow.lede}</p>
 
+  <figure class="fl__shot">
+    <img src="/shots/tradx-editor.jpg" alt={flow.shotAlt}
+      width="1400" height="819" loading="lazy" decoding="async" />
+    <figcaption class="fl__shotcap mono">{flow.shotCap}</figcaption>
+  </figure>
+
+  <p class="fl__team mono">{flow.teamLine}</p>
+
   <div class="fl__graphwrap">
     <svg class="fl__graph" viewBox="0 0 582 236" role="img" aria-label="Strategy graph">
       {WIRES.map(([a, b]) => <path class="fl__wire" d={path(a, b)} />)}
@@ -87,6 +95,19 @@ const path = (a: string, b: string) => {
 
 <style>
   .fl__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; }
+
+  /* The real thing, before the diagram of it. Everything else on this site is a
+     model I built to explain the work; this is a screenshot of the work. */
+  .fl__shot { margin: 0 0 1.4rem; }
+  .fl__shot img {
+    display: block; width: 100%; height: auto; border-radius: 10px;
+    border: 1px solid var(--line-2); background: #06070a;
+  }
+  .fl__shotcap { display: block; margin-top: .55rem; font-size: 10px; color: var(--fg-700); }
+  .fl__team {
+    margin: 0 0 1.6rem; font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--fg-700);
+  }
 
   .fl__graphwrap { overflow-x: auto; }
   .fl__graph {

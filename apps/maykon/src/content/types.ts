@@ -40,6 +40,9 @@ export interface RecordSection {
   title: string;
   lede: string;
   /** Lane headings on the timeline. */
+  /** The promotion story, told once rather than left in the data. */
+  climbTitle: string;
+  climbBody: string;
   lanes: { education: string; research: string; industry: string; venture: string };
   /** careerItem id -> role title. */
   roles: Record<string, string>;
@@ -140,6 +143,26 @@ export interface ThreadGame {
   cancelOn: string;
   cancelOff: string;
   strategies: { sync: ThreadStrategy; await: ThreadStrategy; offMain: ThreadStrategy };
+}
+
+export interface LinkGame {
+  lede: string;
+  channel: string;
+  customScheme: string;
+  universalLink: string;
+  carries: string;
+  token: string;
+  code: string;
+  guards: string;
+  singleUse: string;
+  shipIt: string;
+  naive: string;
+  reachedLabel: string;
+  openLabel: string;
+  hintStart: string;
+  steps: Record<string, { name: string; does: string }>;
+  attacks: Record<string, { name: string; text: string }>;
+  hints: { open: string; halfway: string; safe: string };
 }
 
 export interface LedgerGame {
@@ -296,6 +319,10 @@ export interface GlassGame {
 }
 
 export interface FlowGame {
+  /** The screenshot of the real editor, and who builds it. */
+  shotAlt: string;
+  shotCap: string;
+  teamLine: string;
   lede: string;
   period: string;
   buyLevel: string;
@@ -359,6 +386,7 @@ export interface Content {
   swarm: SwarmGame;
   mind: MindGame;
   ledger: LedgerGame;
+  link: LinkGame;
   thread: ThreadGame;
   service: ServiceGame;
   copper: CopperGame;

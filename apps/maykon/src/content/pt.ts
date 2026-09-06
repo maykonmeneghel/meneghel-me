@@ -13,7 +13,7 @@ export const pt: Content = {
     headline: 'Eu entrego o app e a API com que ele conversa.',
     sub: 'A maioria dos currículos conta o que alguém sabe fazer. Este aqui deixa você experimentar. Cada capítulo é um mini-jogo que funciona: escreva a mesma tela duas vezes, em SwiftUI e em Flutter, planeje uma query, escale um serviço sob carga e veja uma ordem virar um trade — sem sair desta página.',
     proof: [
-      'Tradx · publicado na Mac App Store',
+      'Tradx · produto meu, ~15 mil downloads na Mac App Store',
       'De trainee a sênior em quatro anos num projeto Apple em produção',
       'Clean Architecture para SwiftUI · 30★ no GitHub',
       'Apple Developer Academy · pós em desenvolvimento iOS',
@@ -85,6 +85,15 @@ export const pt: Content = {
       stack: ['SwiftUI', 'UIKit', 'Flutter', 'Dynamic Type', 'VoiceOver', 'Localização', 'RTL', 'Layout adaptativo', 'Acessibilidade', 'Design systems'],
     },
     {
+      track: 'mobile', codename: 'PORTA', slug: 'gate',
+      era: 'Tradx · 2022 → hoje',
+      title: 'O login é por onde arrombam um app',
+      lede: 'Todo o resto num app mobile falha de forma visível. Isso falha em silêncio: o login funciona, a pessoa entra, e o fluxo ficou aberto o tempo inteiro. Eu refiz esse pedaço na Tradx depois de ler a nossa própria implementação com atenção — são as cinquenta linhas que eu perguntaria em qualquer entrevista sênior.',
+      panel: 'oauth · tratamento do redirect',
+      takeaway: 'Trocar o token por um código de uso único é a primeira correção que todo mundo tenta, e sozinha <b>ela abre dois buracos para fechar um</b>. Um código precisa de PKCE para que só o app que iniciou o fluxo o gaste, e de uso único para não ser gasto duas vezes. Meia migração de segurança é pior que nenhuma, porque parece terminada.',
+      stack: ['OAuth 2.0', 'PKCE', 'Universal Links', 'ASWebAuthenticationSession', 'Keychain', 'App Links', 'Deep linking', 'Modelagem de ameaças'],
+    },
+    {
       track: 'platform', codename: 'SERVIÇO', slug: 'service',
       era: 'Backend · 2018 → hoje',
       title: 'Alguém precisa lembrar de tudo isso',
@@ -106,7 +115,7 @@ export const pt: Content = {
       track: 'platform', codename: 'FLUXO', slug: 'flow',
       era: 'Tradx · 2022 → hoje',
       title: 'E então eu construí a ferramenta',
-      lede: 'Uma previsão precisa morar em algum lugar. A minha mora no Tradx — a empresa que eu cofundei em 2022 e toco como COO, uma mesa onde uma estratégia é um grafo que você liga, não um código que você escreve.',
+      lede: 'A Tradx é o meu sandbox — o lugar onde eu tomo todas as decisões e convivo com todas elas. Um cliente de trading para desktop onde uma estratégia é um grafo que você liga em vez de um código que você escreve, publicado na Mac App Store, com cerca de quinze mil downloads. Somos dois construindo: eu e o Luiz Veloso, por pull request, com review que nenhum dos dois pula.',
       panel: 'tradx · grafo de estratégia',
       takeaway: 'Um backtest é uma <b>hipótese</b>, não um resultado. Qualquer um ajusta uma curva até ela ficar bonita nos dados que já tem; o ofício inteiro é saber quanto aquele número vale nos dados que ele não tem.',
       stack: ['Node.js', 'NestJS', 'Flutter', 'MongoDB', 'Redis + BullMQ', 'Motor de backtest', 'Paper trading'],
@@ -181,6 +190,8 @@ export const pt: Content = {
     eyebrow: '12 · TRAJETÓRIA',
     title: 'As provas',
     lede: 'Nove capítulos de demonstração. Este aqui é só evidência. Arraste pelos anos e veja o que estava rodando ao mesmo tempo — porque a manchete honesta desta linha do tempo não é nenhum emprego específico, é o quão raramente houve só um.',
+    climbTitle: 'De trainee a sênior em quatro anos',
+    climbBody: 'Entrei no projeto Apple em 2022 como trainee e cheguei a 2026 como sênior no mesmo produto. Ninguém é promovido por calendário: cada degrau veio de pegar algo que ninguém queria — o processo de release, a suíte instável, a tela que todo mundo reescreveu duas vezes — e transformar aquilo num problema fácil para os outros. Arraste o ano e olhe a faixa de indústria: as quatro barras em sequência são o mesmo produto e o mesmo time, vistos de quatro níveis de responsabilidade diferentes.',
     lanes: {
       education: 'Formação',
       research: 'Pesquisa',
@@ -220,7 +231,7 @@ export const pt: Content = {
     },
     publications: {
       title: 'Publicado e premiado',
-      lede: 'Trabalho revisado por pares, quase todo na costura entre engenharia e saúde.',
+      lede: 'Seis artigos, e nenhum sobre mobile — e é justamente esse o ponto. Foi ali que eu aprendi a errar em público: a descrever um método com precisão suficiente para outra pessoa atacá-lo, receber o parecer e mudar a afirmação. Esse hábito vale mais num code review do que qualquer um dos resultados.',
       read: 'ler o artigo',
       code: 'código',
       items: {
@@ -386,6 +397,79 @@ export const pt: Content = {
       },
     },
   },
+  link: {
+    lede: 'Autenticar alguém pelo navegador e devolver o resultado para o app são as cinquenta linhas mais sensíveis de um código mobile. Comece pela versão que todo tutorial mostra e feche uma chave por vez. A ordem importa mais do que você gostaria.',
+    hintStart: 'Comece pela versão do tutorial e feche uma chave por vez. Veja até onde o redirect chega.',
+    channel: 'O redirect',
+    customScheme: 'esquema tradx://',
+    universalLink: 'Universal Link',
+    carries: 'O que volta',
+    token: 'o access token',
+    code: 'um código de uso único',
+    guards: 'Proteções',
+    singleUse: 'uso único',
+    shipIt: 'O que eu subi',
+    naive: 'Voltar ao tutorial',
+    reachedLabel: 'O redirect chega a',
+    openLabel: 'Ataques que passam',
+    steps: {
+      open: {
+        name: 'O app abre o navegador',
+        does: 'ASWebAuthenticationSession, não uma web view — o cookie de sessão precisa ser o de verdade',
+      },
+      authorise: {
+        name: 'A pessoa faz login',
+        does: 'e o servidor de autorização redireciona de volta',
+      },
+      redirect: {
+        name: 'O aparelho roteia o redirect',
+        does: 'para qualquer app que reivindique aquele endereço',
+      },
+      receive: {
+        name: 'O app lê o callback',
+        does: 'da URL, que vai para logs e histórico',
+      },
+      exchange: {
+        name: 'O app troca o código',
+        does: 'por uma sessão, sobre TLS, a partir do próprio app',
+      },
+      reuse: {
+        name: 'Alguém apresenta de novo',
+        does: 'o mesmo valor, uma segunda vez',
+      },
+      session: {
+        name: 'A sessão vai para o keychain',
+        does: 'e a pessoa entrou',
+      },
+    },
+    attacks: {
+      'scheme-hijack': {
+        name: 'Sequestro de esquema',
+        text: 'qualquer outro app do aparelho pode registrar tradx:// e receber o redirect no seu lugar',
+      },
+      'token-in-logs': {
+        name: 'Token no log',
+        text: 'um access token na query string é gravado em logs do sistema, histórico do navegador e referrer',
+      },
+      'code-replay': {
+        name: 'Replay do código',
+        text: 'um código aceito duas vezes é um access token com passos a mais',
+      },
+      'code-interception': {
+        name: 'Interceptação do código',
+        text: 'sem PKCE a troca não prova nada sobre quem iniciou o fluxo, então quem tiver o código gasta ele',
+      },
+      csrf: {
+        name: 'Callback forjado',
+        text: 'sem um state impossível de adivinhar o app aceita um login que a pessoa nunca iniciou',
+      },
+    },
+    hints: {
+      open: 'Esta é a versão dos tutoriais, e ela perde no canal antes de perder no conteúdo: o redirect vai para qualquer app que reivindicou o esquema, e o token já está num log quando você o lê.',
+      halfway: 'Esta é a armadilha. Trocar o token por um código é a primeira correção que todo mundo tenta, e sozinha ela piora as coisas — fecha o buraco do log e abre dois novos. Um código precisa de PKCE para que só o app que iniciou o fluxo consiga gastá-lo, e de uso único para não ser gasto duas vezes. Metade da migração é pior que nenhuma.',
+      safe: 'Um Universal Link pelo qual o domínio responde, um código de uso único no lugar do token, PKCE para que só o app que iniciou o fluxo faça a troca, uso único para não haver replay, e um state para recusar um callback que ninguém iniciou. Cinco chaves, cada uma fechando uma porta diferente.',
+    },
+  },
   ledger: {
     lede: 'Uma conta, um instrumento, vinte lotes por clique. Compre e venda na mão e veja o que cada ordem faz com os fundos disponíveis — depois troque a checagem de fundos e faça de novo.',
     modeLabel: 'Checagem de fundos',
@@ -539,6 +623,9 @@ export const pt: Content = {
     dart: '// Same three decisions, same order.\nRow(\n  crossAxisAlignment: CrossAxisAlignment.start,\n  children: [\n    if (image != null) Thumbnail(image!),\n    const SizedBox(width: 12),\n    Expanded(                              // min-width: 0, in Flutter\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text(p.symbol, style: t.titleMedium, softWrap: true),\n          error != null\n            ? Text(error!, style: t.bodySmall!.copyWith(color: cs.error))\n            : Text(p.summary, style: t.bodySmall),\n        ],\n      ),\n    ),\n    const SizedBox(width: 12),\n    Text(p.pnl, style: t.titleMedium),\n  ],\n)\n// Directionality mirrors the row; Semantics gives it one spoken label.',
   },
   flow: {
+    shotAlt: 'O editor de estratégias do Tradx: um gráfico de candles de PETR4 acima de um grafo de nós ligando uma média móvel e um RSI a duas entradas a mercado.',
+    shotCap: 'Tradx · o editor de estratégias. Sete nós, sete conexões, e um backtest rodando em PETR4 no gráfico de quinze minutos.',
+    teamLine: 'Duas pessoas, pull requests, e review que nenhum dos dois pula.',
     lede: 'É isso que o Tradx faz, em miniatura. Você não escreve o laço — você liga a lógica, e o motor roda ela sobre os candles. Mexa nos parâmetros e veja o grafo e as operações mudarem juntos.',
     period: 'Período do RSI',
     buyLevel: 'Entrar acima de',
