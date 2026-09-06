@@ -51,6 +51,15 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
     founder: ventures.map((v) => ({ '@type': 'Organization', name: v.name })),
   };
 
+  const app = {
+    '@type': 'SoftwareApplication',
+    name: 'Tradx',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'macOS',
+    url: 'https://apps.apple.com/us/app/tradx/id6743033919',
+    author: { '@id': `${site}/#maykon` },
+  };
+
   const works = publications.map((p) => ({
     '@type': 'ScholarlyArticle',
     headline: c.record.publications.items[p.id],
@@ -74,6 +83,7 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
         mainEntity: { '@id': `${site}/#maykon` },
       },
       person,
+      app,
       ...works,
     ],
   };

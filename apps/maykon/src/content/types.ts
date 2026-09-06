@@ -274,23 +274,20 @@ export interface SteelGame {
 
 export interface GlassGame {
   lede: string;
-  accent: string;
-  layout: string;
-  radius: string;
-  stacked: string;
-  inline: string;
-  device: string;
-  iphone: string;
-  android: string;
-  /** Card contents shown inside the phone. */
-  card: {
-    sensor: string; status: string; age: string; delta: string;
-    depth: string; depthLabel: string; soil: string; soilLabel: string;
-  };
-  /** Uses {n}. */
-  note: string;
-  noteTitle: string;
-  swiftOnAndroid: string;
+  dynamicType: string;
+  width: string;
+  conditions: string;
+  longString: string;
+  rtl: string;
+  noImage: string;
+  error: string;
+  everything: string;
+  reset: string;
+  errorText: string;
+  variants: { fixed: string; adaptive: string };
+  failures: Record<string, string>;
+  swift: string;
+  dart: string;
 }
 
 export interface FlowGame {

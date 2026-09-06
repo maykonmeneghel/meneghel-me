@@ -1,0 +1,252 @@
+---
+import type { Content } from '../../content';
+interface Props { glass: Content['glass'] }
+const { glass } = Astro.props;
+const variants = ['fixed', 'adaptive'] as const;
+---
+<div class="sf" data-sf data-copy={JSON.stringify(glass.failures)}>
+  <p class="sf__lede">{glass.lede}</p>
+
+  <div class="sf__controls">
+    <label class="sf__ctl sf__ctl--wide">
+      <span class="sf__ctlk mono">{glass.dynamicType} <b data-out="scale">1.0×</b></span>
+      <input type="range" min="1" max="3.1" step="0.1" value="1" data-cond="fontScale" />
+    </label>
+    <div class="sf__ctl">
+      <span class="sf__ctlk mono">{glass.width}</span>
+      <div class="sf__row">
+        {[390, 320, 240].map((w, i) => (
+          <button type="button" class="btn sf__w" data-width={w} aria-pressed={i === 0 ? 'true' : 'false'}>{w}</button>
+        ))}
+      </div>
+    </div>
+    <div class="sf__ctl sf__ctl--wide">
+      <span class="sf__ctlk mono">{glass.conditions}</span>
+      <div class="sf__row">
+        <button type="button" class="btn sf__t" data-cond="longString" aria-pressed="false">{glass.longString}</button>
+        <button type="button" class="btn sf__t" data-cond="rtl" aria-pressed="false">{glass.rtl}</button>
+        <button type="button" class="btn sf__t" data-cond="noImage" aria-pressed="false">{glass.noImage}</button>
+        <button type="button" class="btn sf__t" data-cond="error" aria-pressed="false">{glass.error}</button>
+        <button type="button" class="btn btn--primary" data-all>{glass.everything}</button>
+        <button type="button" class="btn" data-reset>{glass.reset}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf__pair">
+    {variants.map((v) => (
+      <div class="sf__side" data-side={v}>
+        <div class="sf__head">
+          <span class="sf__label mono">{glass.variants[v]}</span>
+          <span class="sf__score mono" data-score={v}>—</span>
+        </div>
+
+        <div class="sf__stage">
+          <div class="sf__card" data-card={v}>
+            <span class="sf__avatar" data-avatar></span>
+            <span class="sf__text">
+              <b class="sf__title" data-title>BTC-USD</b>
+              <span class="sf__sub" data-sub>Long · 20 lots</span>
+              <span class="sf__err" data-err>{glass.errorText}</span>
+            </span>
+            <span class="sf__value" data-value>+1,240.50</span>
+            <span class="sf__chev" aria-hidden="true">›</span>
+          </div>
+        </div>
+
+        <ul class="sf__fails" data-fails={v}></ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="sf__code">
+    <div class="sf__col">
+      <span class="sf__colk mono">SwiftUI</span>
+      <pre class="sf__pre mono">{glass.swift}</pre>
+    </div>
+    <div class="sf__col">
+      <span class="sf__colk mono">Flutter</span>
+      <pre class="sf__pre mono">{glass.dart}</pre>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sf__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.4rem; }
+
+  .sf__controls { display: grid; gap: 1rem; margin-bottom: 1.6rem; }
+  .sf__ctl { display: grid; gap: .45rem; }
+  .sf__ctlk { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
+  .sf__ctlk b { color: var(--brand-500); font-weight: 500; }
+  .sf__row { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .sf__ctl--wide input[type="range"] { width: min(100%, 380px); accent-color: var(--brand-500); }
+
+  .sf__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 760px) { .sf__pair { grid-template-columns: 1fr; } }
+  .sf__head { display: flex; justify-content: space-between; align-items: baseline; gap: .75rem; }
+  .sf__label { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .sf__score { font-size: 11px; color: var(--fg-500); }
+  .sf__side[data-broken="0"] .sf__score { color: var(--ok); }
+  .sf__side[data-broken]:not([data-broken="0"]) .sf__score { color: var(--fail); }
+
+  .sf__stage {
+    margin-top: .6rem; padding: 1rem; border-radius: 10px;
+    background: #06070a; border: 1px solid var(--line);
+    display: flex; justify-content: center; overflow: hidden;
+  }
+
+  /* The card is real. Nothing here simulates breakage — the fixed variant is
+     built the way a comp is usually built, and it breaks on its own. */
+  .sf__card {
+    --scale: 1;
+    width: var(--w, 390px); max-width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 12px;
+    background: var(--bg-800); border: 1px solid var(--line-2);
+    font-size: calc(15px * var(--scale));
+  }
+  .sf__avatar {
+    width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px;
+    background: linear-gradient(140deg, var(--brand-500), #7c4dff);
+  }
+  .sf__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .sf__title { font-size: calc(17px * var(--scale)); color: var(--fg-100); font-weight: 600; }
+  .sf__sub { font-size: calc(13px * var(--scale)); color: var(--fg-500); }
+  .sf__err { font-size: calc(13px * var(--scale)); color: var(--fail); display: none; }
+  .sf__value { font-size: calc(17px * var(--scale)); color: var(--ok); font-variant-numeric: tabular-nums; }
+  .sf__chev { color: var(--fg-700); font-size: calc(18px * var(--scale)); }
+
+  /* Drawn to a comp: one row, one line each, a height in points. */
+  .sf__card[data-card="fixed"] {
+    height: 56px; flex-wrap: nowrap; align-items: center;
+  }
+  .sf__card[data-card="fixed"] .sf__text { overflow: hidden; }
+  .sf__card[data-card="fixed"] .sf__title,
+  .sf__card[data-card="fixed"] .sf__sub,
+  .sf__card[data-card="fixed"] .sf__err {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sf__card[data-card="fixed"] .sf__value { flex: 0 0 auto; white-space: nowrap; }
+
+  /* Built to survive: wraps, stacks, mirrors, and has no fixed height. */
+  .sf__card[data-card="adaptive"] { min-height: 56px; flex-wrap: wrap; }
+  .sf__card[data-card="adaptive"] .sf__title,
+  .sf__card[data-card="adaptive"] .sf__sub { overflow-wrap: anywhere; }
+  .sf__card[data-card="adaptive"][data-stacked] { flex-direction: column; align-items: flex-start; }
+  .sf__card[data-card="adaptive"][data-stacked] .sf__value { align-self: flex-start; }
+  .sf__card[data-card="adaptive"][data-noimage] .sf__avatar { display: none; }
+  .sf__card[data-card="adaptive"][data-error] .sf__sub { display: none; }
+  .sf__card[data-error] .sf__err { display: block; }
+  .sf__card[data-rtl] { direction: rtl; }
+  .sf__card[data-card="adaptive"][data-rtl] .sf__chev { transform: scaleX(-1); }
+
+  .sf__fails { list-style: none; margin: .8rem 0 0; padding: 0; display: grid; gap: .35rem; }
+  .sf__fails :global(li) { font-size: 11px; color: var(--fail); line-height: 1.5; }
+  .sf__fails :global(li.is-ok) { color: var(--ok); }
+
+  .sf__code { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.75rem; }
+  @media (max-width: 760px) { .sf__code { grid-template-columns: 1fr; } }
+  .sf__colk { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .sf__pre {
+    margin: .5rem 0 0; padding: .8rem .9rem; overflow-x: auto; white-space: pre;
+    background: var(--bg-800); border: 1px solid var(--line); border-radius: 8px;
+    font-size: 11px; line-height: 1.65; color: var(--fg-300);
+  }
+</style>
+
+<script>
+  import { DEFAULTS, TRIALS, evaluate, stacks, type Conditions, type Strategy } from './layout';
+
+  const root = document.querySelector<HTMLElement>('[data-sf]');
+  if (root) {
+    const FAILCOPY: Record<string, string> = JSON.parse(root.dataset.copy || '{}');
+    const LONG = 'Bitcoin / Dólar dos Estados Unidos';
+    const SHORT = 'BTC-USD';
+
+    let cond: Conditions = { ...DEFAULTS };
+    const toggles = [...root.querySelectorAll<HTMLButtonElement>('.sf__t')];
+    const widths = [...root.querySelectorAll<HTMLButtonElement>('[data-width]')];
+    const scale = root.querySelector<HTMLInputElement>('[data-cond="fontScale"]')!;
+
+    function paintCard(v: Strategy) {
+      const card = root.querySelector<HTMLElement>(`[data-card="${v}"]`)!;
+      card.style.setProperty('--scale', String(cond.fontScale));
+      card.style.setProperty('--w', `${cond.widthPt}px`);
+      card.toggleAttribute('data-rtl', cond.rtl);
+      card.toggleAttribute('data-error', cond.error);
+      card.toggleAttribute('data-noimage', !cond.hasImage);
+      card.toggleAttribute('data-stacked', stacks(cond, v));
+      card.querySelector<HTMLElement>('[data-title]')!.textContent = cond.titleChars > 12 ? LONG : SHORT;
+      // The fixed card keeps the empty avatar box, which is the point.
+      const avatar = card.querySelector<HTMLElement>('[data-avatar]')!;
+      avatar.style.background = cond.hasImage
+        ? '' : (v === 'fixed' ? 'var(--bg-600)' : '');
+    }
+
+    function render() {
+      root.querySelector<HTMLElement>('[data-out="scale"]')!.textContent = `${cond.fontScale.toFixed(1)}×`;
+      for (const v of ['fixed', 'adaptive'] as Strategy[]) {
+        paintCard(v);
+        const fails = evaluate(cond, v);
+        const side = root.querySelector<HTMLElement>(`[data-side="${v}"]`)!;
+        side.dataset.broken = String(fails.length);
+        const passed = TRIALS.filter((t) => evaluate(t.apply(DEFAULTS), v).length === 0).length;
+        root.querySelector<HTMLElement>(`[data-score="${v}"]`)!.textContent = `${passed}/${TRIALS.length}`;
+        const list = root.querySelector<HTMLElement>(`[data-fails="${v}"]`)!;
+        list.textContent = '';
+        if (!fails.length) {
+          const li = document.createElement('li');
+          li.className = 'is-ok';
+          li.textContent = FAILCOPY.none ?? 'nothing broken';
+          list.appendChild(li);
+        } else {
+          for (const f of fails) {
+            const li = document.createElement('li');
+            li.textContent = '— ' + (FAILCOPY[f.id] ?? f.detail);
+            list.appendChild(li);
+          }
+        }
+      }
+    }
+
+    scale.addEventListener('input', () => { cond = { ...cond, fontScale: Number(scale.value) }; render(); });
+    for (const b of widths) {
+      b.addEventListener('click', () => {
+        cond = { ...cond, widthPt: Number(b.dataset.width) };
+        for (const o of widths) o.setAttribute('aria-pressed', String(o === b));
+        render();
+      });
+    }
+    for (const b of toggles) {
+      b.addEventListener('click', () => {
+        const on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(on));
+        const k = b.dataset.cond!;
+        if (k === 'longString') cond = { ...cond, titleChars: on ? 22 : DEFAULTS.titleChars };
+        if (k === 'rtl') cond = { ...cond, rtl: on };
+        if (k === 'noImage') cond = { ...cond, hasImage: !on };
+        if (k === 'error') cond = { ...cond, error: on };
+        render();
+      });
+    }
+    root.querySelector('[data-all]')!.addEventListener('click', () => {
+      cond = { fontScale: 3.1, widthPt: 240, titleChars: 22, rtl: true, hasImage: false, error: true };
+      scale.value = '3.1';
+      for (const b of toggles) b.setAttribute('aria-pressed', 'true');
+      for (const b of widths) b.setAttribute('aria-pressed', String(b.dataset.width === '240'));
+      render();
+    });
+    root.querySelector('[data-reset]')!.addEventListener('click', () => {
+      cond = { ...DEFAULTS };
+      scale.value = '1';
+      for (const b of toggles) b.setAttribute('aria-pressed', 'false');
+      for (const b of widths) b.setAttribute('aria-pressed', String(b.dataset.width === '390'));
+      render();
+    });
+
+    const io = new IntersectionObserver((e) => {
+      if (e.some((x) => x.isIntersecting)) { io.disconnect(); render(); }
+    }, { rootMargin: '200px' });
+    io.observe(root);
+  }
+</script>

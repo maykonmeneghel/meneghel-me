@@ -11,7 +11,7 @@ import LedgerLab from './games/LedgerLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
-import GlassLab from './games/GlassLab.astro';
+import SurfaceLab from './games/SurfaceLab.astro';
 import ThreadLab from './games/ThreadLab.astro';
 import FlowLab from './games/FlowLab.astro';
 import SplatLab from './games/SplatLab.astro';
@@ -63,7 +63,7 @@ const recordNumber = String(chapters.length + 1).padStart(2, '0');
         ) : chapter.slug === 'steel' ? (
           <PartLab steel={c.steel} />
         ) : chapter.slug === 'glass' ? (
-          <GlassLab glass={c.glass} />
+          <SurfaceLab glass={c.glass} />
         ) : chapter.slug === 'ledger' ? (
           <LedgerLab ledger={c.ledger} />
         ) : chapter.slug === 'flow' ? (
