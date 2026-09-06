@@ -16,10 +16,11 @@ export const pt: Content = {
       'Doze apps iOS nativos · um destacado pela Apple',
       'COO e cofundador · Tradx',
       'Mestre em Bioengenharia · pós em IA aplicada',
-      'Seis publicações revisadas por pares',
+      'Clean Architecture para SwiftUI · 30★ no GitHub',
     ],
     links: [
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/maykonmeneghel/' },
+      { label: 'GitHub', href: 'https://github.com/maykonmeneghel' },
     ],
     cta: 'Começar o tour',
     scrollHint: 'role',
@@ -201,6 +202,8 @@ export const pt: Content = {
     publications: {
       title: 'Publicado e premiado',
       lede: 'Trabalho revisado por pares, quase todo na costura entre engenharia e saúde.',
+      read: 'ler o artigo',
+      code: 'código',
       items: {
         soilInstrument: 'Instrumento para Medição de Fatores e/ou Elementos Naturais do Solo',
         fesTool: 'A Tool to Select FES Parameters for chronic SCI',

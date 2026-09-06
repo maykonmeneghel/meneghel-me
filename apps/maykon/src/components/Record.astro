@@ -151,7 +151,9 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
               <span class="proof__k">{record.publications.items[p.id]}</span>
               <span class="proof__v mono">
                 {p.year} · {p.venue}
-                {p.doi && <> · <a href={`https://doi.org/${p.doi}`} rel="noopener">doi:{p.doi}</a></>}
+                {p.url && <> · <a href={p.url} rel="noopener" target="_blank">{record.publications.read} ↗</a></>}
+                {p.doi && <> · <a href={`https://doi.org/${p.doi}`} rel="noopener" target="_blank">doi:{p.doi}</a></>}
+                {p.code && <> · <a href={p.code} rel="noopener" target="_blank">{record.publications.code} ↗</a></>}
               </span>
             </li>
           ))}

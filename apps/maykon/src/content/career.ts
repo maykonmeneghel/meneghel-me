@@ -62,17 +62,33 @@ export interface Publication {
   year: number;
   venue: string;
   doi?: string;
+  /** Where the paper itself is. Verified by opening it, not by guessing a URL. */
+  url?: string;
+  /** A repository that holds the thing the paper is about. */
+  code?: string;
 }
 
 export const publications: Publication[] = [
   { id: 'soilInstrument', year: 2016, venue: 'Control & Automation Engineering, PUC-PR' },
-  { id: 'fesTool',        year: 2019, venue: '41st Annual International Conference of the IEEE EMBS' },
-  { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', doi: '10.5185/amp.2019.1450' },
-  { id: 'inSilicoFes',    year: 2019, venue: "Master's dissertation, PUC-PR" },
+  { id: 'fesTool',        year: 2019, venue: '41st Annual International Conference of the IEEE EMBS',
+    url: 'https://ieeexplore.ieee.org/document/8857421',
+    code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
+  { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', doi: '10.5185/amp.2019.1450',
+    url: 'https://amp.iaamonline.org/article_16020.html',
+    code: 'https://github.com/maykonmeneghel/PoC-Buckle-Device-ESP32' },
+  { id: 'inSilicoFes',    year: 2019, venue: "Master's dissertation, PUC-PR",
+    code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
   { id: 'balanceModel',   year: 2019, venue: 'System identification / bioengineering' },
   { id: 'stockGan',       year: 2020, venue: 'Applied AI specialization, PUC-PR' },
 ];
 
+/**
+ * No URLs here yet, and not for want of looking. Neither item could be found:
+ * the 2021 Apple Newsroom piece on the Developer Academy names three apps and
+ * Hubli is not one of them, and MacMagazine's site returns nothing for Neon
+ * Wave. Both claims come from Maykon's own 2024 portfolio, so they stand — but
+ * they stay unlinked until he produces the articles. See docs/CONTENT-TODO.md.
+ */
 export const press = [
   { id: 'hubli',    outlet: 'Apple Newsroom', year: 2020 },
   { id: 'neonWave', outlet: 'MacMagazine',    year: 2020 },

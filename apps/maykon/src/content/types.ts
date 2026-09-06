@@ -51,7 +51,7 @@ export interface RecordSection {
     coFounder: string;
     sectors: Record<string, string>;
   };
-  publications: { title: string; lede: string; items: Record<string, string> };
+  publications: { title: string; lede: string; read: string; code: string; items: Record<string, string> };
   press: { title: string; items: Record<string, string> };
   /** The line the page ends on. */
   closing: { line: string; note: string };

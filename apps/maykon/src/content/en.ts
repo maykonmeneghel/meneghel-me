@@ -16,10 +16,11 @@ export const en: Content = {
       'Twelve native iOS apps · one featured by Apple',
       'COO & co-founder · Tradx',
       'M.Sc. Bioengineering · postgraduate specialization in applied AI',
-      'Six peer-reviewed publications',
+      'Clean Architecture for SwiftUI · 30★ on GitHub',
     ],
     links: [
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/maykonmeneghel/' },
+      { label: 'GitHub', href: 'https://github.com/maykonmeneghel' },
     ],
     cta: 'Start the tour',
     scrollHint: 'scroll',
@@ -201,6 +202,8 @@ export const en: Content = {
     publications: {
       title: 'Published and awarded',
       lede: 'Peer-reviewed work, mostly at the seam between engineering and health.',
+      read: 'read the paper',
+      code: 'source',
       items: {
         soilInstrument: 'Instrument for Measuring Factors and/or Natural Elements of the Soil',
         fesTool: 'A Tool to Select FES Parameters for chronic SCI',
