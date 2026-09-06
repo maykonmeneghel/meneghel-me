@@ -22,6 +22,7 @@ export const pt: Content = {
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/maykonmeneghel/' },
       { label: 'GitHub', href: 'https://github.com/maykonmeneghel' },
     ],
+    cv: 'Baixar CV (PDF)',
     cta: 'Começar o tour',
     scrollHint: 'role',
     boot: [
@@ -226,9 +227,25 @@ export const pt: Content = {
     },
     contact: {
       title: 'Fale comigo',
-      lede: 'Se alguma coisa aqui tem a cara de um problema que você tem, eu quero ouvir. O jeito mais rápido de me achar é o LinkedIn; o código está no GitHub.',
+      lede: 'Se alguma coisa aqui tem a cara de um problema que você tem, eu quero ouvir. E-mail ou LinkedIn, o que preferir — o CV é um PDF de duas páginas e o código está no GitHub.',
       linkedin: 'Falar comigo no LinkedIn',
       github: 'Ver meu código',
+      email: 'Me mandar um e-mail',
+      cv: 'Baixar meu CV',
+    },
+    skills: {
+      title: 'Com o que eu trabalho',
+      lede: 'Tudo aqui embaixo é creditado por algum capítulo desta página ou está num repositório público. Nada aqui é aspiracional.',
+      groups: {
+        languages: 'Linguagens',
+        backend: 'Backend e APIs',
+        data: 'Dados',
+        cloud: 'Cloud e DevOps',
+        frontend: 'Mobile e front-end',
+        ai: 'IA e 3D',
+        embedded: 'Embarcados e hardware',
+        ways: 'Jeito de trabalhar',
+      },
     },
   },
   signal: {

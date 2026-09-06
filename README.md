@@ -192,3 +192,29 @@ attribute comes with the node, or write the rule as `.parent :global(.child)`.
 Primary `#FF2D55`, sampled directly out of `Portfolio-2024.pdf` — which happens
 to be Apple's system pink, fitting for someone who came up through the Apple
 Developer Academy. Deep accent `#FF0635`.
+
+## The CV
+
+`apps/maykon/src/pages/cv.astro` is the CV as a page: one column, real text,
+standard section headings, no tables — the shape an applicant tracking system
+can parse. It reads the same `career.ts` the site's timeline does, so the CV and
+the page can never disagree about a date.
+
+`tools/build-cv.sh` prints that route to `public/cv-maykon-meneghel.pdf` with
+headless Chrome. It needs a built site, and the file it writes lands in
+`public/`, so the order is build, generate, build again:
+
+```sh
+npm run build && ./tools/build-cv.sh && npm run build
+```
+
+Two things that had to be got right and are easy to lose:
+
+- **No `letter-spacing` on the headings.** It renders beautifully and extracts
+  as `E D U C AT I O N`. Applicant tracking systems find their sections by
+  matching the word, so the heading has to survive copy and paste.
+- **Print from the built site, not the dev server.** The Astro dev toolbar
+  prints as a floating widget in the corner of page one.
+
+Verify a change with `pdftotext -layout` before shipping it — if the text does
+not come out clean there, no machine will read it either.

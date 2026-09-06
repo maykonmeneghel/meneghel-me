@@ -1,0 +1,138 @@
+---
+/**
+ * The CV, as the page an applicant tracking system wants: one column, real
+ * text, headings it recognises, no tables and no two-column layout — those get
+ * parsed as interleaved gibberish. It is also the source for the PDF, printed
+ * from this route by tools/build-cv.sh.
+ */
+import { careerItems, ventures, publications, skillGroups } from '../content/career';
+import { content } from '../content';
+
+const c = content.en;
+const EMAIL = 'maykonmeneghel@icloud.com';
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const when = (d: [number, number] | null) => (d ? `${MONTHS[d[1] - 1]} ${d[0]}` : 'Present');
+const ROLES = c.record.roles;
+
+const lanes = [
+  { id: 'industry', title: 'Experience' },
+  { id: 'venture',  title: 'Ventures' },
+  { id: 'research', title: 'Research' },
+  { id: 'education', title: 'Education' },
+] as const;
+
+const rows = (lane: string) =>
+  careerItems
+    .filter((i) => i.lane === lane)
+    .sort((a, b) => (b.start[0] * 12 + b.start[1]) - (a.start[0] * 12 + a.start[1]));
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Maykon Meneghel — Senior Full-Stack Engineer — CV</title>
+    <meta name="description" content="Senior Full-Stack Engineer. Agribusiness and financial markets. Firmware to production models." />
+    <meta name="robots" content="noindex" />
+    <style>
+      @page { size: A4; margin: 12mm 14mm; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #fff; color: #14161a;
+        font: 9.6pt/1.38 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .cv { max-width: 190mm; margin: 0 auto; }
+      h1 { font-size: 21pt; margin: 0 0 2pt; letter-spacing: -0.02em; }
+      .role { font-size: 11pt; color: #b3123a; font-weight: 600; margin: 0 0 6pt; }
+      .contact { font-size: 9pt; color: #3d434d; margin: 0 0 12pt; }
+      .contact a { color: #14161a; text-decoration: none; }
+      /* No letter-spacing. It renders beautifully and extracts as
+         "E D U C AT I O N", and an applicant tracking system finds its sections
+         by matching the word. The heading has to survive copy and paste. */
+      h2 {
+        font-size: 9.5pt; font-weight: 700; text-transform: uppercase;
+        color: #6a7180; margin: 11pt 0 5pt; padding-bottom: 2.5pt;
+        border-bottom: 0.6pt solid #ccd0d8;
+      }
+      .summary { margin: 0 0 2pt; text-align: justify; }
+      .item { margin: 0 0 5.5pt; break-inside: avoid; }
+      .item__head { display: flex; justify-content: space-between; gap: 10pt; align-items: baseline; }
+      .item__title { font-weight: 600; }
+      .item__when { font-size: 8.5pt; color: #6a7180; white-space: nowrap; }
+      .item__org { font-size: 9pt; color: #3d434d; }
+      .skill { margin: 0 0 4pt; }
+      .skill b { display: inline; font-weight: 600; }
+      .pub { margin: 0 0 5pt; }
+      .pub__meta { font-size: 8.5pt; color: #6a7180; }
+      ul { margin: 3pt 0 0; padding-left: 14pt; }
+      li { margin-bottom: 2pt; }
+      a { color: #14161a; }
+    </style>
+  </head>
+  <body>
+    <main class="cv">
+      <h1>Maykon Meneghel</h1>
+      <p class="role">Senior Full-Stack Engineer — Agribusiness &amp; Financial Markets</p>
+      <p class="contact">
+        Curitiba, Paraná, Brazil ·
+        <a href={`mailto:${EMAIL}`}>{EMAIL}</a> ·
+        <a href="https://www.linkedin.com/in/maykonmeneghel/">linkedin.com/in/maykonmeneghel</a> ·
+        <a href="https://github.com/maykonmeneghel">github.com/maykonmeneghel</a> ·
+        <a href="https://maykon.meneghel.me">maykon.meneghel.me</a>
+      </p>
+
+      <h2>Summary</h2>
+      <p class="summary">
+        Senior full-stack engineer with an M.Sc. in Bioengineering and a postgraduate
+        specialization in applied Artificial Intelligence. Twelve years across the whole
+        stack: embedded firmware and PCB design, MQTT and distributed backends in Node.js
+        and NestJS, Docker and Kubernetes on AWS, native iOS in Swift and cross-platform
+        in Flutter, and machine learning in PyTorch and TensorFlow. Twelve native iOS apps
+        shipped, one featured by Apple. COO and co-founder of Tradx, a trading platform
+        built from the strategy graph down to the execution engine. Currently working on
+        Gaussian Splatting and 3D reconstruction. Six peer-reviewed publications.
+      </p>
+
+      {lanes.map((lane) => (
+        <>
+          <h2>{lane.title}</h2>
+          {rows(lane.id).map((i) => (
+            <div class="item">
+              <div class="item__head">
+                <span class="item__title">{ROLES[i.id]}</span>
+                <span class="item__when">{when(i.start)} — {when(i.end)}</span>
+              </div>
+              <div class="item__org">{i.org}</div>
+            </div>
+          ))}
+        </>
+      ))}
+
+      <h2>Technical Skills</h2>
+      {skillGroups.map((g) => (
+        <p class="skill"><b>{c.record.skills.groups[g.id]}:</b> {g.items.join(', ')}</p>
+      ))}
+
+      <h2>Selected Publications</h2>
+      {publications.map((p) => (
+        <div class="pub">
+          <div>{c.record.publications.items[p.id]}</div>
+          <div class="pub__meta">
+            {p.year} · {p.venue}
+            {p.doi && <> · doi:{p.doi}</>}
+            {p.url && <> · {p.url.replace('https://', '')}</>}
+          </div>
+        </div>
+      ))}
+
+      <h2>Companies Founded</h2>
+      <p class="skill">
+        {ventures.map((v, i) => (
+          <>{i > 0 && ', '}{v.name} ({c.record.ventures.sectors[v.sector]})</>
+        ))}
+      </p>
+
+      <h2>Languages</h2>
+      <p class="skill">Portuguese (native) · English (professional) · Spanish (professional)</p>
+    </main>
+  </body>
+</html>

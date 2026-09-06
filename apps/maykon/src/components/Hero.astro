@@ -17,7 +17,7 @@ const [first, ...rest] = hero.name.split(' ');
 
     <div class="hero__actions">
       <a class="btn btn--primary" href="#chapters">{hero.cta} ↓</a>
-      <a class="btn" href="https://meneghel.me">meneghel.me</a>
+      <a class="btn" href="/cv-maykon-meneghel.pdf" download>{hero.cv}</a>
       {hero.links.map((l) => (
         <a class="btn" href={l.href} rel="noopener" target="_blank">{l.label} ↗</a>
       ))}

@@ -97,3 +97,52 @@ export const press = [
 /** Convert [year, month] to a decimal year for positioning. */
 export const toDecimal = ([y, m]: [number, number]) => y + (m - 1) / 12;
 export const NOW: [number, number] = [2026, 9];
+
+/**
+ * The skill list, grouped the way a recruiter scans and an ATS parses.
+ *
+ * Every entry is either credited by a chapter on this site or verifiable in
+ * this repository — the Terraform under infra/ is AWS with GitHub OIDC, the
+ * site and its game models are TypeScript, the extractors are Python, and the
+ * master's simulator on GitHub is MATLAB. Nothing here is aspirational.
+ */
+export interface SkillGroup { id: string; items: string[] }
+
+export const skillGroups: SkillGroup[] = [
+  { id: 'languages', items: [
+    'TypeScript', 'JavaScript', 'Python', 'Swift', 'Dart', 'Kotlin', 'C', 'C++', 'MATLAB', 'SQL',
+  ] },
+  { id: 'backend', items: [
+    'Node.js', 'NestJS', 'Express', 'REST APIs', 'WebSockets', 'Microservices',
+    'Distributed systems', 'System design', 'Event-driven architecture', 'API design',
+  ] },
+  { id: 'data', items: [
+    'MongoDB', 'PostgreSQL', 'Redis', 'BullMQ', 'Database design', 'Indexing and query planning',
+    'Time series', 'Data pipelines',
+  ] },
+  { id: 'cloud', items: [
+    'AWS', 'Amazon S3', 'CloudFront', 'Route 53', 'AWS IoT Core', 'IAM', 'EC2',
+    'Docker', 'Kubernetes', 'Terraform', 'Infrastructure as Code', 'GitHub Actions',
+    'CI/CD', 'OIDC', 'Observability', 'Scalability', 'Linux',
+  ] },
+  { id: 'frontend', items: [
+    'Swift', 'SwiftUI', 'Flutter', 'Dart', 'Kotlin', 'iOS', 'Android', 'App Store Connect',
+    'Clean Architecture', 'Astro', 'HTML', 'CSS', 'Accessibility',
+  ] },
+  { id: 'ai', items: [
+    'Machine learning', 'PyTorch', 'TensorFlow', 'Keras', 'GANs', 'LSTM', 'Deep learning',
+    'Feature selection', 'PCA', 'XGBoost', 'Gaussian Splatting', '3DGS', 'CUDA',
+    'Photogrammetry', 'Computer vision',
+  ] },
+  { id: 'embedded', items: [
+    'Embedded C', 'ESP32', 'PIC18F4550', 'ATmega', 'PWM', 'ADC', 'MQTT', 'IoT',
+    'PCB design', 'EAGLE', 'Altium', 'SolidWorks', 'CAD', '3D printing', 'Design for manufacturing',
+  ] },
+  { id: 'ways', items: [
+    'Git', 'Code review', 'Unit testing', 'Technical leadership', 'Mentoring',
+    'Product engineering', 'Backtesting', 'Paper trading',
+  ] },
+];
+
+/** Flat, de-duplicated, for schema.org and the CV. */
+export const allSkills = [...new Set(skillGroups.flatMap((g) => g.items))];

@@ -56,7 +56,9 @@ export interface RecordSection {
   /** The line the page ends on. */
   closing: { line: string; note: string };
   /** Where a convinced reader goes next. The page had nowhere at all before. */
-  contact: { title: string; lede: string; linkedin: string; github: string };
+  contact: { title: string; lede: string; linkedin: string; github: string; email: string; cv: string };
+  /** Grouped skills. Named here, listed in career.ts. */
+  skills: { title: string; lede: string; groups: Record<string, string> };
 }
 
 export interface SignalGame {
@@ -320,6 +322,8 @@ export interface Content {
     proof: string[];
     /** Where a recruiter clicks next. */
     links: { label: string; href: string }[];
+    /** Label on the CV download, which replaced a link back to this same domain. */
+    cv: string;
     cta: string;
     scrollHint: string;
     /** Terminal boot lines rendered one by one. */

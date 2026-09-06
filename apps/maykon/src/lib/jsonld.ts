@@ -7,7 +7,7 @@
  * is already visible on the page — this restates it in a form a machine does
  * not have to infer from "It starts with a single pin".
  */
-import { careerItems, publications, ventures } from '../content/career';
+import { careerItems, publications, ventures, allSkills } from '../content/career';
 import type { Content, Locale } from '../content';
 
 export const PROFILES = [
@@ -15,9 +15,9 @@ export const PROFILES = [
   'https://github.com/maykonmeneghel',
 ] as const;
 
-/** Every technology the chapters credit, de-duplicated. No invention. */
+/** The grouped list plus everything the chapters credit, de-duplicated. */
 export function skillsFrom(c: Content): string[] {
-  return [...new Set(c.chapters.flatMap((ch) => ch.stack))];
+  return [...new Set([...allSkills, ...c.chapters.flatMap((ch) => ch.stack)])];
 }
 
 export function personJsonLd(c: Content, locale: Locale, site: string, url: string) {
@@ -31,6 +31,7 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
     jobTitle: c.hero.kicker.split('·')[0].trim(),
     description: c.meta.description,
     url: site + '/',
+    email: 'mailto:maykonmeneghel@icloud.com',
     sameAs: [...PROFILES],
     knowsAbout: skillsFrom(c),
     knowsLanguage: ['pt-BR', 'en', 'es'],
