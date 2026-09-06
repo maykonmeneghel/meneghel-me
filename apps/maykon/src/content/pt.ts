@@ -224,6 +224,12 @@ export const pt: Content = {
       line: 'Full stack sênior, do ponto de solda ao modelo em produção — no agro e no mercado financeiro.',
       note: 'A placa, o firmware, o broker, o banco, o cluster, o modelo e a tela do celular. Ainda não conheci a outra pessoa que faz as duas pontas dos dois.',
     },
+    contact: {
+      title: 'Fale comigo',
+      lede: 'Se alguma coisa aqui tem a cara de um problema que você tem, eu quero ouvir. O jeito mais rápido de me achar é o LinkedIn; o código está no GitHub.',
+      linkedin: 'Falar comigo no LinkedIn',
+      github: 'Ver meu código',
+    },
   },
   signal: {
     levels: ['local', 'área', 'dispositivo', 'medida'],

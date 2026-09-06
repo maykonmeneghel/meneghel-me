@@ -224,6 +224,12 @@ export const en: Content = {
       line: 'Senior full-stack, from the solder joint to the model in production — in agribusiness and in financial markets.',
       note: 'The board, the firmware, the broker, the database, the cluster, the model and the screen on the phone. I have yet to meet the other person who does both ends of both.',
     },
+    contact: {
+      title: 'Talk to me',
+      lede: 'If any of this is the shape of a problem you have, I would like to hear about it. The fastest way to reach me is LinkedIn; the code is on GitHub.',
+      linkedin: 'Message me on LinkedIn',
+      github: 'Read my code',
+    },
   },
   signal: {
     levels: ['site', 'area', 'device', 'reading'],

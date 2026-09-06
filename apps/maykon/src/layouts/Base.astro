@@ -4,9 +4,15 @@ import '../styles/site.css';
 import type { Locale } from '../content';
 import { locales, localeNames, prefix } from '../content';
 
+import { content } from '../content';
+import { personJsonLd } from '../lib/jsonld';
+
 interface Props { locale: Locale; title: string; description: string }
 const { locale, title, description } = Astro.props;
 const site = Astro.site?.origin ?? 'https://maykon.meneghel.me';
+const url = `${site}${prefix(locale)}/`;
+const jsonLd = personJsonLd(content[locale], locale, site, url);
+const ogLocale = locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_ES' : 'en_US';
 ---
 <html lang={locale === 'en' ? 'en' : locale === 'pt' ? 'pt-BR' : 'es'}>
   <head>
@@ -19,10 +25,26 @@ const site = Astro.site?.origin ?? 'https://maykon.meneghel.me';
       <link rel="alternate" hreflang={l} href={`${site}${prefix(l)}/`} />
     ))}
     <link rel="alternate" hreflang="x-default" href={`${site}/`} />
+    <meta name="author" content="Maykon Meneghel" />
     <meta property="og:type" content="profile" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:site_name" content="Maykon Meneghel" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:image" content={`${site}/og.png`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${site}/og.png`} />
     <meta name="theme-color" content="#08090c" />
+
+    <!-- Stated as data, because a screening model will not infer a skill list
+         from a chapter called "It starts with a single pin". -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

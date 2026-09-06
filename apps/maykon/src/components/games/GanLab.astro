@@ -26,7 +26,8 @@ const { mind } = Astro.props;
         <span class="gn__slot mono">{mind.slotA}</span>
         <span class="gn__reading mono">{mind.reading}</span>
       </span>
-      <canvas class="gn__chart" data-chart="a" width="720" height="380"></canvas>
+      <canvas class="gn__chart" data-chart="a" width="720" height="380"
+        role="img" aria-label={mind.reading}></canvas>
       <span class="gn__verdictline mono" data-verdict-a>&nbsp;</span>
     </button>
     <button type="button" class="gn__panel" data-slot="b" aria-label={`${mind.pick} ${mind.slotB}`}>
@@ -34,7 +35,8 @@ const { mind } = Astro.props;
         <span class="gn__slot mono">{mind.slotB}</span>
         <span class="gn__reading mono">{mind.reading}</span>
       </span>
-      <canvas class="gn__chart" data-chart="b" width="720" height="380"></canvas>
+      <canvas class="gn__chart" data-chart="b" width="720" height="380"
+        role="img" aria-label={mind.reading}></canvas>
       <span class="gn__verdictline mono" data-verdict-b>&nbsp;</span>
     </button>
   </div>

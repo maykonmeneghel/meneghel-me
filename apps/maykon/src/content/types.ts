@@ -55,6 +55,8 @@ export interface RecordSection {
   press: { title: string; items: Record<string, string> };
   /** The line the page ends on. */
   closing: { line: string; note: string };
+  /** Where a convinced reader goes next. The page had nowhere at all before. */
+  contact: { title: string; lede: string; linkedin: string; github: string };
 }
 
 export interface SignalGame {

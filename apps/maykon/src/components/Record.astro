@@ -175,6 +175,17 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
       <span class="closing__line">{record.closing.line}</span>
       <span class="closing__note">{record.closing.note}</span>
     </p>
+
+    <div class="contact" id="contact">
+      <h3 class="contact__title">{record.contact.title}</h3>
+      <p class="contact__lede">{record.contact.lede}</p>
+      <div class="contact__links">
+        <a class="btn btn--primary" href="https://www.linkedin.com/in/maykonmeneghel/"
+           rel="noopener" target="_blank">{record.contact.linkedin} ↗</a>
+        <a class="btn" href="https://github.com/maykonmeneghel"
+           rel="noopener" target="_blank">{record.contact.github} ↗</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -190,6 +201,12 @@ const ticks = [2012, 2014, 2016, 2018, 2020, 2022, 2024, 2026];
     color: var(--fg-100); text-wrap: balance; max-width: 62ch;
   }
   .closing__note { font-size: var(--step-0); color: var(--fg-500); }
+
+  /* The page ended on a statement and gave the reader nowhere to go. */
+  .contact { margin-top: 3rem; }
+  .contact__title { margin: 0 0 .6rem; font-size: var(--step-1); font-weight: 500; color: var(--fg-100); }
+  .contact__lede { margin: 0 0 1.4rem; font-size: var(--step-0); color: var(--fg-500); }
+  .contact__links { display: flex; flex-wrap: wrap; gap: .6rem; }
 
   .sr-only {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
