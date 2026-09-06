@@ -12,25 +12,29 @@ import IndexLab from './games/IndexLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
 import GlassLab from './games/GlassLab.astro';
+import ThreadLab from './games/ThreadLab.astro';
 import FlowLab from './games/FlowLab.astro';
 import SplatLab from './games/SplatLab.astro';
 import Record from './Record.astro';
 import type { Locale } from '../content';
-import { content } from '../content';
+import { content, prefix } from '../content';
+import { mainChapters } from '../lib/chapters';
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = content[locale];
+const chapters = mainChapters(c.chapters);
 // The eyebrow reads "12 · RECORD". Both halves come from it, so adding a
 // chapter renumbers the rail without anyone having to remember to.
-const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) => part.trim());
+const [, recordCodename] = c.record.eyebrow.split('·').map((part) => part.trim());
+const recordNumber = String(chapters.length + 1).padStart(2, '0');
 ---
 <Base locale={locale} title={c.meta.title} description={c.meta.description}>
   <Hero hero={c.hero} />
-  <Rail chapters={c.chapters} extra={{ id: recordNumber, codename: recordCodename, slug: 'record' }} />
+  <Rail chapters={chapters} extra={{ id: recordNumber, codename: recordCodename, slug: 'record' }} />
 
   <main id="chapters">
-    {c.chapters.map((chapter) => (
+    {chapters.map((chapter) => (
       <>
       {c.acts.filter((a) => a.before === chapter.slug).map((act) => (
         <div class="act">
@@ -42,7 +46,9 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
         </div>
       ))}
       <Chapter chapter={chapter} learned={c.ui.learned}>
-        {chapter.slug === 'silicon' ? (
+        {chapter.slug === 'thread' ? (
+          <ThreadLab thread={c.thread} />
+        ) : chapter.slug === 'silicon' ? (
           <PwmLab ui={c.ui} />
         ) : chapter.slug === 'signal' ? (
           <MqttBench signal={c.signal} />
@@ -74,6 +80,34 @@ const [recordNumber, recordCodename] = c.record.eyebrow.split('·').map((part) =
       </>
     ))}
 
-    <Record record={c.record} />
+    <aside class="plus">
+      <div class="plus__inner">
+        <p class="plus__kicker mono">{c.hardwarePage.kicker}</p>
+        <h2 class="plus__title">{c.hardwarePage.heading}</h2>
+        <p class="plus__lede">{c.hardwarePage.lede}</p>
+        <a class="btn btn--primary" href={`${prefix(locale)}/hardware/`}>{c.ui.hardwareCta} →</a>
+      </div>
+    </aside>
+
+    <Record record={c.record} number={recordNumber} />
   </main>
 </Base>
+
+<style>
+  /* The hardware work still deserves a door, just not the front one. */
+  .plus {
+    padding: clamp(4rem, 11vh, 8rem) var(--gutter);
+    border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--brand-500) 5%, transparent), transparent 65%);
+  }
+  .plus__inner { max-width: 1080px; margin-inline: auto; }
+  .plus__kicker {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--brand-500); margin: 0 0 .9rem;
+  }
+  .plus__title {
+    font-size: var(--step-2); font-weight: 600; letter-spacing: -0.02em;
+    color: var(--fg-100); margin: 0 0 1rem; text-wrap: balance;
+  }
+  .plus__lede { font-size: var(--step-0); color: var(--fg-500); margin: 0 0 1.5rem; }
+</style>

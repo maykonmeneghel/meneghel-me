@@ -1,0 +1,283 @@
+---
+import type { Content } from '../../content';
+interface Props { thread: Content['thread'] }
+const { thread } = Astro.props;
+const strategies = ['sync', 'await', 'offMain'] as const;
+---
+<div class="th" data-th
+  data-copy={JSON.stringify(thread.strategies)}
+  data-l-cancel-on={thread.cancelOn}
+  data-l-cancel-off={thread.cancelOff}
+>
+  <p class="th__lede">{thread.lede}</p>
+
+  <div class="th__pick">
+    <span class="th__pickk mono">{thread.pickLabel}</span>
+    {strategies.map((s, i) => (
+      <button type="button" class="btn th__s" data-strategy={s} aria-pressed={i === 0 ? 'true' : 'false'}>
+        {thread.strategies[s].name}
+      </button>
+    ))}
+  </div>
+
+  <div class="th__stage">
+    <div class="th__phone">
+      <div class="th__screen">
+        <div class="th__list" data-list></div>
+        <div class="th__frozen" data-frozen hidden><span class="mono">{thread.frozen}</span></div>
+      </div>
+      <span class="th__phonelabel mono">{thread.device}</span>
+    </div>
+
+    <div class="th__meter">
+      <div class="th__meterhead">
+        <span class="th__meterk mono">{thread.frameTimes}</span>
+        <span class="th__budget mono">{thread.budget}</span>
+      </div>
+      <canvas class="th__graph" data-graph width="900" height="240"
+        role="img" aria-label={thread.frameTimes}></canvas>
+      <p class="th__legend mono">
+        <i class="th__key th__key--ok"></i>{thread.onBudget}
+        <i class="th__key th__key--bad"></i>{thread.dropped}
+      </p>
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{thread.worst}</span>
+      <span class="readout__v" data-out="worst">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{thread.droppedFrames}</span>
+      <span class="readout__v" data-out="janky">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{thread.jank}</span>
+      <span class="readout__v" data-out="jank">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{thread.wasted}</span>
+      <span class="readout__v" data-out="wasted">—</span>
+    </div>
+  </div>
+
+  <p class="th__hint" data-hint>{thread.strategies.sync.hint}</p>
+
+  <div class="th__leave">
+    <button type="button" class="btn" data-leave>{thread.leave}</button>
+    <label class="th__toggle">
+      <input type="checkbox" data-cancel checked />
+      <span data-cancel-label>{thread.cancelOn}</span>
+    </label>
+  </div>
+
+  <div class="th__code">
+    <div class="th__col">
+      <span class="th__colk mono">Swift</span>
+      <pre class="th__pre mono" data-code="swift"></pre>
+    </div>
+    <div class="th__col">
+      <span class="th__colk mono">Flutter</span>
+      <pre class="th__pre mono" data-code="dart"></pre>
+    </div>
+  </div>
+</div>
+
+<style>
+  .th__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; }
+
+  .th__pick { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: 1.4rem; }
+  .th__pickk { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+
+  .th__stage { display: grid; grid-template-columns: 190px 1fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 720px) { .th__stage { grid-template-columns: 1fr; } }
+
+  .th__phone { display: grid; gap: .5rem; justify-items: center; }
+  .th__screen {
+    position: relative; width: 180px; height: 320px; overflow: hidden;
+    border-radius: 22px; border: 1px solid var(--line-2); background: #06070a;
+  }
+  .th__list { position: absolute; inset: 0; will-change: transform; }
+  /* Rows are built by script, so the scoped attribute never lands on them. */
+  .th__list :global(i) {
+    display: block; height: 34px; margin: 6px 8px; border-radius: 6px;
+    background: var(--bg-600); opacity: .35;
+  }
+  .th__list :global(i.is-loaded) { opacity: 1; background: color-mix(in oklab, var(--ok) 22%, var(--bg-600)); }
+  .th__frozen {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: color-mix(in oklab, var(--fail) 18%, transparent);
+  }
+  .th__frozen span { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fail); }
+  .th__phonelabel { font-size: 10px; color: var(--fg-700); }
+
+  .th__meterhead { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .th__meterk, .th__budget { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
+  .th__graph {
+    width: 100%; height: auto; display: block; margin-top: .5rem;
+    background: #06070a; border: 1px solid var(--line); border-radius: 8px;
+  }
+  .th__legend { display: flex; align-items: center; gap: .4rem; font-size: 10px; color: var(--fg-700); margin: .55rem 0 0; }
+  .th__key { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .th__key--ok { background: var(--ok); }
+  .th__key--bad { background: var(--fail); margin-left: .9rem; }
+
+  .th__hint { margin-top: 1rem; font-size: var(--step-body); color: var(--fg-300); min-height: 4em; }
+  .th__leave { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 1rem; }
+  .th__toggle { display: inline-flex; align-items: center; gap: .5rem; font-size: var(--step--1); color: var(--fg-500); }
+
+  .th__code { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.75rem; }
+  @media (max-width: 720px) { .th__code { grid-template-columns: 1fr; } }
+  .th__colk { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .th__pre {
+    margin: .5rem 0 0; padding: .8rem .9rem; overflow-x: auto;
+    background: var(--bg-800); border: 1px solid var(--line); border-radius: 8px;
+    font-size: 11px; line-height: 1.65; color: var(--fg-300); white-space: pre;
+  }
+</style>
+
+<script>
+  import { run, rows, FRAME_BUDGET_MS, type Strategy } from './frame';
+
+  const root = document.querySelector<HTMLElement>('[data-th]');
+  if (root) {
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const graph = root.querySelector<HTMLCanvasElement>('[data-graph]')!;
+    const ctx = graph.getContext('2d')!;
+    const list = root.querySelector<HTMLElement>('[data-list]')!;
+    const frozen = root.querySelector<HTMLElement>('[data-frozen]')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const cancelBox = root.querySelector<HTMLInputElement>('[data-cancel]')!;
+    const cancelLabel = root.querySelector<HTMLElement>('[data-cancel-label]')!;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-strategy]')];
+
+    const css = getComputedStyle(document.documentElement);
+    const OK = css.getPropertyValue('--ok').trim() || '#34d399';
+    const BAD = css.getPropertyValue('--fail').trim() || '#f43f5e';
+    const LINE = css.getPropertyValue('--fg-700').trim() || '#818a9c';
+
+    const COPY = JSON.parse(root.dataset.copy || '{}');
+    const ITEMS = rows();
+    const ROWS = 9;
+
+    let strategy: Strategy = 'sync';
+    let leaveAt = Infinity;
+    let result = run({ strategy, items: ITEMS });
+
+    // The rows the phone shows.
+    for (let i = 0; i < ROWS; i++) list.appendChild(document.createElement('i'));
+    const cells = [...list.children] as HTMLElement[];
+
+    function draw(playhead: number) {
+      const { width: w, height: h } = graph;
+      ctx.clearRect(0, 0, w, h);
+      const pad = 10;
+      // Anything above four budgets is clipped, so one 280 ms frame does not
+      // flatten every other bar into nothing.
+      const cap = FRAME_BUDGET_MS * 4;
+      const n = result.samples.length;
+      const bw = (w - pad * 2) / n;
+
+      ctx.strokeStyle = 'rgba(255,255,255,.10)';
+      ctx.lineWidth = 1;
+      const budgetY = h - pad - (FRAME_BUDGET_MS / cap) * (h - pad * 2);
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(pad, budgetY); ctx.lineTo(w - pad, budgetY); ctx.stroke();
+      ctx.setLineDash([]);
+
+      result.samples.forEach((s, i) => {
+        const clipped = Math.min(s.ms, cap);
+        const bh = (clipped / cap) * (h - pad * 2);
+        ctx.fillStyle = i > playhead ? 'rgba(255,255,255,.07)' : s.janky ? BAD : OK;
+        ctx.fillRect(pad + i * bw, h - pad - bh, Math.max(bw - 1, 1), bh);
+        if (s.ms > cap && i <= playhead) {
+          ctx.fillStyle = BAD;
+          ctx.fillRect(pad + i * bw, pad - 4, Math.max(bw - 1, 1), 3);
+        }
+      });
+
+      ctx.fillStyle = LINE;
+      ctx.font = '10px ui-monospace, monospace';
+      ctx.fillText(`${FRAME_BUDGET_MS.toFixed(1)} ms`, pad + 4, budgetY - 5);
+    }
+
+    let raf = 0;
+    let frame = 0;
+    let visible = false;
+    // A chapter about frame budgets has no business burning frames while it is
+    // scrolled off screen, or while somebody has asked for less motion.
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function paintFinal() {
+      const last = result.samples[result.samples.length - 1];
+      cells.forEach((c, i) => c.classList.toggle('is-loaded', i < last.done));
+      frozen.hidden = true;
+      list.style.transform = 'translateY(0)';
+      draw(result.samples.length);
+    }
+
+    function stop() { cancelAnimationFrame(raf); raf = 0; }
+
+    function play() {
+      stop();
+      if (still || !visible) { paintFinal(); return; }
+      frame = 0;
+      let scroll = 0;
+      const step = () => {
+        const s = result.samples[frame];
+        if (!s) return;
+        // The list only advances when the frame had room to advance it.
+        if (!s.janky) scroll += 1.6;
+        list.style.transform = `translateY(${-(scroll % 40)}px)`;
+        cells.forEach((c, i) => c.classList.toggle('is-loaded', i < s.done));
+        frozen.hidden = s.ms < FRAME_BUDGET_MS * 4;
+        draw(frame);
+        frame++;
+        raf = requestAnimationFrame(frame < result.samples.length ? step : play);
+      };
+      raf = requestAnimationFrame(step);
+    }
+
+    function render() {
+      result = run({ strategy, items: ITEMS, leaveAfterFrames: leaveAt, cancelOnLeave: cancelBox.checked });
+      out('worst').textContent = `${result.worstMs.toFixed(1)} ms`;
+      out('janky').textContent = String(result.janky);
+      out('jank').textContent = `${result.jankPercent}%`;
+      out('wasted').textContent = `${result.wastedMs.toFixed(0)} ms`;
+      hint.textContent = COPY[strategy]?.hint ?? '';
+      root.querySelector<HTMLElement>('[data-code="swift"]')!.textContent = COPY[strategy]?.swift ?? '';
+      root.querySelector<HTMLElement>('[data-code="dart"]')!.textContent = COPY[strategy]?.dart ?? '';
+      play();
+    }
+
+    for (const b of buttons) {
+      b.addEventListener('click', () => {
+        strategy = b.dataset.strategy as Strategy;
+        for (const o of buttons) o.setAttribute('aria-pressed', String(o === b));
+        leaveAt = Infinity;
+        render();
+      });
+    }
+    root.querySelector('[data-leave]')!.addEventListener('click', () => {
+      leaveAt = leaveAt === Infinity ? 6 : Infinity;
+      render();
+    });
+    cancelBox.addEventListener('change', () => {
+      cancelLabel.textContent = cancelBox.checked ? root.dataset.lCancelOn! : root.dataset.lCancelOff!;
+      render();
+    });
+
+    let started = false;
+    const io = new IntersectionObserver((entries) => {
+      visible = entries.some((x) => x.isIntersecting);
+      if (visible && !started) { started = true; render(); }
+      else if (visible) play();
+      else stop();
+    }, { rootMargin: '120px' });
+    io.observe(root);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else if (visible) play();
+    });
+  }
+</script>

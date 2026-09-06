@@ -1,0 +1,82 @@
+---
+/**
+ * The hardware years, on their own page.
+ *
+ * These four chapters used to open the site, and they were the reason a reader
+ * came away thinking "IoT engineer". They are still worth playing — a soil
+ * probe designed, routed, machined and put in the ground is not a common thing
+ * to have done — but they belong beside the work, not in front of it.
+ */
+import Base from '../layouts/Base.astro';
+import Rail from './Rail.astro';
+import Chapter from './Chapter.astro';
+import PwmLab from './games/PwmLab.astro';
+import BoardLab from './games/BoardLab.astro';
+import PartLab from './games/PartLab.astro';
+import MqttBench from './games/MqttBench.astro';
+import type { Locale } from '../content';
+import { content, prefix } from '../content';
+import { hardwareChapters } from '../lib/chapters';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = content[locale];
+const chapters = hardwareChapters(c.chapters);
+const h = c.hardwarePage;
+---
+<Base locale={locale} title={h.title} description={h.description}>
+  <header class="hw">
+    <div class="hw__inner">
+      <p class="hw__back mono"><a href={`${prefix(locale)}/`}>← {h.back}</a></p>
+      <p class="hw__kicker mono">{h.kicker}</p>
+      <h1 class="hw__title">{h.heading}</h1>
+      <p class="hw__lede">{h.lede}</p>
+    </div>
+  </header>
+
+  <Rail chapters={chapters} />
+
+  <main id="chapters">
+    {chapters.map((chapter) => (
+      <Chapter chapter={chapter} learned={c.ui.learned}>
+        {chapter.slug === 'silicon' ? (
+          <PwmLab ui={c.ui} />
+        ) : chapter.slug === 'copper' ? (
+          <BoardLab copper={c.copper} />
+        ) : chapter.slug === 'steel' ? (
+          <PartLab steel={c.steel} />
+        ) : chapter.slug === 'signal' ? (
+          <MqttBench signal={c.signal} />
+        ) : (
+          <div class="wip"><span>{c.ui.wip}</span></div>
+        )}
+      </Chapter>
+    ))}
+
+    <section class="hw__out">
+      <div class="hw__inner">
+        <p class="hw__outlede">{h.outro}</p>
+        <a class="btn btn--primary" href={`${prefix(locale)}/`}>{h.backCta} →</a>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .hw { padding: clamp(5rem, 14vh, 9rem) var(--gutter) clamp(2rem, 6vh, 4rem); }
+  .hw__inner { max-width: 1080px; margin-inline: auto; }
+  .hw__back { font-size: var(--step--1); margin: 0 0 2rem; }
+  .hw__back a { color: var(--fg-500); text-decoration: none; }
+  .hw__back a:hover { color: var(--brand-500); }
+  .hw__kicker {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--brand-500); margin: 0 0 .9rem;
+  }
+  .hw__title {
+    font-size: var(--step-3); font-weight: 700; letter-spacing: -0.03em;
+    margin: 0 0 1.2rem; color: var(--fg-100); text-wrap: balance;
+  }
+  .hw__lede { font-size: var(--step-1); color: var(--fg-300); margin: 0; max-width: var(--measure); }
+  .hw__out { padding: clamp(4rem, 10vh, 7rem) var(--gutter); border-top: 1px solid var(--line); }
+  .hw__outlede { font-size: var(--step-0); color: var(--fg-500); margin: 0 0 1.4rem; }
+</style>

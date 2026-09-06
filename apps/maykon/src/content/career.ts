@@ -109,11 +109,27 @@ export const NOW: [number, number] = [2026, 9];
 export interface SkillGroup { id: string; items: string[] }
 
 export const skillGroups: SkillGroup[] = [
+  { id: 'ios', items: [
+    'Swift', 'SwiftUI', 'UIKit', 'Swift Concurrency', 'async/await', 'actors', 'Combine',
+    'MVVM', 'Coordinators', 'Clean Architecture', 'Dependency injection',
+    'SwiftData', 'Core Data', 'URLSession', 'Swift Package Manager',
+    'XCTest', 'XCUITest', 'Instruments', 'Xcode', 'App Store Connect', 'TestFlight',
+    'VoiceOver', 'Dynamic Type', 'Localization', 'Push notifications', 'Deep linking',
+  ] },
+  { id: 'cross', items: [
+    'Flutter', 'Dart', 'Riverpod', 'Bloc', 'Provider', 'Kotlin', 'Jetpack Compose', 'Android',
+    'Platform channels', 'Offline-first', 'State management', 'Widget testing',
+  ] },
+  { id: 'release', items: [
+    'fastlane', 'Xcode Cloud', 'GitHub Actions', 'CI/CD', 'App Store review', 'Phased release',
+    'Firebase Crashlytics', 'Crash-free rate', 'Analytics', 'Feature flags', 'Semantic versioning',
+  ] },
   { id: 'languages', items: [
-    'TypeScript', 'JavaScript', 'Python', 'Swift', 'Dart', 'Kotlin', 'C', 'C++', 'MATLAB', 'SQL',
+    'Swift', 'Dart', 'Kotlin', 'Java', 'TypeScript', 'JavaScript', 'Python', 'C', 'C++', 'MATLAB', 'SQL',
   ] },
   { id: 'backend', items: [
-    'Node.js', 'NestJS', 'Express', 'REST APIs', 'WebSockets', 'Microservices',
+    'Node.js', 'NestJS', 'Express', 'Java', 'REST APIs', 'WebSockets', 'Microservices',
+    'OAuth 2.0', 'JWT', 'API versioning',
     'Distributed systems', 'System design', 'Event-driven architecture', 'API design',
   ] },
   { id: 'data', items: [
@@ -126,8 +142,7 @@ export const skillGroups: SkillGroup[] = [
     'CI/CD', 'OIDC', 'Observability', 'Scalability', 'Linux',
   ] },
   { id: 'frontend', items: [
-    'Swift', 'SwiftUI', 'Flutter', 'Dart', 'Kotlin', 'iOS', 'Android', 'App Store Connect',
-    'Clean Architecture', 'Astro', 'HTML', 'CSS', 'Accessibility',
+    'Astro', 'HTML', 'CSS', 'Accessibility', 'Design systems', 'Responsive layout',
   ] },
   { id: 'ai', items: [
     'Machine learning', 'PyTorch', 'TensorFlow', 'Keras', 'GANs', 'LSTM', 'Deep learning',

@@ -9,9 +9,16 @@ export interface Act {
   lede: string;
 }
 
+/** 'hardware' lives on its own page; the rest are the main narrative. */
+export type Track = 'mobile' | 'platform' | 'ai' | 'hardware';
+
 export interface Chapter {
-  /** Two-digit index shown in the rail, e.g. "01". */
-  id: string;
+  /** Which page and which act this chapter belongs to. The number shown in the
+   *  rail is derived from the order within a track, not stored, so reordering a
+   *  chapter never means renumbering the ones around it. */
+  track: Track;
+  /** Filled in at render time from the chapter's position. */
+  id?: string;
   /** What this chapter is about and when it happened, e.g. "Tradx · 2022 → today".
    *  The page reads as a timeline whether or not it is one, so every chapter says. */
   era: string;
@@ -107,6 +114,32 @@ export interface SwarmGame {
   strained: string;
   failing: string;
   wasteful: string;
+}
+
+export interface ThreadStrategy {
+  name: string;
+  hint: string;
+  swift: string;
+  dart: string;
+}
+
+export interface ThreadGame {
+  lede: string;
+  pickLabel: string;
+  device: string;
+  frozen: string;
+  frameTimes: string;
+  budget: string;
+  onBudget: string;
+  dropped: string;
+  worst: string;
+  droppedFrames: string;
+  jank: string;
+  wasted: string;
+  leave: string;
+  cancelOn: string;
+  cancelOff: string;
+  strategies: { sync: ThreadStrategy; await: ThreadStrategy; offMain: ThreadStrategy };
 }
 
 export interface LedgerGame {
@@ -312,6 +345,11 @@ export interface Content {
     /** Terminal boot lines rendered one by one. */
     boot: string[];
   };
+  /** Copy for the hardware page, which the main narrative links out to. */
+  hardwarePage: {
+    title: string; description: string; back: string; kicker: string;
+    heading: string; lede: string; outro: string; backCta: string;
+  };
   chapters: Chapter[];
   acts: Act[];
   record: RecordSection;
@@ -319,6 +357,7 @@ export interface Content {
   swarm: SwarmGame;
   mind: MindGame;
   ledger: LedgerGame;
+  thread: ThreadGame;
   service: ServiceGame;
   copper: CopperGame;
   steel: SteelGame;
