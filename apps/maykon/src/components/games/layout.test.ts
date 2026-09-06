@@ -1,5 +1,5 @@
 import {
-  DEFAULTS, TRIALS, evaluate, survives, score, stacks, targetHeight,
+  DEFAULTS, TRIALS, STATES, evaluate, survives, score, stacks, targetHeight,
   type Conditions, type Strategy,
 } from './layout.ts';
 
@@ -18,8 +18,27 @@ for (const s of ['fixed', 'adaptive'] as const) {
 }
 
 // --- and then the six conditions a real user arrives with ---
-eq(score('fixed', DEFAULTS), 1, 'the fixed row survives exactly one of the seven — the one it was drawn for');
-eq(score('adaptive', DEFAULTS), TRIALS.length, 'the adaptive one survives all seven');
+eq(score('fixed', DEFAULTS), 1, 'the fixed row survives exactly one of the nine — the one it was drawn for');
+eq(score('adaptive', DEFAULTS), TRIALS.length, 'the adaptive one survives all nine');
+
+// --- the three views nobody draws ---
+// This is the axis that actually separates the two builds. A comp shows the
+// content state; loading, empty and error are left to whoever builds it.
+eq(STATES, ['loading', 'empty', 'error', 'content'], 'a screen owes four views, not one');
+for (const state of ['loading', 'empty', 'error'] as const) {
+  const c: Conditions = { ...DEFAULTS, state };
+  check(!survives(c, 'fixed'), `the comp build has no ${state} view`, ids(c, 'fixed').join(', '));
+  eq(evaluate(c, 'adaptive'), [], `the other one draws ${state}`);
+}
+eq(ids({ ...DEFAULTS, state: 'loading' }, 'fixed'), ['no-skeleton'],
+  'loading renders the same card with empty labels, which reads as a bug');
+eq(ids({ ...DEFAULTS, state: 'empty' }, 'fixed'), ['no-empty-state'],
+  'and empty renders a blank card with a chevron that leads nowhere');
+
+// A state failure is reported on its own: there is no point telling somebody
+// their title is truncated on a screen that is showing a skeleton.
+eq(evaluate({ ...DEFAULTS, state: 'loading', fontScale: 3.1, rtl: true }, 'fixed').length, 1,
+  'a missing view is one problem, not a pile of layout ones');
 
 for (const t of TRIALS.slice(1)) {
   const c = t.apply(DEFAULTS);
@@ -35,7 +54,7 @@ eq(ids({ ...DEFAULTS, rtl: true }, 'fixed'), ['mirrored-wrong'],
   'a right-to-left locale leaves the chevron pointing the wrong way');
 eq(ids({ ...DEFAULTS, hasImage: false }, 'fixed'), ['image-hole'],
   'an image that never arrives leaves its box behind');
-eq(ids({ ...DEFAULTS, error: true }, 'fixed'), ['error-hidden'],
+eq(ids({ ...DEFAULTS, state: 'error' }, 'fixed'), ['error-hidden'],
   'and the error state has nowhere to be shown');
 
 // --- the rule that actually matters ---
@@ -59,7 +78,7 @@ eq(targetHeight(DEFAULTS, 'fixed'), 56, 'the fixed row is the height it was draw
 // Everything at once is not a layout problem any more. It is a different
 // design, and pretending otherwise is how you end up with a card nobody can read.
 const everything: Conditions =
-  { fontScale: 3.1, widthPt: 240, titleChars: 22, rtl: true, hasImage: false, error: true };
+  { fontScale: 3.1, widthPt: 240, titleChars: 22, rtl: true, hasImage: false, state: 'content' };
 check(!survives(everything, 'adaptive'),
   'even the adaptive layout breaks when every condition lands at once',
   ids(everything, 'adaptive').join(', '));

@@ -14,6 +14,18 @@
 
 export type Strategy = 'fixed' | 'adaptive';
 
+/**
+ * The four views a screen owes, not the one the comp shows.
+ *
+ * This is the axis that separates a junior from a senior more reliably than any
+ * layout trick: a designer hands over `content`, and the other three are left to
+ * whoever builds it. A row built to the comp has no skeleton and no empty
+ * state — it renders the same card with nothing in it and reads as a bug.
+ */
+export type ViewState = 'loading' | 'empty' | 'error' | 'content';
+
+export const STATES: ViewState[] = ['loading', 'empty', 'error', 'content'];
+
 export interface Conditions {
   /** Dynamic Type multiplier. 1 is default; 3.1 is the largest accessibility size. */
   fontScale: number;
@@ -25,17 +37,18 @@ export interface Conditions {
   rtl: boolean;
   /** Whether the image actually arrived. */
   hasImage: boolean;
-  /** Whether the row is showing an error instead of a value. */
-  error: boolean;
+  /** Which of the four views is being rendered. */
+  state: ViewState;
 }
 
 export const DEFAULTS: Conditions = {
-  fontScale: 1, widthPt: 390, titleChars: 7, rtl: false, hasImage: true, error: false,
+  fontScale: 1, widthPt: 390, titleChars: 7, rtl: false, hasImage: true, state: 'content',
 };
 
 export type FailureId =
   | 'title-truncated' | 'value-collides' | 'subtitle-clipped'
-  | 'mirrored-wrong' | 'image-hole' | 'error-hidden' | 'target-too-small';
+  | 'mirrored-wrong' | 'image-hole' | 'error-hidden' | 'target-too-small'
+  | 'no-skeleton' | 'no-empty-state';
 
 export interface Failure {
   id: FailureId;
@@ -82,6 +95,24 @@ export function stacks(c: Conditions, s: Strategy): boolean {
 
 export function evaluate(c: Conditions, s: Strategy): Failure[] {
   const out: Failure[] = [];
+
+  // The three states nobody draws. A layout built to the comp has one view and
+  // renders it whatever the data is: empty labels while loading, an empty card
+  // when there is nothing, and an error with nowhere to sit.
+  if (s === 'fixed') {
+    if (c.state === 'loading') {
+      return [{ id: 'no-skeleton', detail: 'the same card with empty labels, which reads as a bug rather than as loading' }];
+    }
+    if (c.state === 'empty') {
+      return [{ id: 'no-empty-state', detail: 'a blank card with a chevron that leads nowhere' }];
+    }
+    if (c.state === 'error') {
+      return [{ id: 'error-hidden', detail: 'the error has nowhere to go and is truncated to nothing' }];
+    }
+  }
+  // The adaptive build draws all four, so loading, empty and error are done.
+  if (s === 'adaptive' && c.state !== 'content') return [];
+
   const stacked = stacks(c, s);
 
   const icon = c.hasImage || s === 'fixed' ? ICON : 0;
@@ -122,9 +153,6 @@ export function evaluate(c: Conditions, s: Strategy): Failure[] {
   if (!c.hasImage && s === 'fixed') {
     out.push({ id: 'image-hole', detail: 'a forty-point empty square where the image never arrived' });
   }
-  if (c.error && s === 'fixed') {
-    out.push({ id: 'error-hidden', detail: 'the error message has nowhere to go and is truncated to nothing' });
-  }
   if (targetHeight(c, s) < 44) {
     out.push({ id: 'target-too-small', detail: 'the row is under the 44-point minimum' });
   }
@@ -139,12 +167,14 @@ export const survives = (c: Conditions, s: Strategy): boolean => evaluate(c, s).
 /** The six conditions the chapter throws at the card, in order. */
 export const TRIALS: { id: string; apply: (c: Conditions) => Conditions }[] = [
   { id: 'default',      apply: (c) => ({ ...c }) },
+  { id: 'loading',      apply: (c) => ({ ...c, state: 'loading' }) },
+  { id: 'empty',        apply: (c) => ({ ...c, state: 'empty' }) },
+  { id: 'error',        apply: (c) => ({ ...c, state: 'error' }) },
   { id: 'dynamicType',  apply: (c) => ({ ...c, fontScale: 3.1 }) },
   { id: 'splitView',    apply: (c) => ({ ...c, widthPt: 240 }) },
   { id: 'longString',   apply: (c) => ({ ...c, titleChars: 22 }) },
   { id: 'rtl',          apply: (c) => ({ ...c, rtl: true }) },
   { id: 'noImage',      apply: (c) => ({ ...c, hasImage: false }) },
-  { id: 'error',        apply: (c) => ({ ...c, error: true }) },
 ];
 
 /** How many of the trials each layout gets through untouched. */

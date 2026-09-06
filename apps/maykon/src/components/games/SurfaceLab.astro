@@ -7,7 +7,7 @@ const variants = ['fixed', 'adaptive'] as const;
 <div class="sf" data-sf data-copy={JSON.stringify(glass.failures)}>
   <p class="sf__lede">{glass.lede}</p>
 
-  <div class="sf__controls">
+  <div class="sf__controls" data-stress>
     <label class="sf__ctl sf__ctl--wide">
       <span class="sf__ctlk mono">{glass.dynamicType} <b data-out="scale">1.0×</b></span>
       <input type="range" min="1" max="3.1" step="0.1" value="1" data-cond="fontScale" />
@@ -26,10 +26,18 @@ const variants = ['fixed', 'adaptive'] as const;
         <button type="button" class="btn sf__t" data-cond="longString" aria-pressed="false">{glass.longString}</button>
         <button type="button" class="btn sf__t" data-cond="rtl" aria-pressed="false">{glass.rtl}</button>
         <button type="button" class="btn sf__t" data-cond="noImage" aria-pressed="false">{glass.noImage}</button>
-        <button type="button" class="btn sf__t" data-cond="error" aria-pressed="false">{glass.error}</button>
-        <button type="button" class="btn btn--primary" data-all>{glass.everything}</button>
         <button type="button" class="btn" data-reset>{glass.reset}</button>
       </div>
+    </div>
+  </div>
+
+  <div class="sf__states">
+    <span class="sf__ctlk mono">{glass.stateLabel}</span>
+    <div class="sf__row" role="tablist">
+      {(['loading', 'empty', 'error', 'content'] as const).map((st) => (
+        <button type="button" class="btn sf__st" role="tab" data-state={st}
+          aria-pressed={st === 'content' ? 'true' : 'false'}>{glass.states[st]}</button>
+      ))}
     </div>
   </div>
 
@@ -42,15 +50,61 @@ const variants = ['fixed', 'adaptive'] as const;
         </div>
 
         <div class="sf__stage">
-          <div class="sf__card" data-card={v}>
-            <span class="sf__avatar" data-avatar></span>
-            <span class="sf__text">
-              <b class="sf__title" data-title>BTC-USD</b>
-              <span class="sf__sub" data-sub>Long · 20 lots</span>
-              <span class="sf__err" data-err>{glass.errorText}</span>
-            </span>
-            <span class="sf__value" data-value>+1,240.50</span>
-            <span class="sf__chev" aria-hidden="true">›</span>
+          <div class="sf__view" data-view={`${v}:content`}>
+            <div class="sf__card" data-card={v}>
+              <span class="sf__avatar" data-avatar></span>
+              <span class="sf__text">
+                <b class="sf__title" data-title>BTC-USD</b>
+                <span class="sf__sub" data-sub>Long · 20 lots</span>
+              </span>
+              <span class="sf__value" data-value>+1,240.50</span>
+              <span class="sf__chev" aria-hidden="true">›</span>
+            </div>
+          </div>
+
+          <div class="sf__view" data-view={`${v}:loading`} hidden>
+            {v === 'fixed' ? (
+              <div class="sf__card sf__card--hollow"><span class="sf__avatar"></span><span class="sf__text"></span></div>
+            ) : (
+              <div class="sf__skeleton">
+                <span class="sf__bone sf__bone--avatar"></span>
+                <span class="sf__bones">
+                  <span class="sf__bone sf__bone--title"></span>
+                  <span class="sf__bone sf__bone--sub"></span>
+                </span>
+                <span class="sf__bone sf__bone--value"></span>
+              </div>
+            )}
+          </div>
+
+          <div class="sf__view" data-view={`${v}:empty`} hidden>
+            {v === 'fixed' ? (
+              <div class="sf__card sf__card--hollow"><span class="sf__chev" aria-hidden="true">›</span></div>
+            ) : (
+              <div class="sf__blank">
+                <span class="sf__blankicon" aria-hidden="true">◫</span>
+                <b class="sf__blanktitle">{glass.emptyTitle}</b>
+                <span class="sf__blanktext">{glass.emptyBody}</span>
+                <span class="btn btn--primary sf__blankcta">{glass.emptyCta}</span>
+              </div>
+            )}
+          </div>
+
+          <div class="sf__view" data-view={`${v}:error`} hidden>
+            {v === 'fixed' ? (
+              <div class="sf__card sf__card--hollow">
+                <span class="sf__avatar"></span>
+                <span class="sf__text"><span class="sf__errline">{glass.errorText}</span></span>
+                <span class="sf__chev" aria-hidden="true">›</span>
+              </div>
+            ) : (
+              <div class="sf__blank sf__blank--error">
+                <span class="sf__blankicon" aria-hidden="true">!</span>
+                <b class="sf__blanktitle">{glass.errorTitle}</b>
+                <span class="sf__blanktext">{glass.errorText}</span>
+                <span class="btn sf__blankcta">{glass.errorCta}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -74,7 +128,8 @@ const variants = ['fixed', 'adaptive'] as const;
 <style>
   .sf__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.4rem; }
 
-  .sf__controls { display: grid; gap: 1rem; margin-bottom: 1.6rem; }
+  .sf__controls { display: grid; gap: 1rem; margin-bottom: 1.6rem; transition: opacity .18s; }
+  .sf__controls[data-off] { opacity: .4; }
   .sf__ctl { display: grid; gap: .45rem; }
   .sf__ctlk { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-700); }
   .sf__ctlk b { color: var(--brand-500); font-weight: 500; }
@@ -89,11 +144,58 @@ const variants = ['fixed', 'adaptive'] as const;
   .sf__side[data-broken="0"] .sf__score { color: var(--ok); }
   .sf__side[data-broken]:not([data-broken="0"]) .sf__score { color: var(--fail); }
 
+  .sf__states { display: grid; gap: .45rem; margin: 0 0 1.4rem; }
+
+  /* The stage scrolls. A row at the largest accessibility size really is that
+     tall on a phone — the honest rendering is a tall row you scroll, not a
+     shrunken one that fits. */
   .sf__stage {
     margin-top: .6rem; padding: 1rem; border-radius: 10px;
     background: #06070a; border: 1px solid var(--line);
-    display: flex; justify-content: center; overflow: hidden;
+    display: flex; justify-content: center;
+    max-height: 340px; overflow-y: auto; overscroll-behavior: contain;
   }
+  .sf__view { width: 100%; display: flex; justify-content: center; }
+
+  /* A card rendering data it does not have. */
+  .sf__card--hollow { min-height: 56px; }
+  .sf__card--hollow .sf__text { min-height: 1.2em; }
+  .sf__errline { font-size: calc(13px * var(--scale)); color: var(--fail);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+  /* A skeleton: the shape of the answer, before the answer. */
+  .sf__skeleton {
+    width: var(--w, 390px); max-width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 12px;
+    background: var(--bg-800); border: 1px solid var(--line-2);
+  }
+  .sf__bones { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .sf__bone {
+    display: block; border-radius: 6px;
+    background: linear-gradient(90deg, var(--bg-600) 25%, var(--line-2) 37%, var(--bg-600) 63%);
+    background-size: 400% 100%;
+    animation: sf-shimmer 1.4s ease-in-out infinite;
+  }
+  .sf__bone--avatar { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; }
+  .sf__bone--title { width: 42%; height: 13px; }
+  .sf__bone--sub { width: 64%; height: 10px; }
+  .sf__bone--value { width: 78px; height: 15px; }
+  @keyframes sf-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+  /* Empty and error: a sentence, and something to do about it. */
+  .sf__blank {
+    width: var(--w, 390px); max-width: 100%;
+    display: grid; justify-items: center; gap: .5rem; text-align: center;
+    padding: 1.6rem 1.2rem; border-radius: 12px;
+    background: var(--bg-800); border: 1px dashed var(--line-2);
+  }
+  .sf__blank--error { border-style: solid; border-color: color-mix(in oklab, var(--fail) 45%, var(--line-2)); }
+  .sf__blankicon { font-size: 22px; color: var(--fg-700); line-height: 1; }
+  .sf__blank--error .sf__blankicon { color: var(--fail); }
+  .sf__blanktitle { font-size: 15px; color: var(--fg-100); }
+  .sf__blanktext { font-size: 13px; color: var(--fg-500); max-width: 30ch; }
+  .sf__blankcta { margin-top: .5rem; font-size: 12px; }
 
   /* The card is real. Nothing here simulates breakage — the fixed variant is
      built the way a comp is usually built, and it breaks on its own. */
@@ -112,7 +214,6 @@ const variants = ['fixed', 'adaptive'] as const;
   .sf__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
   .sf__title { font-size: calc(17px * var(--scale)); color: var(--fg-100); font-weight: 600; }
   .sf__sub { font-size: calc(13px * var(--scale)); color: var(--fg-500); }
-  .sf__err { font-size: calc(13px * var(--scale)); color: var(--fail); display: none; }
   .sf__value { font-size: calc(17px * var(--scale)); color: var(--ok); font-variant-numeric: tabular-nums; }
   .sf__chev { color: var(--fg-700); font-size: calc(18px * var(--scale)); }
 
@@ -135,8 +236,6 @@ const variants = ['fixed', 'adaptive'] as const;
   .sf__card[data-card="adaptive"][data-stacked] { flex-direction: column; align-items: flex-start; }
   .sf__card[data-card="adaptive"][data-stacked] .sf__value { align-self: flex-start; }
   .sf__card[data-card="adaptive"][data-noimage] .sf__avatar { display: none; }
-  .sf__card[data-card="adaptive"][data-error] .sf__sub { display: none; }
-  .sf__card[data-error] .sf__err { display: block; }
   .sf__card[data-rtl] { direction: rtl; }
   .sf__card[data-card="adaptive"][data-rtl] .sf__chev { transform: scaleX(-1); }
 
@@ -155,43 +254,56 @@ const variants = ['fixed', 'adaptive'] as const;
 </style>
 
 <script>
-  import { DEFAULTS, TRIALS, evaluate, stacks, type Conditions, type Strategy } from './layout';
+  import { DEFAULTS, TRIALS, evaluate, stacks, type Conditions, type Strategy, type ViewState } from './layout';
 
   const root = document.querySelector<HTMLElement>('[data-sf]');
   if (root) {
     const FAILCOPY: Record<string, string> = JSON.parse(root.dataset.copy || '{}');
     const LONG = 'Bitcoin / Dólar dos Estados Unidos';
     const SHORT = 'BTC-USD';
+    const VARIANTS: Strategy[] = ['fixed', 'adaptive'];
 
     let cond: Conditions = { ...DEFAULTS };
     const toggles = [...root.querySelectorAll<HTMLButtonElement>('.sf__t')];
     const widths = [...root.querySelectorAll<HTMLButtonElement>('[data-width]')];
+    const stateTabs = [...root.querySelectorAll<HTMLButtonElement>('[data-state]')];
     const scale = root.querySelector<HTMLInputElement>('[data-cond="fontScale"]')!;
+    const stress = [...toggles, ...widths, scale];
 
     function paintCard(v: Strategy) {
-      const card = root.querySelector<HTMLElement>(`[data-card="${v}"]`)!;
+      const card = root.querySelector<HTMLElement>(`[data-card="${v}"]`);
+      if (!card) return;
       card.style.setProperty('--scale', String(cond.fontScale));
       card.style.setProperty('--w', `${cond.widthPt}px`);
       card.toggleAttribute('data-rtl', cond.rtl);
-      card.toggleAttribute('data-error', cond.error);
       card.toggleAttribute('data-noimage', !cond.hasImage);
       card.toggleAttribute('data-stacked', stacks(cond, v));
       card.querySelector<HTMLElement>('[data-title]')!.textContent = cond.titleChars > 12 ? LONG : SHORT;
-      // The fixed card keeps the empty avatar box, which is the point.
       const avatar = card.querySelector<HTMLElement>('[data-avatar]')!;
-      avatar.style.background = cond.hasImage
-        ? '' : (v === 'fixed' ? 'var(--bg-600)' : '');
+      avatar.style.background = cond.hasImage ? '' : (v === 'fixed' ? 'var(--bg-600)' : '');
     }
 
     function render() {
       root.querySelector<HTMLElement>('[data-out="scale"]')!.textContent = `${cond.fontScale.toFixed(1)}×`;
-      for (const v of ['fixed', 'adaptive'] as Strategy[]) {
+
+      // Only the content view answers to type size and width; showing the
+      // stress controls as live on a skeleton would be a lie about what they do.
+      const onContent = cond.state === 'content';
+      for (const el of stress) el.toggleAttribute('disabled', !onContent);
+      root.querySelector<HTMLElement>('[data-stress]')?.toggleAttribute('data-off', !onContent);
+
+      for (const v of VARIANTS) {
+        for (const st of ['loading', 'empty', 'error', 'content'] as ViewState[]) {
+          root.querySelector<HTMLElement>(`[data-view="${v}:${st}"]`)!.hidden = st !== cond.state;
+        }
         paintCard(v);
+
         const fails = evaluate(cond, v);
         const side = root.querySelector<HTMLElement>(`[data-side="${v}"]`)!;
         side.dataset.broken = String(fails.length);
         const passed = TRIALS.filter((t) => evaluate(t.apply(DEFAULTS), v).length === 0).length;
         root.querySelector<HTMLElement>(`[data-score="${v}"]`)!.textContent = `${passed}/${TRIALS.length}`;
+
         const list = root.querySelector<HTMLElement>(`[data-fails="${v}"]`)!;
         list.textContent = '';
         if (!fails.length) {
@@ -225,22 +337,22 @@ const variants = ['fixed', 'adaptive'] as const;
         if (k === 'longString') cond = { ...cond, titleChars: on ? 22 : DEFAULTS.titleChars };
         if (k === 'rtl') cond = { ...cond, rtl: on };
         if (k === 'noImage') cond = { ...cond, hasImage: !on };
-        if (k === 'error') cond = { ...cond, error: on };
         render();
       });
     }
-    root.querySelector('[data-all]')!.addEventListener('click', () => {
-      cond = { fontScale: 3.1, widthPt: 240, titleChars: 22, rtl: true, hasImage: false, error: true };
-      scale.value = '3.1';
-      for (const b of toggles) b.setAttribute('aria-pressed', 'true');
-      for (const b of widths) b.setAttribute('aria-pressed', String(b.dataset.width === '240'));
-      render();
-    });
+    for (const b of stateTabs) {
+      b.addEventListener('click', () => {
+        cond = { ...cond, state: b.dataset.state as ViewState };
+        for (const o of stateTabs) o.setAttribute('aria-pressed', String(o === b));
+        render();
+      });
+    }
     root.querySelector('[data-reset]')!.addEventListener('click', () => {
       cond = { ...DEFAULTS };
       scale.value = '1';
       for (const b of toggles) b.setAttribute('aria-pressed', 'false');
       for (const b of widths) b.setAttribute('aria-pressed', String(b.dataset.width === '390'));
+      for (const b of stateTabs) b.setAttribute('aria-pressed', String(b.dataset.state === 'content'));
       render();
     });
 

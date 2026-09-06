@@ -280,10 +280,15 @@ export interface GlassGame {
   longString: string;
   rtl: string;
   noImage: string;
-  error: string;
-  everything: string;
   reset: string;
+  stateLabel: string;
+  states: { loading: string; empty: string; error: string; content: string };
   errorText: string;
+  errorTitle: string;
+  errorCta: string;
+  emptyTitle: string;
+  emptyBody: string;
+  emptyCta: string;
   variants: { fixed: string; adaptive: string };
   failures: Record<string, string>;
   swift: string;
