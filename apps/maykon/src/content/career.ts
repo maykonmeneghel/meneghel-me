@@ -79,7 +79,10 @@ export const publications: Publication[] = [
   { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', doi: '10.5185/amp.2019.1450',
     url: 'https://amp.iaamonline.org/article_16020.html',
     code: 'https://github.com/maykonmeneghel/PoC-Buckle-Device-ESP32' },
-  { id: 'inSilicoFes',    year: 2019, venue: "Master's dissertation, PUC-PR",
+  // The cover states the PPGTS programme; the degree it was submitted for is
+  // "Mestre em Bioengenharia", which is what the profile claims elsewhere.
+  { id: 'inSilicoFes',    year: 2019, venue: "M.Sc. dissertation in Bioengineering, PUC-PR",
+    url: 'https://archivum.grupomarista.org.br/pergamumweb/vinculos/000093/00009335.pdf',
     code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
   // The proceedings page states 19/01/2018 and ISBN 978-85-5722-065-2; the
   // year here had been 2019 and the venue was a topic rather than a venue.
