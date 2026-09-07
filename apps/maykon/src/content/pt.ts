@@ -237,7 +237,7 @@ export const pt: Content = {
     },
     publications: {
       title: 'Publicado e premiado',
-      lede: 'Seis artigos, e nenhum sobre mobile — e é justamente esse o ponto. Foi ali que eu aprendi a errar em público: a descrever um método com precisão suficiente para outra pessoa atacá-lo, receber o parecer e mudar a afirmação. Esse hábito vale mais num code review do que qualquer um dos resultados.',
+      lede: 'Seis trabalhos acadêmicos, três deles com revisão por pares, e nenhum sobre mobile — e é justamente esse o ponto. Foi ali que eu aprendi a errar em público: a descrever um método com precisão suficiente para outra pessoa atacá-lo, receber o parecer e mudar a afirmação. Esse hábito vale mais num code review do que qualquer um dos resultados.',
       read: 'ler o artigo',
       code: 'código',
       items: {
