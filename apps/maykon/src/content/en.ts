@@ -11,7 +11,7 @@ export const en: Content = {
     kicker: 'Senior Mobile Engineer · native iOS, macOS & visionOS · Flutter and the APIs behind them',
     name: 'Maykon Meneghel',
     headline: 'I ship native Apple apps, and the API they talk to.',
-    sub: 'Most CVs tell you what someone can do. This one lets you try it. There is one thing underneath all of it: a reading. I started by building the instrument that produces one — firmware, board, enclosure, buried in a field — and I have spent the seven years since on everything that happens to a number after it exists: arriving while it is still true, being stored, being found, being bet on, and reaching a screen inside 16.7 milliseconds. Every chapter is a working mini-game, and none of it leaves this page.',
+    sub: 'Most CVs tell you what someone can do. This one lets you try it. Underneath all of it is one thing: a reading. I built the instrument that makes one — firmware, board, enclosure, buried in a field — and I have spent the seven years since on everything that happens to a number afterwards. Every chapter below is a working mini-game.',
     proof: [
       'Tradx · my own product in Flutter, ~15k downloads across the Mac App Store and Microsoft Store',
       'Trainee to Senior in four years on a production Apple engagement',

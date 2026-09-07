@@ -11,7 +11,7 @@ export const es: Content = {
     kicker: 'Ingeniero Móvil Sénior · iOS, macOS y visionOS nativos · Flutter y las APIs detrás',
     name: 'Maykon Meneghel',
     headline: 'Entrego la app Apple nativa y la API con la que habla.',
-    sub: 'La mayoría de los CV te cuentan lo que alguien sabe hacer. Este te deja probarlo. Hay una sola cosa debajo de todo esto: una lectura. Empecé construyendo el instrumento que produce una — firmware, placa, carcasa, enterrado en un campo — y pasé los siete años siguientes en todo lo que le ocurre a un número después de existir: llegar mientras todavía es verdad, ser guardado, ser encontrado, ser apostado, y alcanzar una pantalla dentro de 16,7 milisegundos. Cada capítulo es un mini-juego que funciona, y nada de esto sale de esta página.',
+    sub: 'La mayoría de los CV te cuentan lo que alguien sabe hacer. Este te deja probarlo. Debajo de todo esto hay una sola cosa: una lectura. Construí el instrumento que produce una — firmware, placa, carcasa, enterrado en un campo — y pasé los siete años siguientes en todo lo que le ocurre a un número después. Cada capítulo de abajo es un mini-juego que funciona.',
     proof: [
       'Tradx · producto propio en Flutter, ~15 mil descargas sumando Mac App Store y Microsoft Store',
       'De trainee a sénior en cuatro años en un proyecto Apple en producción',
