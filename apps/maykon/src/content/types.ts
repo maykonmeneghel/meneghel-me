@@ -185,29 +185,6 @@ export interface PulseGame {
   hints: { socket: string; fast: string; poll: string; slow: string };
 }
 
-export interface FacetGame {
-  lede: string;
-  sourceLabel: string;
-  sources: Record<string, string>;
-  transformLabel: string;
-  axisBtn: string;
-  unitsBtn: string;
-  toleranceLabel: string;
-  /** Shown when the source arrived as triangles and the knob does nothing. */
-  toleranceBaked: string;
-  heightLabel: string;
-  trianglesLabel: string;
-  sizeLabel: string;
-  materialLabel: string;
-  materials: { pbr: string; flat: string };
-  warnings: {
-    axis: string; units: string; phong: string;
-    faceColour: string; overBudget: string; faceted: string;
-  };
-  cleanNote: string;
-  personLabel: string;
-}
-
 export interface MindGame {
   lede: string;
   paper: string;
@@ -408,7 +385,6 @@ export interface Content {
   thread: ThreadGame;
   service: ServiceGame;
   pulse: PulseGame;
-  facet: FacetGame;
   copper: CopperGame;
   steel: SteelGame;
   glass: GlassGame;
