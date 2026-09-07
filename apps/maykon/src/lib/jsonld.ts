@@ -55,7 +55,7 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
     '@type': 'SoftwareApplication',
     name: 'Tradx',
     applicationCategory: 'FinanceApplication',
-    operatingSystem: 'macOS',
+    operatingSystem: 'macOS, Windows',
     url: 'https://apps.apple.com/us/app/tradx/id6743033919',
     author: { '@id': `${site}/#maykon` },
   };
