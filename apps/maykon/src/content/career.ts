@@ -71,14 +71,20 @@ export interface Publication {
 export const publications: Publication[] = [
   { id: 'soilInstrument', year: 2016, venue: 'Control & Automation Engineering, PUC-PR' },
   { id: 'fesTool',        year: 2019, venue: '41st Annual International Conference of the IEEE EMBS',
-    url: 'https://ieeexplore.ieee.org/document/8857421',
+    doi: '10.1109/EMBC.2019.8857421',
+    // IEEE Xplore answers HTTP 420 and never renders the page. PubMed indexes
+    // the same paper, opens for everyone, and carries the DOI.
+    url: 'https://pubmed.ncbi.nlm.nih.gov/31946701/',
     code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
   { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', doi: '10.5185/amp.2019.1450',
     url: 'https://amp.iaamonline.org/article_16020.html',
     code: 'https://github.com/maykonmeneghel/PoC-Buckle-Device-ESP32' },
   { id: 'inSilicoFes',    year: 2019, venue: "Master's dissertation, PUC-PR",
     code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
-  { id: 'balanceModel',   year: 2019, venue: 'System identification / bioengineering' },
+  // The proceedings page states 19/01/2018 and ISBN 978-85-5722-065-2; the
+  // year here had been 2019 and the venue was a topic rather than a venue.
+  { id: 'balanceModel',   year: 2018, venue: 'V Congresso Brasileiro de Eletromiografia e Cinesiologia · X Simpósio de Engenharia Biomédica',
+    url: 'https://www.even3.com.br/anais/cobecseb/78906/' },
   { id: 'stockGan',       year: 2020, venue: 'Applied AI specialization, PUC-PR' },
 ];
 
