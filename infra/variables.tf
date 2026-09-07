@@ -27,3 +27,26 @@ variable "aws_profile" {
     Empty means the default credential chain, which is what CI uses.
   TEXT
 }
+
+# GitHub's OIDC subject claim carries immutable numeric ids alongside the names.
+# Find them with:
+#   gh api repos/OWNER/REPO --jq '{repo_id: .id, owner_id: .owner.id}'
+variable "github_owner" {
+  type    = string
+  default = "maykonmeneghel"
+}
+
+variable "github_owner_id" {
+  type    = number
+  default = 9310048
+}
+
+variable "github_repo_name" {
+  type    = string
+  default = "meneghel-me"
+}
+
+variable "github_repo_id" {
+  type    = number
+  default = 1360146385
+}

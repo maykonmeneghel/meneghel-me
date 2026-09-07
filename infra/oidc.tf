@@ -22,10 +22,28 @@ data "aws_iam_policy_document" "github_assume" {
       values   = ["sts.amazonaws.com"]
     }
     # Only this repository, and only on the default branch.
+    #
+    # GitHub now embeds immutable numeric ids in the subject claim, so what
+    # actually arrives is
+    #
+    #   repo:maykonmeneghel@9310048/meneghel-me@1360146385:ref:refs/heads/main
+    #
+    # and not the documented-everywhere repo:owner/repo:ref:... form. A policy
+    # written against the old shape is denied with "Not authorized to perform
+    # sts:AssumeRoleWithWebIdentity", which says nothing about why. The way to
+    # find out is CloudTrail: the failed event records the presented subject
+    # under userIdentity.principalId.
+    #
+    # Both shapes are accepted here so this does not break if GitHub varies it,
+    # and the ids are pinned rather than wildcarded — they are the reason the
+    # claim changed, and they survive a rename, which the names do not.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      values = [
+        "repo:${var.github_repo}:ref:refs/heads/main",
+        "repo:${var.github_owner}@${var.github_owner_id}/${var.github_repo_name}@${var.github_repo_id}:ref:refs/heads/main",
+      ]
     }
   }
 }
