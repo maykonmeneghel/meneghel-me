@@ -5,6 +5,13 @@
 expected_account_id = "000000000000"
 alert_email         = "you@example.com"
 
+# The person's own principal, so the MFA and cost fences attach to it.
+# For IAM Identity Center use the provisioned role:
+#   arn:aws:iam::000000000000:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_abc123
+# For an IAM user:
+#   arn:aws:iam::000000000000:user/maykon
+human_principal_arns = []
+
 # Optional. Defaults are 5 and 25.
 # monthly_budget_usd = 5
 # hard_stop_usd      = 25

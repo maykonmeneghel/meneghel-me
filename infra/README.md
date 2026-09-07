@@ -113,3 +113,36 @@ Terraform cannot do these; they are console-only, and the first two matter most:
 3. An alternate billing contact, so an alert still lands if you lose the inbox.
 4. A user in IAM Identity Center for day-to-day work.
 5. Cost Explorer, which takes about 24 hours to have anything to show.
+
+
+## The human principal
+
+`AdministratorAccess`, with two fences. That is not laziness, and the reasoning
+is in `human-access.tf`: this stack creates IAM roles and policies, so a policy
+narrow enough to be interesting is narrow enough to fail halfway through an
+apply — and a policy that can create roles can escalate to admin regardless.
+The deploys do not use this principal at all; they assume the OIDC role.
+
+**Fence one: no MFA, no access.** An explicit Deny on everything except the
+calls needed to enrol a device, so a fresh principal can still fix its own
+lockout.
+
+**Fence two: a cost fence.** An explicit Deny on EC2, RDS, EKS, ECS, SageMaker,
+Redshift, EMR, OpenSearch, Kinesis, Lightsail and the rest of the families that
+bill by the hour or by the gigabyte. Explicit Deny beats any Allow, including
+AdministratorAccess, so this is a structural limit rather than an alert — the
+services that produce frightening bills are simply not available. Three static
+sites need S3, CloudFront, Route 53 and ACM, and none of the rest.
+
+If a real need turns up — Lambda@Edge is the plausible one — take it out of the
+list in a commit, deliberately, rather than clicking around at the time.
+
+**Identity Center or an IAM user?** Identity Center, if you can face the setup:
+its credentials expire, and an IAM user's access keys sit on the laptop until
+somebody rotates them. Either works with the fences; put the permission set's
+provisioned role ARN in `human_principal_arns` for Identity Center, or the user
+ARN for an IAM user.
+
+**Bootstrap order.** Create the principal in the console with
+AdministratorAccess first, so there is something to run Terraform as. Then set
+`human_principal_arns` and apply, which attaches the fences to it.
