@@ -30,6 +30,30 @@ variable "human_principal_arns" {
   TEXT
 }
 
+variable "attach_mfa_fence" {
+  type        = bool
+  default     = true
+  description = <<-TEXT
+    Attach the MFA fence. Leave it on, but read this first, because it breaks
+    the obvious way of running Terraform.
+
+    aws:MultiFactorAuthPresent is not set at all on a long-lived IAM access
+    key, and BoolIfExists treats an absent key as a match — so the Deny fires
+    and an access key pair is refused everything. That is the intended
+    behaviour of the fence, not a bug in it, but it means `terraform apply`
+    with plain keys in the environment will fail on every call.
+
+    The fix is temporary credentials that carry the MFA context:
+
+      aws sts get-session-token \
+        --serial-number arn:aws:iam::<account>:mfa/<device> \
+        --token-code <six digits> --duration-seconds 43200
+
+    and export the three values it returns. IAM Identity Center avoids the
+    problem entirely, which is the strongest argument for it over an IAM user.
+  TEXT
+}
+
 # --- Fence 1: no MFA, no access -------------------------------------------
 # Nothing at all, including read, unless the session was authenticated with a
 # second factor. The exception is the handful of calls somebody needs in order
@@ -113,13 +137,17 @@ locals {
 }
 
 resource "aws_iam_user_policy_attachment" "fences_user" {
-  for_each   = toset(flatten([for u in local.human_users : ["${u}|mfa", "${u}|fence"]]))
+  for_each = toset(flatten([
+    for u in local.human_users : concat(["${u}|fence"], var.attach_mfa_fence ? ["${u}|mfa"] : [])
+  ]))
   user       = split("|", each.value)[0]
   policy_arn = endswith(each.value, "|mfa") ? aws_iam_policy.require_mfa.arn : aws_iam_policy.cost_fence.arn
 }
 
 resource "aws_iam_role_policy_attachment" "fences_role" {
-  for_each   = toset(flatten([for r in local.human_roles : ["${r}|mfa", "${r}|fence"]]))
+  for_each = toset(flatten([
+    for r in local.human_roles : concat(["${r}|fence"], var.attach_mfa_fence ? ["${r}|mfa"] : [])
+  ]))
   role       = split("|", each.value)[0]
   policy_arn = endswith(each.value, "|mfa") ? aws_iam_policy.require_mfa.arn : aws_iam_policy.cost_fence.arn
 }

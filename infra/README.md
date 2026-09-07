@@ -144,5 +144,27 @@ provisioned role ARN in `human_principal_arns` for Identity Center, or the user
 ARN for an IAM user.
 
 **Bootstrap order.** Create the principal in the console with
-AdministratorAccess first, so there is something to run Terraform as. Then set
-`human_principal_arns` and apply, which attaches the fences to it.
+AdministratorAccess first, so there is something to run Terraform as. Terraform
+cannot bootstrap itself. Then set `human_principal_arns` and apply, which
+attaches the fences to it.
+
+**The trap in the MFA fence.** `aws:MultiFactorAuthPresent` is not set at all on
+a long-lived IAM access key, and `BoolIfExists` treats an absent key as a match
+— so the Deny fires and a plain access key pair is refused everything, Terraform
+included. That is the fence working as designed, not a bug, but it means the
+obvious setup breaks the moment you apply it.
+
+Two ways through. Either take temporary credentials that carry the MFA context:
+
+```sh
+aws sts get-session-token \
+  --serial-number arn:aws:iam::<account>:mfa/<device> \
+  --token-code <six digits> --duration-seconds 43200
+```
+
+and export the three values it returns before running Terraform. Or use IAM
+Identity Center, whose sessions are temporary to begin with, which avoids the
+problem rather than working around it.
+
+`attach_mfa_fence = false` exists for the window between creating the user and
+having MFA-derived credentials working. Turn it back on.
