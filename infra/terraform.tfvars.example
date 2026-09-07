@@ -1,0 +1,10 @@
+# Copy to terraform.tfvars, which is gitignored. This repository is public.
+#
+# The account id is the lock: terraform refuses to plan against anything else,
+# which is what keeps this stack out of the account shared with a partner.
+expected_account_id = "000000000000"
+alert_email         = "you@example.com"
+
+# Optional. Defaults are 5 and 25.
+# monthly_budget_usd = 5
+# hard_stop_usd      = 25

@@ -59,3 +59,57 @@ itself does not move.
 Roughly **US$ 0.50–2.00/month**: the Route 53 hosted zone is a flat $0.50, S3
 storage for ~50 MB is pennies, and CloudFront traffic for a personal site sits
 inside the perpetual free tier. ACM certificates are free.
+
+
+## Money
+
+AWS has no hard spending cap. There is no switch that says "never charge me
+more than twenty dollars", and anybody who tells you otherwise is describing an
+alert. `guardrails.tf` is therefore two different things:
+
+**Things that tell you fast.** A zero-spend budget that fires the moment
+anything at all costs money — on a new account inside the free tier, the useful
+alarm is not "am I near the limit" but "did something start charging me". A
+monthly budget with alerts at 50%, 80% and 100% spent, plus a forecast alert,
+which is the one that buys time because it fires before the money is gone. And
+Cost Anomaly Detection, which catches the shape a fixed threshold misses: a
+service that has never cost anything suddenly costing a little.
+
+**One actual brake.** At `hard_stop_usd` a budget action attaches a Deny policy
+to the deploy role, so it can no longer create instances, databases, clusters,
+functions or buckets. Be clear about what that is: it stops a runaway from
+getting worse. It does not stop CloudFront serving traffic that already exists,
+because nothing in AWS does.
+
+The guardrails cost nothing. The first two budgets on an account are free and
+this creates exactly two; anomaly detection is free.
+
+Expected steady state for three static sites: a Route 53 hosted zone at fifty
+cents a month, and pennies of S3 and CloudFront. Under two dollars.
+
+## The account lock
+
+There is a second AWS account, shared with a business partner. The failure mode
+worth engineering against is not a wrong resource — it is a right resource in
+the wrong account, because credentials on a laptop are ambient and whichever
+profile happens to be exported is the one Terraform uses.
+
+So `account-guard.tf` holds a precondition on the caller's account id, and
+`expected_account_id` has no default. Point these credentials at any other
+account and the plan stops with the two ids printed side by side. It is a
+precondition rather than a `check` block on purpose: a check would print a
+warning and then create everything anyway.
+
+Set it in `terraform.tfvars`, copied from `terraform.tfvars.example`. That file
+is gitignored, and this repository is public.
+
+## Before the first apply
+
+Terraform cannot do these; they are console-only, and the first two matter most:
+
+1. **MFA on the root user**, then never sign in as root again.
+2. **Billing preferences → receive billing alerts**, which is what makes the
+   billing metric exist at all.
+3. An alternate billing contact, so an alert still lands if you lose the inbox.
+4. A user in IAM Identity Center for day-to-day work.
+5. Cost Explorer, which takes about 24 hours to have anything to show.
