@@ -16,3 +16,6 @@ dist/
 
 # Heavy raw assets stay local until curated
 assets/raw/
+
+# Internal working notes: family details and open questions, not for the public repo.
+docs/CONTENT-TODO.md
