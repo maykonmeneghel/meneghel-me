@@ -10,7 +10,7 @@ export interface Act {
 }
 
 /** 'hardware' lives on its own page; the rest are the main narrative. */
-export type Track = 'mobile' | 'platform' | 'ai' | 'hardware';
+export type Track = 'mobile' | 'platform' | 'ai' | 'spatial' | 'hardware';
 
 export interface Chapter {
   /** Which page and which act this chapter belongs to. The number shown in the
@@ -165,28 +165,47 @@ export interface LinkGame {
   hints: { open: string; halfway: string; safe: string };
 }
 
-export interface LedgerGame {
+export interface PulseGame {
   lede: string;
-  modeLabel: string;
-  modeGross: string;
-  modeNet: string;
-  price: string;
-  position: string;
-  equityLabel: string;
-  lockedLabel: string;
-  availableLabel: string;
-  flat: string;
-  buy: string;
-  sell: string;
-  reset: string;
+  transportLabel: string;
+  socket: string;
+  polling: string;
+  intervalLabel: string;
+  /** Keyed by the interval in milliseconds, so the model owns the list. */
+  intervals: Record<string, string>;
+  truthLabel: string;
+  screenLabel: string;
+  requestsLabel: string;
+  bytesLabel: string;
+  seenLabel: string;
+  behindLabel: string;
+  play: string;
   replay: string;
-  replayTitle: string;
-  grossLabel: string;
-  netLabel: string;
-  hintStart: string;
-  hintAccepted: string;
-  hintFunds: string;
-  hintReplay: string;
+  /** One per transport choice: socket, and polling fast, ordinary or slow. */
+  hints: { socket: string; fast: string; poll: string; slow: string };
+}
+
+export interface FacetGame {
+  lede: string;
+  sourceLabel: string;
+  sources: Record<string, string>;
+  transformLabel: string;
+  axisBtn: string;
+  unitsBtn: string;
+  toleranceLabel: string;
+  /** Shown when the source arrived as triangles and the knob does nothing. */
+  toleranceBaked: string;
+  heightLabel: string;
+  trianglesLabel: string;
+  sizeLabel: string;
+  materialLabel: string;
+  materials: { pbr: string; flat: string };
+  warnings: {
+    axis: string; units: string; phong: string;
+    faceColour: string; overBudget: string; faceted: string;
+  };
+  cleanNote: string;
+  personLabel: string;
 }
 
 export interface MindGame {
@@ -385,10 +404,11 @@ export interface Content {
   signal: SignalGame;
   swarm: SwarmGame;
   mind: MindGame;
-  ledger: LedgerGame;
   link: LinkGame;
   thread: ThreadGame;
   service: ServiceGame;
+  pulse: PulseGame;
+  facet: FacetGame;
   copper: CopperGame;
   steel: SteelGame;
   glass: GlassGame;

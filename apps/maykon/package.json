@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node src/components/games/mqtt.test.ts && node src/components/games/swarm.test.ts && node src/components/games/gan.test.ts && node src/components/games/execution.test.ts && node src/components/games/frame.test.ts && node src/components/games/layout.test.ts && node src/components/games/deeplink.test.ts && node src/components/games/dbindex.test.ts && node src/components/games/board.test.ts && node src/components/games/board3d.test.ts && node src/components/games/solid.test.ts && node src/components/games/strategy.test.ts && node src/components/games/splat.test.ts"
+    "test": "node src/components/games/mqtt.test.ts && node src/components/games/transport.test.ts && node src/components/games/usdz.test.ts && node src/components/games/swarm.test.ts && node src/components/games/gan.test.ts && node src/components/games/frame.test.ts && node src/components/games/layout.test.ts && node src/components/games/deeplink.test.ts && node src/components/games/dbindex.test.ts && node src/components/games/board.test.ts && node src/components/games/board3d.test.ts && node src/components/games/solid.test.ts && node src/components/games/strategy.test.ts && node src/components/games/splat.test.ts"
   },
   "dependencies": {
     "@meneghel/ui": "*",
