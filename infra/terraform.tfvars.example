@@ -5,6 +5,9 @@
 # Pin the profile so an exported AWS_PROFILE cannot pick the account.
 aws_profile = "your-profile-name"
 
+# aws ce get-anomaly-monitors --query 'AnomalyMonitors[?MonitorType==`DIMENSIONAL`].MonitorArn'
+anomaly_monitor_arn = "arn:aws:ce::000000000000:anomalymonitor/..."
+
 expected_account_id = "000000000000"
 alert_email         = "you@example.com"
 

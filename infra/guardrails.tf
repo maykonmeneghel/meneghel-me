@@ -87,17 +87,28 @@ resource "aws_budgets_budget" "monthly" {
 # --- 3. Spend that is out of character --------------------------------------
 # Free, and it catches the shape of a problem a fixed threshold misses: a
 # service that has never cost anything suddenly costing a little.
-resource "aws_ce_anomaly_monitor" "all_services" {
-  name              = "all-services"
-  monitor_type      = "DIMENSIONAL"
-  monitor_dimension = "SERVICE"
+# AWS creates a dimensional monitor on every account by default, and allows
+# exactly one — so this is consumed rather than created. Creating a second one
+# fails with "Limit exceeded on dimensional spend monitor creation", which is a
+# confusing way of saying "you already have the only one you are allowed".
+#
+# Find it with:
+#   aws ce get-anomaly-monitors --query 'AnomalyMonitors[?MonitorType==`DIMENSIONAL`].MonitorArn'
+#
+# There is no data source for it, so the ARN goes in terraform.tfvars.
+variable "anomaly_monitor_arn" {
+  type        = string
+  default     = ""
+  description = "ARN of the account's default dimensional anomaly monitor. Leave empty to skip the subscription."
 }
 
 resource "aws_ce_anomaly_subscription" "daily" {
+  count = var.anomaly_monitor_arn == "" ? 0 : 1
+
   name      = "anomalies-daily"
   frequency = "DAILY"
 
-  monitor_arn_list = [aws_ce_anomaly_monitor.all_services.arn]
+  monitor_arn_list = [var.anomaly_monitor_arn]
 
   subscriber {
     type    = "EMAIL"
