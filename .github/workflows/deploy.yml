@@ -14,7 +14,25 @@ permissions:
   contents: read
 
 jobs:
+  # The deploy used to build each app and publish it without a single test ever
+  # running, on the branch that goes straight to three live distributions. The
+  # suites gate it now: nothing reaches a bucket until they pass, once, before
+  # the matrix fans out.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+
   build-and-deploy:
+    needs: verify
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
