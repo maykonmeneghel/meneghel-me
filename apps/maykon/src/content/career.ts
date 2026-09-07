@@ -66,29 +66,36 @@ export interface Publication {
   url?: string;
   /** A repository that holds the thing the paper is about. */
   code?: string;
+  /**
+   * Whether this went through peer review. Three of the six did; the other
+   * three are academic work — an undergraduate project, a dissertation and a
+   * specialization project — which is not the same claim and should not be
+   * counted as if it were.
+   */
+  peerReviewed: boolean;
 }
 
 export const publications: Publication[] = [
-  { id: 'soilInstrument', year: 2016, venue: 'Control & Automation Engineering, PUC-PR' },
-  { id: 'fesTool',        year: 2019, venue: '41st Annual International Conference of the IEEE EMBS',
+  { id: 'soilInstrument', year: 2016, venue: 'Control & Automation Engineering, PUC-PR', peerReviewed: false },
+  { id: 'fesTool',        year: 2019, venue: '41st Annual International Conference of the IEEE EMBS', peerReviewed: true,
     doi: '10.1109/EMBC.2019.8857421',
     // IEEE Xplore answers HTTP 420 and never renders the page. PubMed indexes
     // the same paper, opens for everyone, and carries the DOI.
     url: 'https://pubmed.ncbi.nlm.nih.gov/31946701/',
     code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
-  { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', doi: '10.5185/amp.2019.1450',
+  { id: 'fallDetector',   year: 2019, venue: 'Advanced Materials Proceedings, 4(1), 40–45', peerReviewed: true, doi: '10.5185/amp.2019.1450',
     url: 'https://amp.iaamonline.org/article_16020.html',
     code: 'https://github.com/maykonmeneghel/PoC-Buckle-Device-ESP32' },
   // The cover states the PPGTS programme; the degree it was submitted for is
   // "Mestre em Bioengenharia", which is what the profile claims elsewhere.
-  { id: 'inSilicoFes',    year: 2019, venue: "M.Sc. dissertation in Bioengineering, PUC-PR",
+  { id: 'inSilicoFes',    year: 2019, venue: "M.Sc. dissertation in Bioengineering, PUC-PR", peerReviewed: false,
     url: 'https://archivum.grupomarista.org.br/pergamumweb/vinculos/000093/00009335.pdf',
     code: 'https://github.com/maykonmeneghel/EENM-Simulation-System' },
   // The proceedings page states 19/01/2018 and ISBN 978-85-5722-065-2; the
   // year here had been 2019 and the venue was a topic rather than a venue.
-  { id: 'balanceModel',   year: 2018, venue: 'V Congresso Brasileiro de Eletromiografia e Cinesiologia · X Simpósio de Engenharia Biomédica',
+  { id: 'balanceModel',   year: 2018, venue: 'V Congresso Brasileiro de Eletromiografia e Cinesiologia · X Simpósio de Engenharia Biomédica', peerReviewed: true,
     url: 'https://www.even3.com.br/anais/cobecseb/78906/' },
-  { id: 'stockGan',       year: 2020, venue: 'Applied AI specialization, PUC-PR' },
+  { id: 'stockGan',       year: 2020, venue: 'Applied AI specialization, PUC-PR', peerReviewed: false },
 ];
 
 export interface PressItem {
@@ -97,6 +104,8 @@ export interface PressItem {
   year: number;
   /** The article itself. Verified by opening it and finding the claim inside. */
   url: string;
+  /** The outlet's own headline, exactly as published. */
+  headline: string;
 }
 
 /**
@@ -118,10 +127,15 @@ export interface PressItem {
  */
 export const press: PressItem[] = [
   { id: 'hubli',    outlet: 'Apple Newsroom', year: 2021,
+    headline: 'Apple launches inaugural Entrepreneur Camp for Black Founders and Developers',
     url: 'https://www.apple.com/newsroom/2021/02/apple-launches-inaugural-entrepreneur-camp-for-black-founders-and-developers/' },
   { id: 'neonWave', outlet: 'MacMagazine',    year: 2020,
+    headline: 'Alunos da Apple Developer Academy criam app para ajudar comunidades carentes durante a pandemia',
     url: 'https://macmagazine.com.br/post/2020/04/07/alunos-da-apple-developer-academy-criam-app-para-ajudar-comunidades-carentes-durante-a-pandemia/' },
 ];
+
+/** How many of the six went through review, so the prose cannot drift from it. */
+export const peerReviewedCount = publications.filter((p) => p.peerReviewed).length;
 
 /** Convert [year, month] to a decimal year for positioning. */
 export const toDecimal = ([y, m]: [number, number]) => y + (m - 1) / 12;

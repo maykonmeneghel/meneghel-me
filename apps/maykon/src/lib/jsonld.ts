@@ -7,7 +7,7 @@
  * is already visible on the page — this restates it in a form a machine does
  * not have to infer from "It starts with a single pin".
  */
-import { careerItems, publications, ventures, allSkills } from '../content/career';
+import { careerItems, publications, press, ventures, allSkills } from '../content/career';
 import type { Content, Locale } from '../content';
 
 export const PROFILES = [
@@ -49,6 +49,7 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
     // Only roles with no end date, so the profile never claims a job he left.
     worksFor: open.map((i) => ({ '@type': 'Organization', name: i.org })),
     founder: ventures.map((v) => ({ '@type': 'Organization', name: v.name })),
+    subjectOf: press.map((a) => ({ '@type': 'NewsArticle', headline: a.headline, url: a.url })),
   };
 
   const app = {
@@ -70,6 +71,18 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
     ...(p.url ? { url: p.url } : {}),
   }));
 
+  // Coverage of him, stated with the outlet's own headline rather than with
+  // this site's description of it. The Apple piece names him in its body, which
+  // is the one claim here a screening model cannot get from anywhere else.
+  const coverage = press.map((a) => ({
+    '@type': 'NewsArticle',
+    headline: a.headline,
+    url: a.url,
+    datePublished: String(a.year),
+    publisher: { '@type': 'Organization', name: a.outlet },
+    about: { '@id': `${site}/#maykon` },
+  }));
+
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -85,6 +98,7 @@ export function personJsonLd(c: Content, locale: Locale, site: string, url: stri
       person,
       app,
       ...works,
+      ...coverage,
     ],
   };
 }

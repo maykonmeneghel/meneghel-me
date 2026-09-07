@@ -237,7 +237,7 @@ export const en: Content = {
     },
     publications: {
       title: 'Published and awarded',
-      lede: 'Six papers, and none of them about mobile — which is the point. They are where I learned to be wrong in public: to state a method precisely enough that somebody else can attack it, take the review, and change the claim. That habit is worth more in a code review than any of the results are.',
+      lede: 'Six pieces of academic work, three of them peer-reviewed, and none of them about mobile — which is the point. They are where I learned to be wrong in public: to state a method precisely enough that somebody else can attack it, take the review, and change the claim. That habit is worth more in a code review than any of the results are.',
       read: 'read the paper',
       code: 'source',
       items: {
