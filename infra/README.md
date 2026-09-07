@@ -168,3 +168,12 @@ problem rather than working around it.
 
 `attach_mfa_fence = false` exists for the window between creating the user and
 having MFA-derived credentials working. Turn it back on.
+
+**And a second trap underneath the first.** A passkey or security key is the
+better MFA for the console, and it cannot help the CLI at all: FIDO2 does not
+produce a six-digit code, so there is nothing to pass to `--token-code`. A user
+whose only MFA is a passkey has a console they can sign into and no way to get
+MFA-carrying credentials for Terraform.
+
+Register a virtual TOTP device as well — AWS allows eight per user. Passkey for
+the console, authenticator app for the command line.
