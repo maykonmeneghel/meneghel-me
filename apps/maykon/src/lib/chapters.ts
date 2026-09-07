@@ -4,7 +4,7 @@
  */
 import type { Chapter, Track } from '../content';
 
-export const MAIN_TRACKS: Track[] = ['mobile', 'platform', 'ai'];
+export const MAIN_TRACKS: Track[] = ['mobile', 'platform', 'ai', 'spatial'];
 
 const number = (list: Chapter[]): Chapter[] =>
   list.map((c, i) => ({ ...c, id: String(i + 1).padStart(2, '0') }));
@@ -20,7 +20,7 @@ export const hardwareChapters = (all: Chapter[]): Chapter[] =>
 /** Where each act divider goes: the first chapter of each track. */
 export const actAnchors = (all: Chapter[]): Record<Track, string | undefined> => {
   const out = {} as Record<Track, string | undefined>;
-  for (const t of ['mobile', 'platform', 'ai', 'hardware'] as Track[]) {
+  for (const t of [...MAIN_TRACKS, 'hardware'] as Track[]) {
     out[t] = all.find((c) => c.track === t)?.slug;
   }
   return out;

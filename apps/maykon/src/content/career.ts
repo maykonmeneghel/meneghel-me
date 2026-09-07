@@ -110,7 +110,7 @@ export interface SkillGroup { id: string; items: string[] }
 
 export const skillGroups: SkillGroup[] = [
   { id: 'ios', items: [
-    'Swift', 'SwiftUI', 'UIKit', 'Swift Concurrency', 'async/await', 'actors', 'Combine',
+    'Swift', 'SwiftUI', 'UIKit', 'visionOS', 'macOS', 'Swift Concurrency', 'async/await', 'actors', 'Combine',
     'MVVM', 'Coordinators', 'Clean Architecture', 'Dependency injection',
     'SwiftData', 'Core Data', 'URLSession', 'Swift Package Manager',
     'XCTest', 'XCUITest', 'Instruments', 'Xcode', 'App Store Connect', 'TestFlight',
@@ -147,7 +147,7 @@ export const skillGroups: SkillGroup[] = [
   { id: 'ai', items: [
     'Machine learning', 'PyTorch', 'TensorFlow', 'Keras', 'GANs', 'LSTM', 'Deep learning',
     'Feature selection', 'PCA', 'XGBoost', 'Gaussian Splatting', '3DGS', 'CUDA',
-    'Photogrammetry', 'Computer vision',
+    'Photogrammetry', 'Computer vision', 'USD / USDZ', 'Tessellation', '3D asset pipelines',
   ] },
   { id: 'embedded', items: [
     'Embedded C', 'ESP32', 'PIC18F4550', 'ATmega', 'PWM', 'ADC', 'MQTT', 'IoT',

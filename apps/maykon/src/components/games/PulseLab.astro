@@ -1,0 +1,277 @@
+---
+import type { Content } from '../../content';
+import { POLL_INTERVALS_MS } from './transport';
+
+interface Props { pulse: Content['pulse'] }
+const { pulse } = Astro.props;
+---
+<div class="pl" data-pl data-hints={JSON.stringify(pulse.hints)}
+  data-l-play={pulse.play} data-l-replay={pulse.replay}>
+  <p class="pl__lede">{pulse.lede}</p>
+
+  <div class="pl__row">
+    <span class="pl__rowk mono">{pulse.transportLabel}</span>
+    <button type="button" class="btn pl__t" data-transport="socket" aria-pressed="true">{pulse.socket}</button>
+    <button type="button" class="btn pl__t" data-transport="poll" aria-pressed="false">{pulse.polling}</button>
+  </div>
+
+  <div class="pl__row" data-intervals hidden>
+    <span class="pl__rowk mono">{pulse.intervalLabel}</span>
+    {POLL_INTERVALS_MS.map((ms, i) => (
+      <button type="button" class="btn pl__i" data-interval={ms} aria-pressed={i === 1 ? 'true' : 'false'}>
+        {pulse.intervals[String(ms)]}
+      </button>
+    ))}
+  </div>
+
+  <div class="pl__prices">
+    <div class="pl__price">
+      <span class="pl__pricek mono">{pulse.truthLabel}</span>
+      <span class="pl__pricev mono" data-truth>—</span>
+    </div>
+    <div class="pl__price pl__price--screen" data-screen-cell>
+      <span class="pl__pricek mono">{pulse.screenLabel}</span>
+      <span class="pl__pricev mono" data-screen>—</span>
+    </div>
+  </div>
+
+  <canvas class="pl__strip" data-strip width="960" height="96"
+    role="img" aria-label="Every tick the feed emitted, and which of them reached the client"></canvas>
+
+  <div class="pl__row">
+    <button type="button" class="btn btn--primary" data-play>{pulse.play}</button>
+    <span class="pl__clock mono" data-clock>0.0s</span>
+  </div>
+
+  <div class="readout">
+    <div class="readout__cell">
+      <span class="readout__k">{pulse.requestsLabel}</span>
+      <span class="readout__v" data-out="requests">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{pulse.bytesLabel}</span>
+      <span class="readout__v" data-out="bytes">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{pulse.seenLabel}</span>
+      <span class="readout__v" data-out="seen">—</span>
+    </div>
+    <div class="readout__cell">
+      <span class="readout__k">{pulse.behindLabel}</span>
+      <span class="readout__v" data-out="behind">—</span>
+    </div>
+  </div>
+
+  <p class="pl__hint" data-hint>{pulse.hints.socket}</p>
+</div>
+
+<style>
+  .pl__lede { color: var(--fg-500); font-size: var(--step-body); margin: 0 0 1.25rem; }
+
+  .pl__row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: 1rem; }
+  .pl__rowk {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fg-700); min-width: 6.5rem;
+  }
+  .pl__t[aria-pressed="true"], .pl__i[aria-pressed="true"] {
+    background: var(--bg-600); border-color: var(--brand-500); color: var(--fg-100);
+  }
+  .pl__i { font-size: 11px; padding: .32rem .6rem; }
+  .pl__clock { font-size: 11px; color: var(--fg-700); }
+
+  /* The two numbers are the whole argument: one is the market, one is what the
+     reader would have been looking at. Under a socket they stay together. */
+  .pl__prices { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: 1.25rem 0 .9rem; }
+  @media (max-width: 520px) { .pl__prices { grid-template-columns: 1fr; } }
+  .pl__price {
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg-900); padding: .8rem .9rem;
+    display: grid; gap: .3rem;
+  }
+  .pl__price--screen { transition: border-color .15s, background .15s; }
+  .pl__price--screen[data-behind="true"] {
+    border-color: color-mix(in oklab, var(--fail) 55%, transparent);
+    background: color-mix(in oklab, var(--fail) 8%, var(--bg-900));
+  }
+  .pl__pricek { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-700); }
+  .pl__pricev {
+    font-size: var(--step-2); color: var(--fg-100); font-variant-numeric: tabular-nums;
+  }
+  .pl__price--screen[data-behind="true"] .pl__pricev { color: var(--fail); }
+
+  .pl__strip {
+    width: 100%; height: auto; display: block; margin-bottom: 1.1rem;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--bg-900);
+  }
+
+  .pl__hint { margin-top: 1rem; font-size: var(--step-body); color: var(--fg-300); min-height: 4.6em; }
+</style>
+
+<script>
+  import {
+    ticks, deliveries, pollTimes, lastTickAt, seenTicks, staleness,
+    bytesPolling, bytesSocket, breakEvenIntervalMs, POLL_INTERVALS_MS,
+    type Tick, type Delivery,
+  } from './transport';
+
+  const root = document.querySelector<HTMLElement>('[data-pl]');
+  if (root) {
+    const WINDOW_MS = 60_000;
+    /** The minute is replayed in this many seconds of real time. */
+    const PLAY_MS = 9_000;
+
+    const strip = root.querySelector<HTMLCanvasElement>('[data-strip]')!;
+    const ctx = strip.getContext('2d')!;
+    const truthOut = root.querySelector<HTMLElement>('[data-truth]')!;
+    const screenOut = root.querySelector<HTMLElement>('[data-screen]')!;
+    const screenCell = root.querySelector<HTMLElement>('[data-screen-cell]')!;
+    const clockOut = root.querySelector<HTMLElement>('[data-clock]')!;
+    const hintOut = root.querySelector<HTMLElement>('[data-hint]')!;
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const intervalRow = root.querySelector<HTMLElement>('[data-intervals]')!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const hints: Record<string, string> = JSON.parse(root.dataset.hints!);
+
+    const feed: Tick[] = ticks(WINDOW_MS);
+    let transport: 'socket' | 'poll' = 'socket';
+    let interval: number = POLL_INTERVALS_MS[1];
+    let ds: Delivery[] = deliveries(feed, WINDOW_MS, null);
+    let raf = 0;
+
+    const fmt = (n: number) => n.toFixed(2);
+    const kb = (b: number) => `${(b / 1000).toFixed(1)} kB`;
+    const pct = (f: number) => `${Math.round(f * 100)}%`;
+
+    function fill(token: string, values: Record<string, string>): string {
+      return token.replace(/\{(\w+)\}/g, (_, k) => values[k] ?? `{${k}}`);
+    }
+
+    /** Every tick the feed emitted, with the ones that reached the client lit. */
+    function draw(playhead: number) {
+      const w = strip.width, h = strip.height;
+      const seen = new Set(ds.filter((d) => d.at <= playhead).map((d) => d.tick));
+      ctx.clearRect(0, 0, w, h);
+
+      // The lane the feed lives on, and the lane the client's view lives on.
+      ctx.fillStyle = '#12151c';
+      ctx.fillRect(0, 20, w, 2);
+      ctx.fillRect(0, 66, w, 2);
+
+      for (let i = 0; i < feed.length; i++) {
+        const x = (feed[i].t / WINDOW_MS) * (w - 6) + 3;
+        const past = feed[i].t <= playhead;
+        ctx.fillStyle = !past ? '#181c25' : seen.has(i) ? 'rgba(52,211,153,.9)' : 'rgba(248,113,113,.55)';
+        ctx.fillRect(x - 1.5, 8, 3, 26);
+      }
+
+      // Deliveries: what the client was actually handed, and when.
+      for (const d of ds) {
+        if (d.at > playhead) continue;
+        const x = (d.at / WINDOW_MS) * (w - 6) + 3;
+        ctx.fillStyle = 'rgba(96,165,250,.85)';
+        ctx.fillRect(x - 1.5, 56, 3, 26);
+      }
+
+      const px = (playhead / WINDOW_MS) * (w - 6) + 3;
+      ctx.fillStyle = 'rgba(255,255,255,.5)';
+      ctx.fillRect(px - 0.5, 4, 1, h - 8);
+    }
+
+    function stats() {
+      const s = staleness(feed, ds, WINDOW_MS);
+      const requests = transport === 'socket' ? 1 : pollTimes(WINDOW_MS, interval).length;
+      const bytes = transport === 'socket'
+        ? bytesSocket(WINDOW_MS, ds.length)
+        : bytesPolling(WINDOW_MS, interval);
+      return { s, requests, bytes, seen: seenTicks(ds) };
+    }
+
+    function paintStats() {
+      const { s, requests, bytes, seen } = stats();
+      const socketBytes = bytesSocket(WINDOW_MS, deliveries(feed, WINDOW_MS, null).length);
+
+      out('requests').textContent = String(requests);
+      out('requests').dataset.state = transport === 'socket' ? 'ok' : requests > 20 ? 'fail' : 'warn';
+      out('bytes').textContent = kb(bytes);
+      out('bytes').dataset.state = bytes <= socketBytes ? 'ok' : bytes > socketBytes * 3 ? 'fail' : 'warn';
+      out('seen').textContent = `${seen}/${feed.length}`;
+      out('seen').dataset.state = seen === feed.length ? 'ok' : seen < feed.length / 2 ? 'fail' : 'warn';
+      out('behind').textContent = pct(s.behindShare);
+      out('behind').dataset.state = s.behindShare < 0.1 ? 'ok' : s.behindShare > 0.5 ? 'fail' : 'warn';
+
+      const values = {
+        bytes: kb(bytes),
+        socketBytes: kb(socketBytes),
+        ratio: (bytes / socketBytes).toFixed(1),
+        requests: String(requests),
+        seen: String(seen),
+        missed: String(feed.length - seen),
+        emitted: String(feed.length),
+        behind: pct(s.behindShare),
+        stale: `${(s.meanWhileBehindMs / 1000).toFixed(1)}s`,
+        breakEven: `${(breakEvenIntervalMs(WINDOW_MS, deliveries(feed, WINDOW_MS, null).length) / 1000).toFixed(1)}s`,
+      };
+      const key = transport === 'socket'
+        ? 'socket'
+        : interval <= 1_000 ? 'fast' : interval >= 30_000 ? 'slow' : 'poll';
+      hintOut.textContent = fill(hints[key], values);
+    }
+
+    function frame(playhead: number) {
+      const current = lastTickAt(feed, playhead);
+      // What the client holds: the newest thing delivered so far.
+      let shown = -1;
+      for (const d of ds) { if (d.at <= playhead) shown = d.tick; else break; }
+
+      truthOut.textContent = current >= 0 ? fmt(feed[current].price) : '—';
+      screenOut.textContent = shown >= 0 ? fmt(feed[shown].price) : '—';
+      screenCell.dataset.behind = String(current > shown);
+      clockOut.textContent = `${(playhead / 1000).toFixed(1)}s`;
+      draw(playhead);
+    }
+
+    function reset() {
+      cancelAnimationFrame(raf);
+      ds = deliveries(feed, WINDOW_MS, transport === 'socket' ? null : interval);
+      playBtn.textContent = root!.dataset.lPlay!;
+      playBtn.disabled = false;
+      frame(0);
+      paintStats();
+    }
+
+    function play() {
+      cancelAnimationFrame(raf);
+      playBtn.disabled = true;
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / PLAY_MS);
+        frame(p * WINDOW_MS);
+        if (p < 1) { raf = requestAnimationFrame(step); return; }
+        playBtn.textContent = root!.dataset.lReplay!;
+        playBtn.disabled = false;
+      };
+      raf = requestAnimationFrame(step);
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-transport]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        transport = btn.dataset.transport as 'socket' | 'poll';
+        root.querySelectorAll('[data-transport]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        intervalRow.hidden = transport === 'socket';
+        reset();
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-interval]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        interval = Number(btn.dataset.interval);
+        root.querySelectorAll('[data-interval]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        transport = 'poll';
+        reset();
+      });
+    });
+
+    playBtn.addEventListener('click', play);
+    reset();
+  }
+</script>
