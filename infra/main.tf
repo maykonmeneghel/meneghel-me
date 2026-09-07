@@ -7,8 +7,14 @@ terraform {
   # backend "s3" {}
 }
 
+# The profile is pinned rather than inherited. AWS_PROFILE is ambient — it is
+# whatever the last shell exported — and this machine also holds credentials for
+# an account shared with a business partner. Pinning means an exported profile
+# cannot quietly become the one Terraform uses. Empty falls back to the normal
+# chain, so CI, which has no profiles, still works.
 provider "aws" {
-  region = var.region
+  region  = var.region
+  profile = var.aws_profile != "" ? var.aws_profile : null
   default_tags {
     tags = {
       Project   = "meneghel-me"
@@ -20,8 +26,9 @@ provider "aws" {
 # CloudFront only accepts certificates issued in us-east-1, regardless of
 # where everything else lives. This is the single most common first-time trap.
 provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
+  alias   = "us_east_1"
+  region  = "us-east-1"
+  profile = var.aws_profile != "" ? var.aws_profile : null
   default_tags {
     tags = {
       Project   = "meneghel-me"

@@ -2,6 +2,9 @@
 #
 # The account id is the lock: terraform refuses to plan against anything else,
 # which is what keeps this stack out of the account shared with a partner.
+# Pin the profile so an exported AWS_PROFILE cannot pick the account.
+aws_profile = "your-profile-name"
+
 expected_account_id = "000000000000"
 alert_email         = "you@example.com"
 

@@ -103,6 +103,16 @@ warning and then create everything anyway.
 Set it in `terraform.tfvars`, copied from `terraform.tfvars.example`. That file
 is gitignored, and this repository is public.
 
+There are two locks, not one, because they fail differently. `aws_profile` pins
+which credentials Terraform uses, so an exported `AWS_PROFILE` cannot decide the
+account — it fails before authenticating. `expected_account_id` checks who the
+credentials turned out to belong to, which catches the case where the pinned
+profile itself is pointed somewhere unexpected. Empty `aws_profile` falls back to
+the default chain, which is what CI needs.
+
+**This project uses the personal account only.** Not the shared one, not for a
+read-only plan, not to demonstrate anything.
+
 ## Before the first apply
 
 Terraform cannot do these; they are console-only, and the first two matter most:
