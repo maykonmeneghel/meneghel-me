@@ -91,16 +91,36 @@ export const publications: Publication[] = [
   { id: 'stockGan',       year: 2020, venue: 'Applied AI specialization, PUC-PR' },
 ];
 
+export interface PressItem {
+  id: string;
+  outlet: string;
+  year: number;
+  /** The article itself. Verified by opening it and finding the claim inside. */
+  url: string;
+}
+
 /**
- * No URLs here yet, and not for want of looking. Neither item could be found:
- * the 2021 Apple Newsroom piece on the Developer Academy names three apps and
- * Hubli is not one of them, and MacMagazine's site returns nothing for Neon
- * Wave. Both claims come from Maykon's own 2024 portfolio, so they stand — but
- * they stay unlinked until he produces the articles. See docs/CONTENT-TODO.md.
+ * Both items are linked now, and both were checked by reading the article
+ * rather than by trusting the portfolio they came from.
+ *
+ * The Apple piece had been looked for in the wrong place: an earlier pass
+ * checked a Developer Academy story, found three apps and no Hubli, and
+ * concluded the claim was unverifiable. The right article is the February 2021
+ * Entrepreneur Camp announcement, which names the app and names him inside it —
+ * "created by five Apple Developer Academy students in Brazil: Ailton Vieira,
+ * Gabriel Taques, Maykon Meneghel, Mariana Lech, and Rodolfo Diniz". It is
+ * dated 16 February 2021, not 2020.
+ *
+ * MacMagazine covers NeonWave — "um jogo de música inspirado na trilha sonora
+ * dos filmes, videogames e desenhos animados dos anos 1980", by the Academy
+ * developers in Curitiba. It does not name him; that the app is his is his own
+ * statement, which is what a personal site is for.
  */
-export const press = [
-  { id: 'hubli',    outlet: 'Apple Newsroom', year: 2020 },
-  { id: 'neonWave', outlet: 'MacMagazine',    year: 2020 },
+export const press: PressItem[] = [
+  { id: 'hubli',    outlet: 'Apple Newsroom', year: 2021,
+    url: 'https://www.apple.com/newsroom/2021/02/apple-launches-inaugural-entrepreneur-camp-for-black-founders-and-developers/' },
+  { id: 'neonWave', outlet: 'MacMagazine',    year: 2020,
+    url: 'https://macmagazine.com.br/post/2020/04/07/alunos-da-apple-developer-academy-criam-app-para-ajudar-comunidades-carentes-durante-a-pandemia/' },
 ];
 
 /** Convert [year, month] to a decimal year for positioning. */
