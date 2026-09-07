@@ -1,0 +1,38 @@
+
+# Nothing verified this repository before a merge: deploy.yml runs only on main,
+# and it builds without ever running the suites. So a pull request could be
+# green by virtue of nobody having looked, and a broken build reached the three
+# distributions before anyone found out.
+name: ci
+
+on:
+  pull_request:
+  push:
+    # main is the deploy branch; this keeps every other branch honest without
+    # duplicating a run for the commit a merge produces.
+    branches-ignore: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Both fan out across the workspaces, so a new app is covered the day it
+      # gains a script rather than the day somebody remembers this file.
+      - run: npm test
+      - run: npm run build
