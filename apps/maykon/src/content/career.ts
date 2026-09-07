@@ -147,7 +147,7 @@ export const skillGroups: SkillGroup[] = [
   { id: 'ai', items: [
     'Machine learning', 'PyTorch', 'TensorFlow', 'Keras', 'GANs', 'LSTM', 'Deep learning',
     'Feature selection', 'PCA', 'XGBoost', 'Gaussian Splatting', '3DGS', 'CUDA',
-    'Photogrammetry', 'Computer vision', 'USD / USDZ', 'Tessellation', '3D asset pipelines',
+    'Photogrammetry', 'Computer vision',
   ] },
   { id: 'embedded', items: [
     'Embedded C', 'ESP32', 'PIC18F4550', 'ATmega', 'PWM', 'ADC', 'MQTT', 'IoT',

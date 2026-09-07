@@ -9,7 +9,6 @@ import ClusterLab from './games/ClusterLab.astro';
 import GanLab from './games/GanLab.astro';
 import IndexLab from './games/IndexLab.astro';
 import PulseLab from './games/PulseLab.astro';
-import FacetLab from './games/FacetLab.astro';
 import BoardLab from './games/BoardLab.astro';
 import PartLab from './games/PartLab.astro';
 import SurfaceLab from './games/SurfaceLab.astro';
@@ -62,8 +61,6 @@ const recordNumber = String(chapters.length + 1).padStart(2, '0');
           <GanLab mind={c.mind} />
         ) : chapter.slug === 'pulse' ? (
           <PulseLab pulse={c.pulse} />
-        ) : chapter.slug === 'facet' ? (
-          <FacetLab facet={c.facet} />
         ) : chapter.slug === 'service' ? (
           <IndexLab service={c.service} />
         ) : chapter.slug === 'copper' ? (
