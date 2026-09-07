@@ -251,8 +251,9 @@ export const pt: Content = {
     },
     press: {
       title: 'Na imprensa',
+      read: 'ler a matéria',
       items: {
-        hubli: 'Hubli, criado na Apple Developer Academy, destacado pela Apple',
+        hubli: 'Hubli, criado na Apple Developer Academy — a Apple me nomeia entre os cinco criadores',
         neonWave: 'Neon Wave, jogo de iOS que saiu no MacMagazine',
       },
     },

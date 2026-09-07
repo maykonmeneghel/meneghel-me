@@ -62,7 +62,7 @@ export interface RecordSection {
     sectors: Record<string, string>;
   };
   publications: { title: string; lede: string; read: string; code: string; items: Record<string, string> };
-  press: { title: string; items: Record<string, string> };
+  press: { title: string; read: string; items: Record<string, string> };
   /** The line the page ends on. */
   closing: { line: string; note: string };
   /** Where a convinced reader goes next. The page had nowhere at all before. */
