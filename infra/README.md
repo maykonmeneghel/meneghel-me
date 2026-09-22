@@ -39,7 +39,7 @@ itself does not move.
 6. **Apply the rest**: `terraform apply`.
 7. **Wire up GitHub**: set repository secrets `AWS_DEPLOY_ROLE` (from
    `terraform output deploy_role_arn`) and `CF_DIST_ROOT` / `CF_DIST_MAYKON` /
-   `CF_DIST_MANU` from `terraform output sites`.
+   `CF_DIST_MANU` / `CF_DIST_GHEL` from `terraform output sites`.
 
 ## Gotchas worth knowing before you hit them
 

@@ -47,6 +47,9 @@ jobs:
           - app: manu
             bucket: manu-meneghel-me
             distribution_secret: CF_DIST_MANU
+          - app: ghel
+            bucket: ghel-meneghel-me
+            distribution_secret: CF_DIST_GHEL
     steps:
       - uses: actions/checkout@v4
 
