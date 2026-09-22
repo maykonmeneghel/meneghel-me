@@ -13,5 +13,6 @@ output "sites" {
     root   = { bucket = module.root_site.bucket, distribution = module.root_site.distribution_id }
     maykon = { bucket = module.maykon_site.bucket, distribution = module.maykon_site.distribution_id }
     manu   = { bucket = module.manu_site.bucket, distribution = module.manu_site.distribution_id }
+    ghel   = { bucket = module.ghel_site.bucket, distribution = module.ghel_site.distribution_id }
   }
 }

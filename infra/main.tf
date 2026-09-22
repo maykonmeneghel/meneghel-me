@@ -90,3 +90,11 @@ module "manu_site" {
   zone_id         = aws_route53_zone.root.zone_id
   certificate_arn = aws_acm_certificate_validation.wildcard.certificate_arn
 }
+
+# Legal pages (privacy, terms) shared by the apps.
+module "ghel_site" {
+  source          = "./modules/static-site"
+  domain          = "ghel.${var.root_domain}"
+  zone_id         = aws_route53_zone.root.zone_id
+  certificate_arn = aws_acm_certificate_validation.wildcard.certificate_arn
+}

@@ -60,6 +60,7 @@ data "aws_iam_policy_document" "deployer" {
       "arn:aws:s3:::${replace(var.root_domain, ".", "-")}",
       "arn:aws:s3:::maykon-${replace(var.root_domain, ".", "-")}",
       "arn:aws:s3:::manu-${replace(var.root_domain, ".", "-")}",
+      "arn:aws:s3:::ghel-${replace(var.root_domain, ".", "-")}",
     ]
   }
   statement {
@@ -68,6 +69,7 @@ data "aws_iam_policy_document" "deployer" {
       "arn:aws:s3:::${replace(var.root_domain, ".", "-")}/*",
       "arn:aws:s3:::maykon-${replace(var.root_domain, ".", "-")}/*",
       "arn:aws:s3:::manu-${replace(var.root_domain, ".", "-")}/*",
+      "arn:aws:s3:::ghel-${replace(var.root_domain, ".", "-")}/*",
     ]
   }
   statement {
