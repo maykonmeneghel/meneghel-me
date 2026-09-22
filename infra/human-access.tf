@@ -99,6 +99,11 @@ data "aws_iam_policy_document" "require_mfa" {
 # If a real need appears — Lambda@Edge is the plausible one, since CloudFront
 # Functions cover most cases but not all — remove it from this list
 # deliberately, in a commit, rather than by clicking around at the time.
+#
+# Lambda left the list on 2026-09-22 for the ghel-backend API (Pocket English
+# and the other apps). It bills per request with a permanent free tier, so the
+# budgets and the hard stop below remain the brake — the hard stop still denies
+# lambda:CreateFunction once the ceiling is crossed.
 data "aws_iam_policy_document" "cost_fence" {
   statement {
     sid    = "DenyServicesThisAccountDoesNotUse"
@@ -111,7 +116,6 @@ data "aws_iam_policy_document" "cost_fence" {
       "lightsail:*", "batch:*", "workspaces:*", "appstream:*",
       "globalaccelerator:*", "transfer:*", "fsx:*", "storagegateway:*",
       "connect:*", "chime:*", "mediaconvert:*", "medialive:*",
-      "lambda:CreateFunction", "lambda:UpdateFunctionCode",
     ]
     resources = ["*"]
   }
