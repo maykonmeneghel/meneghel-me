@@ -1,0 +1,300 @@
+---
+import Doc from '../layouts/Doc.astro';
+---
+<Doc
+  lang="pt-BR"
+  title="Política de Privacidade — Aplicativos de Maykon Christian Meneghel"
+  description="Como os aplicativos Pocket English, Neoos e Coach Management tratam dados pessoais, em conformidade com a LGPD."
+  altHref="/en/privacy/"
+  sibling={{ href: '/terms/', label: 'Termos de Uso' }}
+>
+  <h1>Política de Privacidade</h1>
+  <p class="meta">Vigente a partir de 22 de setembro de 2026.</p>
+
+  <p>
+    Esta Política explica quais dados pessoais os meus aplicativos tratam, para quê, com quem são
+    compartilhados e como você pode exercer os seus direitos. Ela foi escrita com base na Lei Geral de
+    Proteção de Dados Pessoais (Lei nº 13.709/2018, “LGPD”) e vale para todos os aplicativos listados
+    na seção 2.
+  </p>
+
+  <nav class="toc" aria-label="Sumário">
+    <strong>Sumário</strong>
+    <ol>
+      <li><a href="#controlador">Quem é o controlador</a></li>
+      <li><a href="#escopo">Aplicativos cobertos</a></li>
+      <li><a href="#geral">Dados tratados por todos os aplicativos</a></li>
+      <li><a href="#apps">Dados tratados por aplicativo</a></li>
+      <li><a href="#bases">Bases legais</a></li>
+      <li><a href="#compartilhamento">Compartilhamento e operadores</a></li>
+      <li><a href="#transferencia">Transferência internacional</a></li>
+      <li><a href="#retencao">Retenção e eliminação</a></li>
+      <li><a href="#seguranca">Segurança</a></li>
+      <li><a href="#direitos">Seus direitos</a></li>
+      <li><a href="#criancas">Crianças e adolescentes</a></li>
+      <li><a href="#alteracoes">Alterações desta Política</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="controlador">1. Quem é o controlador</h2>
+  <p>
+    O controlador dos dados pessoais tratados pelos aplicativos é <strong>Maykon Christian Meneghel</strong>,
+    pessoa física, que desenvolve e publica os aplicativos. Nesta Política, “eu”, “meu” e “minha” se referem a ele.
+  </p>
+  <p>
+    Contato para qualquer assunto de privacidade, inclusive o exercício dos direitos previstos na LGPD:
+    <a href="mailto:maykonmeneghel@icloud.com">maykonmeneghel@icloud.com</a>. Esse mesmo canal faz as vezes de
+    canal do encarregado pelo tratamento de dados.
+  </p>
+
+  <h2 id="escopo">2. Aplicativos cobertos</h2>
+  <ul>
+    <li><strong>Pocket English</strong> — aplicativo para iOS e Android de prática de inglês, com lições, áudio e conversação com inteligência artificial.</li>
+    <li><strong>Neoos</strong> — aplicativo de notícias do mercado financeiro, com análise de sentimento feita no próprio aparelho e acompanhamento de uma lista de ativos.</li>
+    <li><strong>Coach Management</strong> — aplicativo para computador (macOS) que ajuda profissionais de coaching de carreira a organizar clientes, sessões, avaliações e pagamentos.</li>
+  </ul>
+  <p>
+    Não vendo dados pessoais, e nenhum dos aplicativos exibe publicidade de terceiros nem rastreia você em
+    outros aplicativos ou sites para fins de publicidade.
+  </p>
+
+  <h2 id="geral">3. Dados tratados por todos os aplicativos</h2>
+  <h3>3.1. Dados técnicos de conexão</h3>
+  <p>
+    Sempre que um aplicativo se comunica com um servidor, o servidor recebe dados técnicos inerentes à conexão,
+    como endereço IP, data e hora da requisição e informações sobre o aparelho e o sistema operacional. Esses dados
+    podem ser registrados pelos provedores de infraestrutura para segurança e diagnóstico.
+  </p>
+  <h3>3.2. Compras e assinaturas</h3>
+  <p>
+    Compras dentro dos aplicativos são processadas pela <strong>Apple App Store</strong> ou pelo <strong>Google Play</strong>,
+    que atuam como controladores independentes dos dados de pagamento. Eu não recebo o número do seu cartão nem os seus
+    dados de cobrança. Os aplicativos recebem da loja apenas as informações necessárias para liberar o que foi comprado,
+    como o produto adquirido, o estado da compra e identificadores da transação.
+  </p>
+  <h3>3.3. Contato por e-mail</h3>
+  <p>
+    Se você me escrever, trato o seu endereço de e-mail e o conteúdo da mensagem para responder e, quando for o caso,
+    para atender ao seu pedido.
+  </p>
+
+  <h2 id="apps">4. Dados tratados por aplicativo</h2>
+
+  <h3 id="pocket-english">4.1. Pocket English</h3>
+  <p><strong>Conta anônima.</strong> Ao abrir o aplicativo pela primeira vez, é criada uma sessão anônima no Firebase
+    Authentication (Google). Ela gera um identificador aleatório de usuário que não está ligado ao seu nome, e-mail ou
+    telefone. O aplicativo não pede cadastro.</p>
+  <p><strong>Backend do aplicativo.</strong> O backend do Pocket English é hospedado na Amazon Web Services (AWS), na região
+    de São Paulo (sa-east-1). Ele armazena, associados ao identificador anônimo:</p>
+  <ul>
+    <li>o plano contratado e o saldo de créditos;</li>
+    <li>identificadores de compra e de transação fornecidos pela App Store ou pelo Google Play;</li>
+    <li>contadores de uso: sessões de prática iniciadas e uso diário de síntese de voz.</li>
+  </ul>
+  <p><strong>Prática de conversação com IA.</strong> Na função Praticar, as suas respostas (digitadas ou transcritas da
+    sua fala) e o contexto da lição — a situação, o seu nível de inglês e o vocabulário da lição — são enviados, por meio
+    do backend, à <strong>Anthropic</strong> (modelo Claude), que gera a resposta do interlocutor virtual e uma avaliação
+    curta. Não escreva dados pessoais nas suas respostas; o campo é livre e o texto é enviado como foi digitado ou transcrito.</p>
+  <p><strong>Síntese de voz.</strong> Frases das lições e as falas do interlocutor virtual podem ser enviadas, por meio do
+    backend, à <strong>ElevenLabs</strong> para gerar áudio. O áudio gerado fica guardado em cache no seu aparelho. Parte do áudio também
+    pode ser produzida pelo recurso de leitura de texto do próprio sistema operacional, sem envio a servidores.</p>
+  <p><strong>Reconhecimento de fala (microfone).</strong> Se você optar por responder por voz, o aplicativo pede acesso ao
+    microfone e usa o reconhecedor de fala do sistema operacional (Apple no iOS, Google no Android). Dependendo do aparelho
+    e das configurações, o áudio pode ser processado nos servidores da Apple ou do Google, de acordo com as políticas
+    deles. O aplicativo usa apenas o texto transcrito; ele não grava nem envia o áudio ao backend.</p>
+  <p><strong>Sugestões.</strong> Se você enviar uma sugestão pelas Configurações, o texto, o identificador anônimo e a
+    data e hora do envio são gravados no Cloud Firestore (Google). As regras de acesso do banco permitem criar
+    sugestões, mas não permitem que o aplicativo as leia, altere ou apague.</p>
+  <p><strong>Serviços do Firebase (Google).</strong> Além do Authentication e do Firestore, o aplicativo usa o
+    <strong>Firebase Analytics</strong>, que coleta automaticamente dados de uso e do aparelho (por exemplo, eventos de
+    abertura e de sessão, modelo do aparelho, sistema operacional, idioma, país aproximado e identificadores de instância do
+    aplicativo) para estatísticas agregadas; o <strong>Firebase App Check</strong>, que verifica, por meio do App Attest da
+    Apple ou do Play Integrity do Google, se as chamadas vêm de uma cópia legítima do aplicativo; e o
+    <strong>Firebase Remote Config</strong>, que entrega configurações ao aplicativo.</p>
+  <p><strong>Conteúdo das lições.</strong> As lições novas são baixadas do mesmo backend na AWS. Essa requisição usa o
+    identificador anônimo para autenticar a chamada e não envia outros dados além dos dados técnicos de conexão descritos
+    na seção 3.1.</p>
+  <p><strong>Dados guardados só no aparelho.</strong> Preferências (como nível de inglês e tema), lições concluídas, cópia das
+    lições e áudios em cache ficam no armazenamento local do aparelho e são apagados quando o aplicativo é desinstalado.</p>
+  <p><strong>Finalidades:</strong> fornecer as lições e a prática com IA, controlar plano, créditos e limites de uso,
+    liberar compras, proteger o serviço contra abuso, receber sugestões e entender de forma agregada como o aplicativo é usado.</p>
+
+  <h3 id="neoos">4.2. Neoos</h3>
+  <p><strong>Conta.</strong> Você pode entrar anonimamente, com um link enviado ao seu e-mail ou com a sua conta Google, por
+    meio do Firebase Authentication (Google). Quando você entra com e-mail ou Google, o aplicativo grava no Cloud Firestore o
+    seu endereço de e-mail, o nome de exibição (se houver) e a data do último acesso. Você pode alterar o nome de exibição no
+    Perfil.</p>
+  <p><strong>Portfólio.</strong> Os ativos que você adiciona à sua lista são gravados no Cloud Firestore, vinculados à sua
+    conta: código do ativo, nome, bolsa, tipo, país, moeda e data de inclusão. O aplicativo não pede quantidades, preços de
+    compra nem valores investidos.</p>
+  <p><strong>Notícias e dados de mercado.</strong> Para buscar notícias e informações dos ativos, o aplicativo consulta
+    diretamente os provedores <strong>EODHD</strong>, <strong>Finnhub</strong>, <strong>NewsAPI</strong> e
+    <strong>Marketaux</strong>. Nessas consultas são enviados os códigos (tickers) dos ativos do seu portfólio e os termos que
+    você digita na busca de ativos, além dos dados técnicos de conexão. O seu e-mail e o seu nome não são enviados a esses
+    provedores.</p>
+  <p><strong>Análise de sentimento.</strong> A classificação de sentimento das notícias é feita no próprio aparelho, por um
+    modelo de aprendizado de máquina embarcado no aplicativo. Os textos não são enviados a servidores para essa análise.</p>
+  <p><strong>Leitura de notícias.</strong> Ao abrir uma notícia, a página do veículo que a publicou é carregada dentro do
+    aplicativo, e imagens de pré-visualização e logotipos podem ser carregados de sites de terceiros. Se você usar a opção de
+    tradução, o endereço da notícia é aberto no Google Tradutor. Esses sites seguem as próprias políticas de privacidade.</p>
+  <p><strong>Outros serviços do Firebase.</strong> O aplicativo usa o <strong>Firebase Remote Config</strong> para receber
+    configurações e inclui o <strong>Firebase Cloud Messaging</strong>, que pode gerar um identificador do aparelho para o envio
+    de notificações caso você as permita.</p>
+  <p><strong>Assinatura.</strong> A assinatura é feita pela App Store ou pelo Google Play e verificada no próprio aparelho
+    com as informações fornecidas pela loja (seção 3.2).</p>
+  <p><strong>Finalidades:</strong> manter a sua conta e sincronizar o portfólio entre aparelhos, mostrar notícias e dados
+    relacionados aos seus ativos e liberar os recursos da assinatura.</p>
+
+  <h3 id="coach-management">4.3. Coach Management</h3>
+  <p><strong>Dados guardados no computador.</strong> Os dados que você cadastra — clientes (nome, telefone, endereço, data de
+    nascimento, profissão, redes sociais e observações), sessões, avaliações e pagamentos — ficam armazenados localmente no seu
+    computador, em um banco de dados local. Eles não são enviados para servidores meus, e você pode apagá-los no próprio
+    aplicativo.</p>
+  <p><strong>Papel do profissional.</strong> Em relação aos dados dos seus clientes, quem decide o que é cadastrado e para quê é
+    você, profissional que usa o aplicativo. Por isso, você é o controlador desses dados perante a LGPD e é responsável por ter
+    uma base legal para tratá-los e por informar os seus clientes.</p>
+  <p><strong>Sessões por vídeo (LiveKit).</strong> As sessões ao vivo usam a <strong>LiveKit Cloud</strong>. Durante a chamada, o
+    áudio e o vídeo dos participantes trafegam pela infraestrutura da LiveKit, e o nome do participante (por exemplo, o nome
+    do cliente) vai no token de acesso à sala. O cliente entra pelo navegador, pelo aplicativo LiveKit Meet, usando o link
+    gerado. O aplicativo não grava as sessões.</p>
+  <p><strong>Google Agenda e Google Meet.</strong> Se você conectar a sua conta Google, o aplicativo pede permissão de acesso à
+    sua agenda (Google Calendar) por OAuth e passa a criar eventos com link do Google Meet. O título do evento inclui o nome do
+    cliente. O acesso vale enquanto o aplicativo estiver aberto e pode ser revogado a qualquer momento nas configurações da sua
+    Conta Google.</p>
+  <p><strong>Ações que você inicia.</strong> Recursos como abrir um endereço no Google Maps, enviar o link da sessão por WhatsApp
+    ou pesquisar no Google Acadêmico abrem esses serviços com os dados necessários para a ação, e passam a valer as políticas
+    deles.</p>
+  <p><strong>Finalidades:</strong> permitir que você organize o seu trabalho de coaching, realize sessões por vídeo e agende
+    sessões na sua agenda.</p>
+
+  <h2 id="bases">5. Bases legais</h2>
+  <p>Trato dados pessoais com base nas hipóteses do art. 7º da LGPD, conforme a tabela abaixo.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Tratamento</th><th scope="col">Base legal</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Criar e manter a conta (anônima ou não), sincronizar o portfólio, fornecer lições, prática com IA, síntese de voz, notícias e sessões por vídeo</td><td>Execução de contrato ou de procedimentos preliminares a pedido do titular (art. 7º, V)</td></tr>
+        <tr><td>Controlar plano, créditos, compras e limites de uso</td><td>Execução de contrato (art. 7º, V)</td></tr>
+        <tr><td>Estatísticas de uso agregadas, prevenção de abuso e fraude, verificação de integridade do aplicativo e dados técnicos de conexão</td><td>Legítimo interesse (art. 7º, IX), sempre respeitando os seus direitos e expectativas</td></tr>
+        <tr><td>Uso do microfone, envio de sugestões, conexão com a Conta Google e notificações</td><td>Consentimento (art. 7º, I), que você dá ao permitir o recurso e pode revogar a qualquer momento</td></tr>
+        <tr><td>Guardar registros de compras e de solicitações de titulares</td><td>Cumprimento de obrigação legal ou regulatória (art. 7º, II) e exercício regular de direitos (art. 7º, VI)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="compartilhamento">6. Compartilhamento e operadores</h2>
+  <p>
+    Os aplicativos dependem de prestadores de serviço que tratam dados pessoais em meu nome (operadores) ou que atuam como
+    controladores independentes. Compartilho apenas o necessário para cada finalidade descrita acima.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Prestador</th><th scope="col">Aplicativo</th><th scope="col">Para quê</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Google (Firebase: Authentication, Firestore, Analytics, App Check, Remote Config, Cloud Messaging)</td><td>Pocket English, Neoos</td><td>Contas, banco de dados, estatísticas, proteção contra abuso, configurações e notificações</td></tr>
+        <tr><td>Amazon Web Services</td><td>Pocket English</td><td>Hospedagem do backend e do conteúdo das lições (região São Paulo)</td></tr>
+        <tr><td>Anthropic</td><td>Pocket English</td><td>Geração das respostas da prática de conversação</td></tr>
+        <tr><td>ElevenLabs</td><td>Pocket English</td><td>Síntese de voz</td></tr>
+        <tr><td>Apple e Google (reconhecimento de fala do sistema)</td><td>Pocket English</td><td>Transcrição da fala, quando você usa o microfone</td></tr>
+        <tr><td>EODHD, Finnhub, NewsAPI, Marketaux</td><td>Neoos</td><td>Notícias e dados de mercado</td></tr>
+        <tr><td>LiveKit</td><td>Coach Management</td><td>Transmissão de áudio e vídeo das sessões</td></tr>
+        <tr><td>Google (Calendar e Meet)</td><td>Coach Management</td><td>Criação de eventos e links de reunião, quando você conecta a sua conta</td></tr>
+        <tr><td>Apple (App Store) e Google (Google Play)</td><td>Todos</td><td>Distribuição dos aplicativos e processamento de pagamentos (controladores independentes)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Também posso compartilhar dados quando a lei exigir, por ordem de autoridade competente ou para defender direitos em
+    processo judicial, administrativo ou arbitral.
+  </p>
+
+  <h2 id="transferencia">7. Transferência internacional</h2>
+  <p>
+    Vários desses prestadores, entre eles Google, Anthropic, ElevenLabs, LiveKit e os provedores de notícias, processam dados
+    em servidores localizados fora do Brasil, principalmente nos Estados Unidos. Essas transferências são feitas com base nas
+    hipóteses do art. 33 da LGPD, como a necessidade para executar o serviço que você pediu e as garantias contratuais oferecidas
+    pelos prestadores, que podem incluir cláusulas-padrão de proteção de dados.
+  </p>
+
+  <h2 id="retencao">8. Retenção e eliminação</h2>
+  <ul>
+    <li><strong>Dados guardados só no aparelho ou no computador</strong> ficam sob o seu controle e são apagados quando você os
+      exclui no aplicativo ou o desinstala.</li>
+    <li><strong>Dados de conta, portfólio, plano, créditos e uso</strong> são mantidos enquanto a conta estiver ativa ou enquanto
+      forem necessários para prestar o serviço. Registros de compras podem ser mantidos pelo tempo necessário para cumprir obrigações
+      legais e para o exercício regular de direitos.</li>
+    <li><strong>Sugestões</strong> são mantidas até que você peça a eliminação.</li>
+    <li><strong>Dados de estatística do Firebase Analytics</strong> seguem o período de retenção configurado no Firebase.</li>
+    <li><strong>Textos enviados à Anthropic e à ElevenLabs</strong> são usados para gerar a resposta ou o áudio. O backend do Pocket
+      English armazena apenas os dados listados na seção 4.1; a retenção pelos próprios prestadores segue os termos deles.</li>
+  </ul>
+  <p>
+    Encerrada a finalidade, os dados são eliminados ou anonimizados, salvo quando a lei permitir ou exigir a sua conservação
+    (art. 16 da LGPD).
+  </p>
+
+  <h2 id="seguranca">9. Segurança</h2>
+  <p>
+    Adoto medidas técnicas e organizacionais razoáveis para proteger os dados, como comunicação criptografada (HTTPS/TLS),
+    autenticação das chamadas ao backend, verificação de integridade do aplicativo e regras de acesso restritivas no banco de dados.
+    Nenhum sistema é totalmente seguro; se você identificar uma vulnerabilidade, escreva para o e-mail de contato. Em caso de
+    incidente de segurança que possa causar risco ou dano relevante, comunicarei a Autoridade Nacional de Proteção de Dados (ANPD)
+    e os titulares afetados, nos termos do art. 48 da LGPD.
+  </p>
+
+  <h2 id="direitos">10. Seus direitos</h2>
+  <p>Nos termos do art. 18 da LGPD, você pode pedir, a qualquer momento:</p>
+  <ul>
+    <li>confirmação de que os seus dados são tratados;</li>
+    <li>acesso aos dados;</li>
+    <li>correção de dados incompletos, inexatos ou desatualizados;</li>
+    <li>anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a LGPD;</li>
+    <li>portabilidade dos dados a outro fornecedor, observada a regulamentação da ANPD;</li>
+    <li>eliminação dos dados tratados com base no seu consentimento;</li>
+    <li>informação sobre as entidades com as quais os dados foram compartilhados;</li>
+    <li>informação sobre a possibilidade de não dar consentimento e as consequências da negativa;</li>
+    <li>revogação do consentimento.</li>
+  </ul>
+  <p>
+    <strong>Como exercer:</strong> envie um e-mail para <a href="mailto:maykonmeneghel@icloud.com">maykonmeneghel@icloud.com</a>
+    dizendo qual aplicativo você usa e o que deseja. Posso pedir informações para confirmar que o pedido é seu. Como o Pocket English
+    usa apenas um identificador anônimo, pode ser necessário que você informe dados da compra (por exemplo, o recibo da loja) para
+    que eu localize os registros; sem isso, pode não ser possível associar os dados a você. No Neoos, informe o e-mail da conta.
+    Respondo no prazo previsto no art. 19 da LGPD.
+  </p>
+  <p>
+    Você também pode revogar permissões (microfone, notificações, acesso à Conta Google) nas configurações do aparelho ou da conta,
+    e tem o direito de apresentar reclamação à ANPD.
+  </p>
+  <p>
+    Os dados dos clientes cadastrados no Coach Management ficam no computador do profissional e não são acessíveis por mim; pedidos
+    sobre esses dados devem ser feitos diretamente ao profissional que os cadastrou.
+  </p>
+
+  <h2 id="criancas">11. Crianças e adolescentes</h2>
+  <p>
+    Os aplicativos não são direcionados a menores de 13 anos. O Pocket English tem classificação etária livre nas lojas, o que diz
+    respeito ao conteúdo, e não significa que o aplicativo seja voltado a crianças; recomendo que o uso por crianças seja feito com
+    supervisão dos pais ou responsáveis. O Neoos e o Coach Management são destinados a adultos. Não coleto intencionalmente dados
+    pessoais de crianças. Se você é pai, mãe ou responsável e acredita que uma criança forneceu dados pessoais sem o consentimento
+    exigido pelo art. 14 da LGPD, escreva para o e-mail de contato para que os dados sejam eliminados.
+  </p>
+
+  <h2 id="alteracoes">12. Alterações desta Política</h2>
+  <p>
+    Esta Política pode ser atualizada, por exemplo, quando um aplicativo ganhar um recurso novo ou trocar de prestador de serviço.
+    A data de vigência no topo indica a versão atual. Mudanças relevantes serão informadas nesta página e, quando apropriado, dentro
+    do aplicativo.
+  </p>
+
+  <h2 id="contato">13. Contato</h2>
+  <p>
+    Maykon Christian Meneghel<br />
+    <a href="mailto:maykonmeneghel@icloud.com">maykonmeneghel@icloud.com</a>
+  </p>
+</Doc>
