@@ -1,0 +1,123 @@
+---
+interface Props {
+  lang: 'pt-BR' | 'en';
+  title: string;
+  description: string;
+  /** Path of the same document in the other language, e.g. "/en/privacy/". */
+  altHref?: string;
+  /** Link to the sibling document in the same language. */
+  sibling?: { href: string; label: string };
+}
+
+const { lang, title, description, altHref, sibling } = Astro.props;
+const pt = lang === 'pt-BR';
+const home = '/';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const altLang = pt ? 'en' : 'pt-BR';
+const altLabel = pt ? 'English' : 'Português';
+const email = 'maykonmeneghel@icloud.com';
+---
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {altHref && <link rel="alternate" hreflang={lang} href={canonical} />}
+    {altHref && <link rel="alternate" hreflang={altLang} href={new URL(altHref, Astro.site).href} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#content">{pt ? 'Pular para o conteúdo' : 'Skip to content'}</a>
+    <header class="top">
+      <a class="brand" href={home}>Maykon Christian Meneghel</a>
+      <nav aria-label={pt ? 'Documentos' : 'Documents'}>
+        {sibling && <a href={sibling.href}>{sibling.label}</a>}
+        {altHref && <a href={altHref} hreflang={altLang} lang={altLang}>{altLabel}</a>}
+      </nav>
+    </header>
+    <main id="content">
+      <slot />
+    </main>
+    <footer class="foot">
+      <p>
+        {pt ? 'Dúvidas ou pedidos sobre seus dados:' : 'Questions or requests about your data:'}{' '}
+        <a href={`mailto:${email}`}>{email}</a>
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #fbfbfc;
+    --surface: #f1f2f5;
+    --fg: #16181d;
+    --muted: #515866;
+    --line: #dcdfe5;
+    --accent: #c8102e;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1015;
+      --surface: #171a21;
+      --fg: #eceef3;
+      --muted: #a3abbb;
+      --line: #2a2f3a;
+      --accent: #ff5c7a;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-underline-offset: 0.18em; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 1rem; top: 1rem; background: var(--bg); padding: .5rem .75rem; z-index: 10; }
+
+  .top, main, .foot { max-width: 46rem; margin-inline: auto; padding-inline: 1.25rem; }
+  .top {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: baseline; justify-content: space-between;
+    padding-block: 1.5rem 1rem; border-bottom: 1px solid var(--line);
+  }
+  .brand { color: var(--fg); font-weight: 650; text-decoration: none; letter-spacing: -0.01em; }
+  .top nav { display: flex; gap: 1rem; font-size: .95rem; }
+  main { padding-block: 2rem 3rem; }
+  .foot { border-top: 1px solid var(--line); padding-block: 1.5rem 3rem; color: var(--muted); font-size: .95rem; }
+
+  h1 { font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.4rem); line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 .5rem; }
+  h2 { font-size: 1.35rem; line-height: 1.25; margin: 2.5rem 0 .75rem; letter-spacing: -0.01em; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.1rem; margin: 1.75rem 0 .5rem; }
+  p, li { text-wrap: pretty; }
+  ul, ol { padding-left: 1.3rem; }
+  li + li { margin-top: .3rem; }
+  .meta { color: var(--muted); font-size: .95rem; margin: 0 0 1.5rem; }
+  .note {
+    background: var(--surface); border-left: 3px solid var(--accent);
+    padding: .85rem 1rem; border-radius: 0 8px 8px 0; margin: 1.25rem 0;
+  }
+  .toc { background: var(--surface); border-radius: 10px; padding: 1rem 1.25rem; margin: 1.5rem 0 2rem; }
+  .toc ol { margin: .25rem 0 0; }
+  .toc a { color: var(--fg); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; vertical-align: top; padding: .55rem .6rem; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; background: var(--surface); }
+  code { font-family: var(--mono); font-size: .9em; }
+  @media print {
+    .top nav, .skip { display: none; }
+    a { color: inherit; }
+  }
+</style>
