@@ -4,12 +4,12 @@ import Doc from '../../layouts/Doc.astro';
 <Doc
   lang="en"
   title="Privacy Policy — Apps by Maykon Christian Meneghel"
-  description="How the Pocket English, Neoos and Coach Management apps process personal data, in accordance with Brazil's LGPD."
+  description="How the Pocket English, Neoos, Coach Management and Pritaneu apps process personal data, in accordance with Brazil's LGPD."
   altHref="/privacy/"
   sibling={{ href: '/en/terms/', label: 'Terms of Use' }}
 >
   <h1>Privacy Policy</h1>
-  <p class="meta">Effective September 22, 2026.</p>
+  <p class="meta">Effective October 31, 2026.</p>
 
   <p>
     This Policy explains what personal data my apps process, why, with whom it is shared and how you can exercise your
@@ -53,6 +53,7 @@ import Doc from '../../layouts/Doc.astro';
     <li><strong>Pocket English</strong> — an iOS and Android app for practicing English, with lessons, audio and conversation practice with artificial intelligence.</li>
     <li><strong>Neoos</strong> — a financial-market news app with on-device sentiment analysis and a watchlist of assets.</li>
     <li><strong>Coach Management</strong> — a desktop app (macOS) that helps career coaches organize clients, sessions, assessments and payments.</li>
+    <li><strong>Pritaneu</strong> — an iPhone app that organizes companies' financial, legal and strategic documents and delivers them to the registered councils.</li>
   </ul>
   <p>
     I do not sell personal data, and none of the apps shows third-party advertising or tracks you across other apps or
@@ -159,6 +160,14 @@ import Doc from '../../layouts/Doc.astro';
     searching Google Scholar open those services with the data needed for the action, and their policies then apply.</p>
   <p><strong>Purposes:</strong> to let you organize your coaching work, hold video sessions and schedule sessions in your calendar.</p>
 
+  <h3 id="pritaneu">4.4. Pritaneu</h3>
+  <p><strong>Account.</strong> You sign in with your Google account through Firebase Authentication. I keep your name, e-mail, photo and account identifier, plus the dates of your first and last access, to identify who uses the app. Another user can only find your account by entering your full e-mail.</p>
+  <p><strong>Documents and financial data.</strong> What you share with the app (statements, receipts, invoices, contracts and plans) and what is extracted from it (names, tax IDs, bank accounts and amounts) is kept in private, encrypted storage on AWS, in the São Paulo region. Photos and scanned PDFs are read on the device before they are sent.</p>
+  <p><strong>Registered people.</strong> The app keeps the name and e-mail of council members and of those who work in each company. Whoever registers them must have a legal basis to do so and is the controller of that data.</p>
+  <p><strong>Who sees what.</strong> Only those with access to a company see its data. A council member only sees a count of open items until they receive the documents, which are sent only when an administrator triggers it.</p>
+  <p><strong>Statistics.</strong> <strong>Firebase Analytics</strong> records the screens opened and steps completed, tied to the account identifier, along with the usage and device data it collects automatically. I never send names, e-mails, documents or amounts to Analytics.</p>
+  <p><strong>Purposes:</strong> keeping the account, reading and organizing documents, building the monthly close, delivering it to councils and understanding how the app is used.</p>
+
   <h2 id="legal-bases">5. Legal bases</h2>
   <p>I process personal data under the legal bases of article 7 of the LGPD, as shown below.</p>
   <div class="table-wrap">
@@ -187,8 +196,8 @@ import Doc from '../../layouts/Doc.astro';
         <tr><th scope="col">Provider</th><th scope="col">App</th><th scope="col">Purpose</th></tr>
       </thead>
       <tbody>
-        <tr><td>Google (Firebase: Authentication, Firestore, Analytics, App Check, Remote Config, Cloud Messaging)</td><td>Pocket English, Neoos</td><td>Accounts, database, statistics, abuse protection, settings and notifications</td></tr>
-        <tr><td>Amazon Web Services</td><td>Pocket English</td><td>Hosting the backend and lesson content (São Paulo region)</td></tr>
+        <tr><td>Google (Firebase: Authentication, Firestore, Analytics, App Check, Remote Config, Cloud Messaging)</td><td>Pocket English, Neoos, Pritaneu</td><td>Accounts, database, statistics, abuse protection, settings and notifications</td></tr>
+        <tr><td>Amazon Web Services</td><td>Pocket English, Pritaneu</td><td>Hosting the backend and lesson content (São Paulo region) and storage of Pritaneu documents</td></tr>
         <tr><td>Anthropic</td><td>Pocket English</td><td>Generating conversation-practice replies</td></tr>
         <tr><td>ElevenLabs</td><td>Pocket English</td><td>Speech synthesis</td></tr>
         <tr><td>Apple and Google (system speech recognition)</td><td>Pocket English</td><td>Transcribing speech when you use the microphone</td></tr>
@@ -219,6 +228,7 @@ import Doc from '../../layouts/Doc.astro';
     <li><strong>Account, portfolio, plan, credit and usage data</strong> is kept while the account is active or while needed to provide
       the service. Purchase records may be kept as long as needed to meet legal obligations and for the regular exercise of rights.</li>
     <li><strong>Suggestions</strong> are kept until you ask for them to be deleted.</li>
+    <li><strong>Pritaneu documents and data</strong> are kept while the company uses the app or until an administrator asks for deletion, unless the law requires keeping them. Old file versions are erased within 90 days.</li>
     <li><strong>Firebase Analytics data</strong> follows the retention period configured in Firebase.</li>
     <li><strong>Text sent to Anthropic and ElevenLabs</strong> is used to generate the reply or the audio. The Pocket English backend
       stores only the data listed in section 4.1; retention by the providers themselves follows their own terms.</li>

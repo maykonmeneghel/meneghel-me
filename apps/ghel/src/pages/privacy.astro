@@ -4,12 +4,12 @@ import Doc from '../layouts/Doc.astro';
 <Doc
   lang="pt-BR"
   title="Política de Privacidade — Aplicativos de Maykon Christian Meneghel"
-  description="Como os aplicativos Pocket English, Neoos e Coach Management tratam dados pessoais, em conformidade com a LGPD."
+  description="Como os aplicativos Pocket English, Neoos, Coach Management e Pritaneu tratam dados pessoais, em conformidade com a LGPD."
   altHref="/en/privacy/"
   sibling={{ href: '/terms/', label: 'Termos de Uso' }}
 >
   <h1>Política de Privacidade</h1>
-  <p class="meta">Vigente a partir de 22 de setembro de 2026.</p>
+  <p class="meta">Vigente a partir de 31 de outubro de 2026.</p>
 
   <p>
     Esta Política explica quais dados pessoais os meus aplicativos tratam, para quê, com quem são
@@ -53,6 +53,7 @@ import Doc from '../layouts/Doc.astro';
     <li><strong>Pocket English</strong> — aplicativo para iOS e Android de prática de inglês, com lições, áudio e conversação com inteligência artificial.</li>
     <li><strong>Neoos</strong> — aplicativo de notícias do mercado financeiro, com análise de sentimento feita no próprio aparelho e acompanhamento de uma lista de ativos.</li>
     <li><strong>Coach Management</strong> — aplicativo para computador (macOS) que ajuda profissionais de coaching de carreira a organizar clientes, sessões, avaliações e pagamentos.</li>
+    <li><strong>Pritaneu</strong> — aplicativo para iPhone que organiza os documentos financeiros, jurídicos e estratégicos de empresas e os entrega aos conselhos cadastrados.</li>
   </ul>
   <p>
     Não vendo dados pessoais, e nenhum dos aplicativos exibe publicidade de terceiros nem rastreia você em
@@ -168,6 +169,14 @@ import Doc from '../layouts/Doc.astro';
   <p><strong>Finalidades:</strong> permitir que você organize o seu trabalho de coaching, realize sessões por vídeo e agende
     sessões na sua agenda.</p>
 
+  <h3 id="pritaneu">4.4. Pritaneu</h3>
+  <p><strong>Conta.</strong> Você entra com a sua conta Google, pelo Firebase Authentication. Guardo o seu nome, e-mail, foto e identificador da conta, além das datas do primeiro e do último acesso, para identificar quem usa o aplicativo. Outro usuário só encontra a sua conta informando o seu e-mail completo.</p>
+  <p><strong>Documentos e dados financeiros.</strong> O que você compartilha com o aplicativo (extratos, comprovantes, notas fiscais, contratos e planejamentos) e o que é extraído deles (nomes, CPF ou CNPJ, contas bancárias e valores) ficam em armazenamento privado e criptografado na AWS, na região de São Paulo. Fotos e PDFs digitalizados são lidos no próprio aparelho antes do envio.</p>
+  <p><strong>Pessoas cadastradas.</strong> O aplicativo guarda o nome e o e-mail dos membros de conselhos e de quem trabalha em cada empresa. Quem faz o cadastro responde por ter base legal para isso e, para esses dados, é o controlador.</p>
+  <p><strong>Quem vê o quê.</strong> Só quem tem acesso à empresa vê os dados dela. Um membro de conselho vê apenas a contagem de pendências, até receber os documentos, que só são enviados quando um administrador aciona o envio.</p>
+  <p><strong>Estatísticas.</strong> O <strong>Firebase Analytics</strong> registra as telas abertas e as etapas concluídas, ligadas ao identificador da conta, além dos dados de uso e do aparelho coletados automaticamente. Nunca envio nomes, e-mails, documentos ou valores ao Analytics.</p>
+  <p><strong>Finalidades:</strong> manter a conta, ler e organizar os documentos, montar o fechamento do mês, entregá-lo aos conselhos e entender como o aplicativo é usado.</p>
+
   <h2 id="bases">5. Bases legais</h2>
   <p>Trato dados pessoais com base nas hipóteses do art. 7º da LGPD, conforme a tabela abaixo.</p>
   <div class="table-wrap">
@@ -196,8 +205,8 @@ import Doc from '../layouts/Doc.astro';
         <tr><th scope="col">Prestador</th><th scope="col">Aplicativo</th><th scope="col">Para quê</th></tr>
       </thead>
       <tbody>
-        <tr><td>Google (Firebase: Authentication, Firestore, Analytics, App Check, Remote Config, Cloud Messaging)</td><td>Pocket English, Neoos</td><td>Contas, banco de dados, estatísticas, proteção contra abuso, configurações e notificações</td></tr>
-        <tr><td>Amazon Web Services</td><td>Pocket English</td><td>Hospedagem do backend e do conteúdo das lições (região São Paulo)</td></tr>
+        <tr><td>Google (Firebase: Authentication, Firestore, Analytics, App Check, Remote Config, Cloud Messaging)</td><td>Pocket English, Neoos, Pritaneu</td><td>Contas, banco de dados, estatísticas, proteção contra abuso, configurações e notificações</td></tr>
+        <tr><td>Amazon Web Services</td><td>Pocket English, Pritaneu</td><td>Hospedagem do backend e do conteúdo das lições (região São Paulo) e armazenamento dos documentos do Pritaneu</td></tr>
         <tr><td>Anthropic</td><td>Pocket English</td><td>Geração das respostas da prática de conversação</td></tr>
         <tr><td>ElevenLabs</td><td>Pocket English</td><td>Síntese de voz</td></tr>
         <tr><td>Apple e Google (reconhecimento de fala do sistema)</td><td>Pocket English</td><td>Transcrição da fala, quando você usa o microfone</td></tr>
@@ -229,6 +238,7 @@ import Doc from '../layouts/Doc.astro';
       forem necessários para prestar o serviço. Registros de compras podem ser mantidos pelo tempo necessário para cumprir obrigações
       legais e para o exercício regular de direitos.</li>
     <li><strong>Sugestões</strong> são mantidas até que você peça a eliminação.</li>
+    <li><strong>Documentos e dados do Pritaneu</strong> são mantidos enquanto a empresa usar o aplicativo ou até que um administrador peça a eliminação, salvo obrigação legal de guarda. Versões antigas de arquivos são apagadas em até 90 dias.</li>
     <li><strong>Dados de estatística do Firebase Analytics</strong> seguem o período de retenção configurado no Firebase.</li>
     <li><strong>Textos enviados à Anthropic e à ElevenLabs</strong> são usados para gerar a resposta ou o áudio. O backend do Pocket
       English armazena apenas os dados listados na seção 4.1; a retenção pelos próprios prestadores segue os termos deles.</li>
