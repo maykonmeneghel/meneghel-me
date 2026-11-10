@@ -111,13 +111,25 @@ data "aws_iam_policy_document" "cost_fence" {
     actions = [
       "ec2:*", "rds:*", "eks:*", "ecs:*", "elasticache:*",
       "redshift:*", "emr:*", "elasticmapreduce:*", "sagemaker:*",
-      "bedrock:*", "opensearch:*", "es:*", "neptune-db:*",
+      "opensearch:*", "es:*", "neptune-db:*",
       "kafka:*", "kinesis:*", "glue:*", "athena:*", "quicksight:*",
       "lightsail:*", "batch:*", "workspaces:*", "appstream:*",
       "globalaccelerator:*", "transfer:*", "fsx:*", "storagegateway:*",
       "connect:*", "chime:*", "mediaconvert:*", "medialive:*",
     ]
     resources = ["*"]
+  }
+
+  # Bedrock left the blanket deny on 2026-11-09 for one model only: Titan Text
+  # Embeddings V2 in São Paulo, which Pritaneu uses to index each company's
+  # documents (billed per token, about US$ 0.02 per million). Everything else
+  # in Bedrock stays denied. The API Lambda's own role is not fenced here; this
+  # lets a person index the history and test from the laptop.
+  statement {
+    sid           = "DenyBedrockButEmbeddings"
+    effect        = "Deny"
+    actions       = ["bedrock:*"]
+    not_resources = ["arn:aws:bedrock:sa-east-1::foundation-model/amazon.titan-embed-text-v2:0"]
   }
 }
 
